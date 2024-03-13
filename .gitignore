@@ -9,7 +9,7 @@ pyvenv.cfg
 finder.txt
 .DS_STORE
 /.vscode/
-venv/
+.venv/
 /dist/
 /site/
 .coverage
