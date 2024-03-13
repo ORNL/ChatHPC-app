@@ -35,6 +35,7 @@ Issues = "https://code.ornl.gov/7ry/python-project-template/-/issues"
 Source = "https://code.ornl.gov/7ry/python-project-template"
 
 [project.scripts]
+python-project-template-add1 = "python_project_template.add:main"
 
 [tool.hatch.version]
 path = "src/python_project_template/__about__.py"

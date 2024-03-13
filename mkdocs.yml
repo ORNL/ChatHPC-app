@@ -1,6 +1,7 @@
 site_name: Python Project Template
 nav:
   - index.md
+  - api.md
 
 theme:
   name: material
