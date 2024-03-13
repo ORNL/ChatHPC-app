@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "python-project-template"
 dynamic = ["version"]
-description = ''
+description = "Example python project which can be used as a template to create pure python projects with CI and documentation."
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = []
@@ -25,13 +25,29 @@ classifiers = [
 ]
 dependencies = []
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [project.urls]
-Documentation = "https://github.com/unknown/python-project-template#readme"
-Issues = "https://github.com/unknown/python-project-template/issues"
-Source = "https://github.com/unknown/python-project-template"
+Documentation = "https://code.ornl.gov/7ry/python-project-template#readme"
+Homepage = "https://code.ornl.gov/7ry/python-project-template"
+Issues = "https://code.ornl.gov/7ry/python-project-template/-/issues"
+Source = "https://code.ornl.gov/7ry/python-project-template"
+
+[project.scripts]
 
 [tool.hatch.version]
 path = "src/python_project_template/__about__.py"
+
+[tool.hatch.env]
+requires = [
+  "hatch-mkdocs",
+]
+
+[tool.hatch.env.collectors.mkdocs.docs]
+path = "mkdocs.yml"
+
+[tool.hatch.envs.docs]
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -44,6 +60,12 @@ test-cov = "coverage run -m pytest {args:tests}"
 cov-report = [
   "- coverage combine",
   "coverage report",
+  "coverage xml -o coverage.xml",
+]
+cov-html = [
+  "test-cov",
+  "cov-report",
+  "coverage html",
 ]
 cov = [
   "test-cov",
@@ -77,4 +99,27 @@ exclude_lines = [
   "no cov",
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
+  "raise AssertionError",
+  "raise RuntimeError",
+  "raise NotImplementedError",
+  "pass",
+  "raise ValueError",
+]
+
+[tool.coverage.html]
+directory = "coverage_html_report"
+
+[tool.hatch.envs.hatch-static-analysis]
+config-path = "ruff_defaults.toml"
+
+[tool.ruff]
+extend = "ruff_defaults.toml"
+
+[tool.ruff.lint]
+extend-ignore = [
+  "T201",   # `print` found
+  "FBT001", # Boolean-typed positional argument in function definition
+  "FBT002", # Boolean default positional argument in function definition
+  "EM101",  # Raw string in Exception
+  "TRY003", # Avoid long strings in Exception Class.
 ]
