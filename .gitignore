@@ -1,0 +1,17 @@
+tmp/
+*.out
+*.swp
+*.whl
+*.old
+*.o
+__pycache__/
+pyvenv.cfg
+finder.txt
+.DS_STORE
+/.vscode/
+venv/
+/dist/
+/site/
+.coverage
+coverage.xml
+metrics.txt
