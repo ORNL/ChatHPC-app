@@ -155,6 +155,7 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
     - [MkDocs Setup](#mkdocs-setup)
     - [Readme Example](#readme-example)
       - [Installation](#installation)
+      - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
       - [Running with hatch](#running-with-hatch)
       - [Testing with hatch](#testing-with-hatch)
       - [Format code with hatch.](#format-code-with-hatch)
@@ -167,6 +168,7 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
     - [.gitignore](#gitignore)
     - [Example Changelog](#example-changelog)
       - [Changelog Header Template](#changelog-header-template)
+    - [Setup Pre-Commit](#setup-pre-commit)
 
 #### Installation
 
@@ -186,6 +188,27 @@ For use in virtual environment:
 python3 -m venv .venv
 source .venv/bin/activate
 pip install git+ssh://git@code.ornl.gov/example.git
+```
+
+#### Setup pre-commit Git hooks
+
+Use hatch or install pre-commit inside python virtual environment.
+```bash
+hatch shell
+```
+or
+```bash
+pip install pre-commit
+```
+
+Then install the hooks.
+```bash
+pre-commit install
+```
+
+Note: You might have to upgrade pre-commit.
+```bash
+pre-commit autoupdate
 ```
 
 #### Running with hatch
@@ -449,3 +472,7 @@ A summary of Development Versioning Specification is shown below.
 
 ## [Unreleased]
 ```
+
+### Setup Pre-Commit
+
+Use `pre-commit sample-config` to generate sample config and then modify it to add the desired hooks.

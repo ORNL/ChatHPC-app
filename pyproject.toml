@@ -54,6 +54,7 @@ path = "mkdocs.yml"
 dependencies = [
   "coverage[toml]>=6.5",
   "pytest",
+  "pre-commit",
 ]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"

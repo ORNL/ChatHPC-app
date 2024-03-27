@@ -15,6 +15,7 @@ Coverage Report: <https://devdocs.ornl.gov/7ry/python-project-template/coverage>
 - [Python Project Template](#python-project-template)
 - [Quick Start with Template.](#quick-start-with-template)
     - [Installation](#installation)
+    - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
     - [Running with hatch](#running-with-hatch)
     - [Testing with hatch](#testing-with-hatch)
     - [Format code with hatch.](#format-code-with-hatch)
@@ -42,6 +43,27 @@ For use in virtual environment:
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
 pip install git+ssh://git@code.ornl.gov/7ry/python-project-template.git
+```
+
+## Setup pre-commit Git hooks
+
+Use hatch or install pre-commit inside python virtual environment.
+```bash
+hatch shell
+```
+or
+```bash
+pip install pre-commit
+```
+
+Then install the hooks.
+```bash
+pre-commit install
+```
+
+Note: You might have to upgrade pre-commit.
+```bash
+pre-commit autoupdate
 ```
 
 ## Running with hatch
