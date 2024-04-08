@@ -26,3 +26,8 @@ repos:
     - id: ruff
     # Run the formatter.
     - id: ruff-format
+- repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+  rev: 2.7.3
+  hooks:
+    - id: editorconfig-checker
+      alias: ec

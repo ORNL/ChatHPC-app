@@ -21,6 +21,7 @@ allow-direct-references = true
 
 ### Lint Rules
 
+<!-- editorconfig-checker-disable -->
 ```toml
 [tool.hatch.envs.hatch-static-analysis]
 config-path = "ruff_defaults.toml"
@@ -35,6 +36,7 @@ extend-ignore = [
   "FBT002", # Boolean default positional argument in function definition
 ]
 ```
+<!-- editorconfig-checker-enable -->
 
 Generate default ruff rules.
 ```bash
@@ -51,6 +53,7 @@ mkdocs new .
 Customize `mkdocs.yml`.
 
 Example:
+<!-- editorconfig-checker-disable -->
 ```yml
 site_name: Example
 nav:
@@ -81,8 +84,10 @@ markdown_extensions:
   - markdown.extensions.toc:
       permalink: true
 ```
+<!-- editorconfig-checker-enable -->
 
 Add the following to `pyproject.toml`.
+<!-- editorconfig-checker-disable -->
 ```toml
 [tool.hatch.env]
 requires = [
@@ -94,8 +99,10 @@ path = "mkdocs.yml"
 
 [tool.hatch.envs.docs]
 ```
+<!-- editorconfig-checker-enable -->
 
 Update the coverage section:
+<!-- editorconfig-checker-disable -->
 ```toml
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
@@ -130,6 +137,7 @@ exclude_lines = [
 [tool.coverage.html]
 directory = "coverage_html_report"
 ```
+<!-- editorconfig-checker-enable -->
 
 Note: If you project uses a namespace package, you will need to specify the package wheel target.
 ```bash
@@ -169,6 +177,7 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
     - [Example Changelog](#example-changelog)
       - [Changelog Header Template](#changelog-header-template)
     - [Setup Pre-Commit](#setup-pre-commit)
+    - [Setup Editor Config](#setup-editor-config)
 
 #### Installation
 
@@ -300,6 +309,7 @@ See [Devdocs](devdocs.md) and [gitlab-ci](gitlab-ci.md).
 
 Example `.gitlab-ci.yml`:
 
+<!-- editorconfig-checker-disable -->
 ```yml
 stages:
   - build
@@ -419,6 +429,7 @@ deploy_docs_manual-job:
     - branches@7ry/python-project-template
 ```
 
+<!-- editorconfig-checker-enable -->
 
 ### .gitignore
 
@@ -476,3 +487,7 @@ A summary of Development Versioning Specification is shown below.
 ### Setup Pre-Commit
 
 Use `pre-commit sample-config` to generate sample config and then modify it to add the desired hooks.
+
+### Setup Editor Config
+
+Add `.editorconfig` file to the root of the project.  See <https://EditorConfig.org> for details.
