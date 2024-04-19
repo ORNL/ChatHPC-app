@@ -9,6 +9,8 @@ Coverage Report: <https://devdocs.ornl.gov/7ry/python-project-template/coverage>
 2. Run `setup_template.sh` to setup the template for the new project.
 3. Remove `setup_template.sh`
 
+Note: If you are using gitlab and the runners are setup for the group/project and the entries into setup_template.sh are correct, the CI pipeline will start building and deploying the documentation to devdocs. There is currently a known bug with the first run of the pipeline where deploy coverage depends on deploy docs running first. If you enconder an rsync error with deploy coverage try rerunning it after deploy docs finishes.
+
 ----
 
 **Table of Contents**
