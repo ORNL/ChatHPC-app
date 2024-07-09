@@ -3,7 +3,7 @@
 Documentation: <https://devdocs.ornl.gov/7ry/python-project-template>  
 Coverage Report: <https://devdocs.ornl.gov/7ry/python-project-template/coverage>
 
-# Quick Start with Template.
+# Quick Start with Template
 
 1. Fork the repository.
 2. Run `setup_template.sh` to setup the template for the new project.
@@ -66,6 +66,13 @@ pre-commit install
 Note: You might have to upgrade pre-commit.
 ```bash
 pre-commit autoupdate
+```
+
+Note: The markdown linter requires Ruby gem to be installed to auto-install and run mdl.
+
+On Ubuntu this can be done with:
+```bash
+sudo apt install ruby-full
 ```
 
 ## Running with hatch

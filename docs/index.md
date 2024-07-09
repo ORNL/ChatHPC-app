@@ -301,7 +301,7 @@ or
 hatch run docs:serve -a 0.0.0.0:8000
 ```
 
----
+----
 
 ### Setup CI
 
@@ -428,7 +428,6 @@ deploy_docs_manual-job:
   only:
     - branches@7ry/python-project-template
 ```
-
 <!-- editorconfig-checker-enable -->
 
 ### .gitignore
