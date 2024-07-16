@@ -15,14 +15,14 @@ Note: If you are using gitlab and the runners are setup for the group/project an
 
 **Table of Contents**
 - [Python Project Template](#python-project-template)
-- [Quick Start with Template.](#quick-start-with-template)
+- [Quick Start with Template](#quick-start-with-template)
     - [Installation](#installation)
     - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
     - [Running with hatch](#running-with-hatch)
     - [Testing with hatch](#testing-with-hatch)
-    - [Format code with hatch.](#format-code-with-hatch)
-    - [View version with hatch.](#view-version-with-hatch)
-    - [Update version with hatch.](#update-version-with-hatch)
+    - [Format code with hatch](#format-code-with-hatch)
+    - [View version with hatch](#view-version-with-hatch)
+    - [Update version with hatch](#update-version-with-hatch)
     - [Documentation](#documentation)
         - [Commands](#commands)
         - [Hatch Commands](#hatch-commands)

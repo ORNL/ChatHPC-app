@@ -1,8 +1,36 @@
 # Python Project Template
 
-This repo was setup by following this general process.
+For general information on packaging python projects see [Packaging Python Projects](https://packaging.python.org/tutorials/packaging-projects/).
+
+## Tools Used
+
+- [Hatch](https://hatch.pypa.io/) --- Python Build System.
+- [MkDocs](https://www.mkdocs.org/) --- Documentation Generator.
+    - [Material Theme](https://squidfunk.github.io/mkdocs-material/) --- Theme for documentation.
+    - [mkdocstrings](https://mkdocstrings.github.io/) --- Automatic documentation generation from sources.
+    - [DevDocs](https://docs.excl.ornl.gov/quick-start-guides/devdocs) --- Internal to ORNL document website hosting.
+- [GitLab CI](https://docs.gitlab.com/ee/ci/) --- Continuous Integration.
+    - [Example Pipeline](https://code.ornl.gov/7ry/python-project-template/-/pipelines)
+    - [Example Pipeline Source](https://code.ornl.gov/7ry/python-project-template/-/blob/main/.gitlab-ci.yml?ref_type=heads)
+- [Ruff](https://docs.astral.sh/ruff/) --- Python linter and code formater.
+    - [Ruff Rules](https://docs.astral.sh/ruff/rules/) --- Rules used by Ruff.
+- [EditorConfig](https://editorconfig.org/) --- Maintain consistent coding styles between different editors and IDEs.
+- [Markdown Lint Tool](https://github.com/markdownlint/markdownlint) --- Markdown linting tool.
+- [Pre-Commit](https://pre-commit.com/) --- Git precommit hooks.
+    - [Built-in Hooks](https://github.com/pre-commit/pre-commit-hooks)
+    - [Ruff Pre-Commit Hooks](https://github.com/astral-sh/ruff-pre-commit)
+    - [Editor Config Pre-Commit Hooks](https://github.com/editorconfig-checker/editorconfig-checker.python)
+    - [Markdown Lint Pre-Commit Hooks](https://github.com/markdownlint/markdownlint)
+
+## Quick Start with this Template
+
+1. Fork the repository.
+2. Run `setup_template.sh` to setup the template for the new project.
+3. Remove `setup_template.sh`
 
 ## Steps to Manually Setup Hatch and MkDocs Python Repo with CI Setup
+
+This repo was setup by following this general process.
 
 ### Hatch Setup
 
@@ -147,6 +175,8 @@ packages = ["src/<package_name>"]
 
 ### Readme Example
 
+Note the readme example's Table of Contents is kept up-to-date using the [Markdown All in One](https://github.com/yzhang-gh/vscode-markdown) VSCode extension.
+
 Example Readme Content:
 
 Documentation: <https://devdocs.ornl.gov/example>  
@@ -157,27 +187,29 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
 **Table of Contents**
 
 - [Python Project Template](#python-project-template)
-  - [Steps to Manually Setup Hatch and MkDocs Python Repo with CI Setup](#steps-to-manually-setup-hatch-and-mkdocs-python-repo-with-ci-setup)
-    - [Hatch Setup](#hatch-setup)
-    - [Lint Rules](#lint-rules)
-    - [MkDocs Setup](#mkdocs-setup)
-    - [Readme Example](#readme-example)
-      - [Installation](#installation)
-      - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
-      - [Running with hatch](#running-with-hatch)
-      - [Testing with hatch](#testing-with-hatch)
-      - [Format code with hatch.](#format-code-with-hatch)
-      - [View version with hatch.](#view-version-with-hatch)
-      - [Update version with hatch.](#update-version-with-hatch)
-      - [Documentation](#documentation)
-        - [Commands](#commands)
-        - [Hatch Commands](#hatch-commands)
-    - [Setup CI](#setup-ci)
-    - [.gitignore](#gitignore)
-    - [Example Changelog](#example-changelog)
-      - [Changelog Header Template](#changelog-header-template)
-    - [Setup Pre-Commit](#setup-pre-commit)
-    - [Setup Editor Config](#setup-editor-config)
+    - [Tools Used](#tools-used)
+    - [Quick Start with this Template](#quick-start-with-this-template)
+    - [Steps to Manually Setup Hatch and MkDocs Python Repo with CI Setup](#steps-to-manually-setup-hatch-and-mkdocs-python-repo-with-ci-setup)
+        - [Hatch Setup](#hatch-setup)
+        - [Lint Rules](#lint-rules)
+        - [MkDocs Setup](#mkdocs-setup)
+        - [Readme Example](#readme-example)
+            - [Installation](#installation)
+            - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
+            - [Running with hatch](#running-with-hatch)
+            - [Testing with hatch](#testing-with-hatch)
+            - [Format code with hatch](#format-code-with-hatch)
+            - [View version with hatch](#view-version-with-hatch)
+            - [Update version with hatch](#update-version-with-hatch)
+            - [Documentation](#documentation)
+                - [Commands](#commands)
+                - [Hatch Commands](#hatch-commands)
+        - [Setup CI](#setup-ci)
+        - [.gitignore](#gitignore)
+        - [Example Changelog](#example-changelog)
+            - [Changelog Header Template](#changelog-header-template)
+        - [Setup Pre-Commit](#setup-pre-commit)
+        - [Setup Editor Config](#setup-editor-config)
 
 #### Installation
 
