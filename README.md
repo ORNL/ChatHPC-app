@@ -1,6 +1,7 @@
 # Python Project Template
 
-Documentation: <https://devdocs.ornl.gov/7ry/python-project-template>  
+Documentation: <https://devdocs.ornl.gov/7ry/python-project-template>
+
 Coverage Report: <https://devdocs.ornl.gov/7ry/python-project-template/coverage>
 
 # Quick Start with Template
@@ -23,6 +24,7 @@ Note: If you are using gitlab and the runners are setup for the group/project an
     - [Format code with hatch](#format-code-with-hatch)
     - [View version with hatch](#view-version-with-hatch)
     - [Update version with hatch](#update-version-with-hatch)
+    - [Update version with script](#update-version-with-script)
     - [Documentation](#documentation)
         - [Commands](#commands)
         - [Hatch Commands](#hatch-commands)
@@ -119,6 +121,14 @@ hatch version
 
 ```bash
 hatch version <new version>
+```
+
+## Update version with script
+
+An automated script is provided to update the version using a date based version. This scripts will determine the next version to use and then update the version, update the changelog, and commit the changes. Lastly, it will tag the commit.
+
+```bash
+scripts/version_bump.py
 ```
 
 ## Documentation
