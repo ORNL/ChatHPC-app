@@ -1,15 +1,15 @@
 import unittest
 
-import python_project_template
+import chatkokkos
 
 
 class TestStringMethods(unittest.TestCase):
     def test_add1(self):
         for i in range(10):
-            assert python_project_template.add1(i) == i + 1
+            assert chatkokkos.add1(i) == i + 1
 
     def test_main(self):
-        python_project_template.add.main(["1.0"])
+        chatkokkos.add.main(["1.0"])
 
 
 if __name__ == "__main__":

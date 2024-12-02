@@ -1,4 +1,4 @@
-# Python Project Template
+# ChatKokkos
 
 For general information on packaging python projects see [Packaging Python Projects](https://packaging.python.org/tutorials/packaging-projects/).
 
@@ -10,8 +10,8 @@ For general information on packaging python projects see [Packaging Python Proje
     - [mkdocstrings](https://mkdocstrings.github.io/) --- Automatic documentation generation from sources.
     - [DevDocs](https://docs.excl.ornl.gov/quick-start-guides/devdocs) --- Internal to ORNL document website hosting.
 - [GitLab CI](https://docs.gitlab.com/ee/ci/) --- Continuous Integration.
-    - [Example Pipeline](https://code.ornl.gov/7ry/python-project-template/-/pipelines)
-    - [Example Pipeline Source](https://code.ornl.gov/7ry/python-project-template/-/blob/main/.gitlab-ci.yml?ref_type=heads)
+    - [Example Pipeline](https://code.ornl.gov/ChatHPC/ChatKokkos/-/pipelines)
+    - [Example Pipeline Source](https://code.ornl.gov/ChatHPC/ChatKokkos/-/blob/main/.gitlab-ci.yml?ref_type=heads)
 - [Ruff](https://docs.astral.sh/ruff/) --- Python linter and code formater.
     - [Ruff Rules](https://docs.astral.sh/ruff/rules/) --- Rules used by Ruff.
 - [EditorConfig](https://editorconfig.org/) --- Maintain consistent coding styles between different editors and IDEs.
@@ -186,7 +186,7 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
 
 **Table of Contents**
 
-- [Python Project Template](#python-project-template)
+- [ChatKokkos](#ChatKokkos)
     - [Tools Used](#tools-used)
     - [Quick Start with this Template](#quick-start-with-this-template)
     - [Steps to Manually Setup Hatch and MkDocs Python Repo with CI Setup](#steps-to-manually-setup-hatch-and-mkdocs-python-repo-with-ci-setup)
@@ -365,7 +365,7 @@ build-job:
   stage: build
   script:
     - pip install .
-    - python3 -c "import python_project_template; print(python_project_template.__doc__)"
+    - python3 -c "import chatkokkos; print(chatkokkos.__doc__)"
 
 check_format-job:
   extends: [.zenith]
@@ -429,36 +429,36 @@ coverage-job:
   stage: deploy_coverage
   needs: [coverage-job]
   script:
-    - rsync -a --delete coverage_html_report/ ~/www/7ry/python-project-template/coverage
+    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatKokkos/coverage
 
 deploy_coverage-job:
   extends: .deploy_coverage_common
   only:
-    - main@7ry/python-project-template
+    - main@ChatHPC/ChatKokkos
 
 deploy_coverage_manual-job:
   extends: .deploy_coverage_common
   when: manual
   only:
-    - branches@7ry/python-project-template
+    - branches@ChatHPC/ChatKokkos
 
 .deploy_docs_common:
   tags: [devdocs]
   stage: deploy_docs
   needs: [docs-job]
   script:
-    - rsync -a --delete site/ ~/www/7ry/python-project-template
+    - rsync -a --delete site/ ~/www/ChatHPC/ChatKokkos
 
 deploy_docs-job:
   extends: .deploy_docs_common
   only:
-    - main@7ry/python-project-template
+    - main@ChatHPC/ChatKokkos
 
 deploy_docs_manual-job:
   extends: .deploy_docs_common
   when: manual
   only:
-    - branches@7ry/python-project-template
+    - branches@ChatHPC/ChatKokkos
 ```
 <!-- editorconfig-checker-enable -->
 

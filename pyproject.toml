@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "python-project-template"
+name = "ChatKokkos"
 dynamic = ["version"]
-description = "Example python project which can be used as a template to create pure python projects with CI and documentation."
+description = "ChatHPC project for Kokkos."
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = []
@@ -29,16 +29,16 @@ dependencies = []
 allow-direct-references = true
 
 [project.urls]
-Documentation = "https://code.ornl.gov/7ry/python-project-template#readme"
-Homepage = "https://code.ornl.gov/7ry/python-project-template"
-Issues = "https://code.ornl.gov/7ry/python-project-template/-/issues"
-Source = "https://code.ornl.gov/7ry/python-project-template"
+Documentation = "https://code.ornl.gov/ChatHPC/ChatKokkos#readme"
+Homepage = "https://code.ornl.gov/ChatHPC/ChatKokkos"
+Issues = "https://code.ornl.gov/ChatHPC/ChatKokkos/-/issues"
+Source = "https://code.ornl.gov/ChatHPC/ChatKokkos"
 
 [project.scripts]
-python-project-template-add1 = "python_project_template.add:main"
+ChatKokkos-add1 = "chatkokkos.add:main"
 
 [tool.hatch.version]
-path = "src/python_project_template/__about__.py"
+path = "src/chatkokkos/__about__.py"
 
 [tool.hatch.env]
 requires = [
@@ -82,19 +82,19 @@ dependencies = [
   "mypy>=1.0.0",
 ]
 [tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/python_project_template tests}"
+check = "mypy --install-types --non-interactive {args:src/chatkokkos tests}"
 
 [tool.coverage.run]
-source_pkgs = ["python_project_template", "tests"]
+source_pkgs = ["chatkokkos", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/python_project_template/__about__.py",
+  "src/chatkokkos/__about__.py",
 ]
 
 [tool.coverage.paths]
-python_project_template = ["src/python_project_template", "*/python-project-template/src/python_project_template"]
-tests = ["tests", "*/python-project-template/tests"]
+chatkokkos = ["src/chatkokkos", "*/ChatKokkos/src/chatkokkos"]
+tests = ["tests", "*/ChatKokkos/tests"]
 
 [tool.coverage.report]
 exclude_lines = [

@@ -1,8 +1,8 @@
-# Python Project Template
+# ChatKokkos
 
-Documentation: <https://devdocs.ornl.gov/7ry/python-project-template>
+Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatKokkos>
 
-Coverage Report: <https://devdocs.ornl.gov/7ry/python-project-template/coverage>
+Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatKokkos/coverage>
 
 # Quick Start with Template
 
@@ -15,7 +15,7 @@ Note: If you are using gitlab and the runners are setup for the group/project an
 ----
 
 **Table of Contents**
-- [Python Project Template](#python-project-template)
+- [ChatKokkos](#ChatKokkos)
 - [Quick Start with Template](#quick-start-with-template)
     - [Installation](#installation)
     - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
@@ -34,8 +34,8 @@ Note: If you are using gitlab and the runners are setup for the group/project an
 For development in folder:
 
 ```bash
-git clone git@code.ornl.gov:7ry/python-project-template.git
-cd python-project-template
+git clone git@code.ornl.gov:ChatHPC/ChatKokkos.git
+cd ChatKokkos
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
 pip install -e .
@@ -46,7 +46,7 @@ For use in virtual environment:
 ```bash
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
-pip install git+ssh://git@code.ornl.gov/7ry/python-project-template.git
+pip install git+ssh://git@code.ornl.gov/ChatHPC/ChatKokkos.git
 ```
 
 ## Setup pre-commit Git hooks

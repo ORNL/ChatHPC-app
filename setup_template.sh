@@ -2,11 +2,11 @@
 
 # Prompt for new project name.
 echo "Note: Please fill in every field. This script is not smart enought to handle missing entries."
-read -p "Enter new project name (i.e. Python Project Template): " project_name
+read -p "Enter new project name (i.e. ChatKokkos): " project_name
 read -p "Enter new project description. " project_description
-read -p "Enter new project slug (i.e. python-project-template): " project_slug
-read -p "Enter new python project name (i.e. python_project_template): " project_path
-read -p "Enter new project group/user (i.e. 7ry): " project_gitlab_path
+read -p "Enter new project slug (i.e. ChatKokkos): " project_slug
+read -p "Enter new python project name (i.e. chatkokkos): " project_path
+read -p "Enter new project group/user (i.e. ChatHPC): " project_gitlab_path
 read -p "Enter new author (i.e. Aaron Young): " author_name
 read -p "Enter new author email (i.e. youngar@ornl.gov): " author_email
 
@@ -22,31 +22,31 @@ echo "*****************************************"
 
 read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
-FILES=".editorconfig .gitignore .gitlab-ci.yml .pre-commit-config.yaml CHANGELOG.md README.md docs/api.md docs/index.md mkdocs.yml pyproject.toml ruff_defaults.toml scripts/test_commands.sh src/python_project_template/__about__.py src/python_project_template/__init__.py src/python_project_template/add.py tests/__init__.py tests/test_add.py"
+FILES=".editorconfig .gitignore .gitlab-ci.yml .pre-commit-config.yaml CHANGELOG.md README.md docs/api.md docs/index.md mkdocs.yml pyproject.toml ruff_defaults.toml scripts/test_commands.sh src/chatkokkos/__about__.py src/chatkokkos/__init__.py src/chatkokkos/add.py tests/__init__.py tests/test_add.py"
 
 echo Project Name:
-echo sed -i "s#Python Project Template#$project_name#g" $FILES
-sed -i "s#Python Project Template#$project_name#g" $FILES
+echo sed -i "s#ChatKokkos#$project_name#g" $FILES
+sed -i "s#ChatKokkos#$project_name#g" $FILES
 echo
 
 echo Project Description:
-echo sed -i "s/\"Example python project which can be used as a template to create pure python projects with CI and documentation.\"/\"$project_description\"/g" $FILES
-sed -i "s/\"Example python project which can be used as a template to create pure python projects with CI and documentation.\"/\"$project_description\"/g" $FILES
+echo sed -i "s/\"ChatHPC project for Kokkos.\"/\"$project_description\"/g" $FILES
+sed -i "s/\"ChatHPC project for Kokkos.\"/\"$project_description\"/g" $FILES
 echo
 
 echo Project Slug:
-echo sed -i "s#python-project-template#$project_slug#g" $FILES
-sed -i "s#python-project-template#$project_slug#g" $FILES
+echo sed -i "s#ChatKokkos#$project_slug#g" $FILES
+sed -i "s#ChatKokkos#$project_slug#g" $FILES
 echo
 
 echo Project Path:
-echo sed -i "s#python_project_template#$project_path#g" $FILES
-sed -i "s#python_project_template#$project_path#g" $FILES
+echo sed -i "s#chatkokkos#$project_path#g" $FILES
+sed -i "s#chatkokkos#$project_path#g" $FILES
 echo
 
 echo Project GitLab Path:
-echo sed -i "s#7ry#$project_gitlab_path#g" $FILES
-sed -i "s#7ry#$project_gitlab_path#g" $FILES
+echo sed -i "s#ChatHPC#$project_gitlab_path#g" $FILES
+sed -i "s#ChatHPC#$project_gitlab_path#g" $FILES
 echo
 
 echo Author Name:
@@ -60,15 +60,15 @@ sed -i "s#youngar@ornl.gov#$author_email#g" $FILES
 echo
 
 echo Move project source files
-echo mv src/python_project_template src/${project_path}
-mv src/python_project_template src/${project_path}
+echo mv src/chatkokkos src/${project_path}
+mv src/chatkokkos src/${project_path}
 
 echo Update setup_template.sh with new project information.
-sed -i "s#Python Project Template#$project_name#g" setup_template.sh
-sed -i "s/Example python project which can be used as a template to create pure python projects with CI and documentation./$project_description/g" setup_template.sh
-sed -i "s#python-project-template#$project_slug#g" setup_template.sh
-sed -i "s#python_project_template#$project_path#g" setup_template.sh
-sed -i "s#7ry#$project_gitlab_path#g" setup_template.sh
+sed -i "s#ChatKokkos#$project_name#g" setup_template.sh
+sed -i "s/ChatHPC project for Kokkos./$project_description/g" setup_template.sh
+sed -i "s#ChatKokkos#$project_slug#g" setup_template.sh
+sed -i "s#chatkokkos#$project_path#g" setup_template.sh
+sed -i "s#ChatHPC#$project_gitlab_path#g" setup_template.sh
 sed -i "s#Aaron Young#$author_name#g" setup_template.sh
 sed -i "s#youngar@ornl.gov#$author_email#g" setup_template.sh
 
