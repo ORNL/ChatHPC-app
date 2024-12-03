@@ -12,6 +12,9 @@ finder.txt
 .venv/
 /dist/
 /site/
+/wandb/
+/kokkos-code-llama/
+/peft_adapter/
 .coverage
 coverage.xml
 metrics.txt

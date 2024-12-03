@@ -1,6 +1,58 @@
 # ChatKokkos
 
-For general information on packaging python projects see [Packaging Python Projects](https://packaging.python.org/tutorials/packaging-projects/).
+ChatHPC project for Kokkos.
+
+## Steps taken to get started in ExCL with ChatKokkos.
+
+### Step 1: Fork the template repo
+
+Follow [How to create a new ChatHPC/ChatX application repo](https://devdocs.ornl.gov/ChatHPC/ChatHPC-project/#how-to-create-a-new-chathpcchatx-application-repo) to create a new project repository. I used these settings when running `setup_template.sh`:
+
+```bash
+$ ./setup_template.sh
+Note: Please fill in every field. This script is not smart enought to handle missing entries.
+Enter new project name (i.e. Python Project Template): ChatKokkos
+Enter new project description. ChatHPC project for Kokkos.
+Enter new project slug (i.e. python-project-template): ChatKokkos
+Enter new python project name (i.e. python_project_template): chatkokkos
+Enter new project group/user (i.e. 7ry): ChatHPC
+Enter new author (i.e. Aaron Young): Aaron Young
+Enter new author email (i.e. youngar@ornl.gov): youngar@ornl.gov
+****** Update Template for project ******
+*** Project Name        = ChatKokkos
+*** Project Description = ChatHPC project for Kokkos.
+*** Project Slug        = ChatKokkos
+*** Project Path        = chatkokkos
+*** Project GitLab Path = ChatHPC
+*** Author Name         = Aaron Young
+*** Author Email        = youngar@ornl.gov
+*****************************************
+Continue? (Y/N): y
+```
+
+### Step 2: Setup and install dependencies
+
+Add dependencies to `pyproject.toml`.
+
+## Step 3: Collect Data
+
+Data should be created and stored in `/auto/projects/ChatHPC/datasets/ornl/kokkos-data`.
+
+### Step 4: Create fine-tunning notebook
+
+Create `fine-tune-chat-kokkos.ipynb`.
+
+### Step 5: Run notebook
+
+Run `fine-tune-chat-kokkos.ipynb`.
+
+### Step 6: Save agent and Load agent into ollama
+
+Create `Modelfile`.
+
+```bash
+ollama create ChatKokkos
+```
 
 ## Tools Used
 
@@ -186,7 +238,14 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
 
 **Table of Contents**
 
-- [ChatKokkos](#ChatKokkos)
+- [ChatKokkos](#chatkokkos)
+    - [Steps taken to get started in ExCL with ChatKokkos.](#steps-taken-to-get-started-in-excl-with-chatkokkos)
+        - [Step 1: Fork the template repo](#step-1-fork-the-template-repo)
+        - [Step 2: Setup and install dependencies](#step-2-setup-and-install-dependencies)
+    - [Step 3: Collect Data](#step-3-collect-data)
+        - [Step 4: Create fine-tunning notebook](#step-4-create-fine-tunning-notebook)
+        - [Step 5: Run notebook](#step-5-run-notebook)
+        - [Step 6: Save agent and Load agent into ollama](#step-6-save-agent-and-load-agent-into-ollama)
     - [Tools Used](#tools-used)
     - [Quick Start with this Template](#quick-start-with-this-template)
     - [Steps to Manually Setup Hatch and MkDocs Python Repo with CI Setup](#steps-to-manually-setup-hatch-and-mkdocs-python-repo-with-ci-setup)

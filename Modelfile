@@ -1,0 +1,2 @@
+FROM /home/7ry/Data/ellora/models/meta-llama/CodeLlama-7b-hf
+ADAPTER /home/7ry/Data/ellora/ChatKokkos/peft_adapter

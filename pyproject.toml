@@ -23,7 +23,21 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dependencies = [
+  "codellama @ git+ssh://git@github.com/meta-llama/codellama.git",
+  "peft==0.13.2",
+  "transformers==4.46.3",
+  "accelerate==1.1.1",
+  "datasets==3.1.0",
+  "bitsandbytes",
+  "protobuf",
+  "ipykernel",
+  "ipython",
+  "ipywidgets",
+  "jupyter",
+  "nbdime",
+  "wandb",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
