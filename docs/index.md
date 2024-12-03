@@ -34,7 +34,7 @@ Continue? (Y/N): y
 
 Add dependencies to `pyproject.toml`.
 
-## Step 3: Collect Data
+### Step 3: Collect Data
 
 Data should be created and stored in `/auto/projects/ChatHPC/datasets/ornl/kokkos-data`.
 
@@ -242,7 +242,7 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
     - [Steps taken to get started in ExCL with ChatKokkos.](#steps-taken-to-get-started-in-excl-with-chatkokkos)
         - [Step 1: Fork the template repo](#step-1-fork-the-template-repo)
         - [Step 2: Setup and install dependencies](#step-2-setup-and-install-dependencies)
-    - [Step 3: Collect Data](#step-3-collect-data)
+        - [Step 3: Collect Data](#step-3-collect-data)
         - [Step 4: Create fine-tunning notebook](#step-4-create-fine-tunning-notebook)
         - [Step 5: Run notebook](#step-5-run-notebook)
         - [Step 6: Save agent and Load agent into ollama](#step-6-save-agent-and-load-agent-into-ollama)
