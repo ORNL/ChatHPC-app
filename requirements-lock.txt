@@ -17,7 +17,7 @@ bleach==6.2.0
 certifi==2024.8.30
 cffi==1.17.1
 charset-normalizer==3.4.0
--e git+ssh://git@code.ornl.gov/ChatHPC/ChatKokkos.git@6ad03dea1f9ea2a216f4ce1de3251bcf947a62d1#egg=ChatKokkos
+-e git+ssh://git@code.ornl.gov/ChatHPC/ChatKokkos.git@e801847f39e41dc9f49a4e0f299e0a2056228581#egg=ChatKokkos
 click==8.1.7
 codellama @ git+ssh://git@github.com/meta-llama/codellama.git@e81b597e44dbecc2a0dedb9949fdf84adfc22395
 colorama==0.4.6
