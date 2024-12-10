@@ -34,6 +34,8 @@ Continue? (Y/N): y
 
 Add dependencies to `pyproject.toml`.
 
+Install virtual python environment, by following the [Chat Application Readme](https://code.ornl.gov/ChatHPC/ChatKokkos#installation).
+
 ### Step 3: Collect Data
 
 Data should be created and stored in `/auto/projects/ChatHPC/datasets/ornl/kokkos-data`.
