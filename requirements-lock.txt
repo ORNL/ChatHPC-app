@@ -18,7 +18,7 @@ bleach==6.2.0
 certifi==2024.12.14
 cffi==1.17.1
 charset-normalizer==3.4.0
-ChatKokkos @ file:///home/7ry/Data/ellora/ChatKokkos-oldpkgs
+ChatKokkos @ file:///home/7ry/Data/ellora/ChatKokkos-oldpkgs-2
 click==8.1.7
 codellama @ git+ssh://git@github.com/meta-llama/codellama.git@e81b597e44dbecc2a0dedb9949fdf84adfc22395
 colorama==0.4.6
@@ -100,7 +100,7 @@ packaging==24.2
 pandas==2.2.3
 pandocfilters==1.5.1
 parso==0.8.4
-peft @ git+https://github.com/huggingface/peft.git@e536616888d51b453ed354a6f1e243fecb02ea08
+peft==0.9.0
 pexpect==4.9.0
 platformdirs==4.3.6
 prometheus_client==0.21.1
@@ -146,7 +146,7 @@ torch==2.5.1
 tornado==6.4.2
 tqdm==4.67.1
 traitlets==5.14.3
-transformers @ git+https://github.com/huggingface/transformers.git@9a94dfe1239ddfb8010a654aa1e677d56c01eee0
+transformers @ git+https://github.com/huggingface/transformers.git@9613933b022ddbf085e2c593ed4ceea4c734179a
 triton==3.1.0
 types-python-dateutil==2.9.0.20241206
 typing_extensions==4.12.2
