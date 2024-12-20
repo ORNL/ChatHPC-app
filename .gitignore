@@ -16,6 +16,7 @@ finder.txt
 /kokkos-code-llama/
 /peft_adapter/
 /tokenizer/
+/merged_adapters/
 .coverage
 coverage.xml
 metrics.txt

@@ -53,6 +53,7 @@ Run `fine-tune-chat-kokkos.ipynb`.
 Create `Modelfile`.
 
 ```bash
+../llama.cpp/convert_hf_to_gguf.py merged_adapters/     
 ollama create ChatKokkos
 ```
 
