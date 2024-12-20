@@ -25,7 +25,7 @@ classifiers = [
 ]
 dependencies = [
   "codellama @ git+ssh://git@github.com/meta-llama/codellama.git",
-  "peft==0.9.0",
+  "peft==0.14.0",
   "transformers @ git+https://github.com/huggingface/transformers.git@main",
   "accelerate==0.26.0",
   "datasets",
