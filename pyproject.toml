@@ -24,11 +24,11 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-  "codellama @ git+ssh://git@github.com/meta-llama/codellama.git",
-  "peft==0.14",
-  "transformers==4.47.0",
+  "codellama @ git+ssh://git@github.com/meta-llama/codellama.git@main",
+  "peft==0.14.0",
+  "transformers==4.47.1",
   "accelerate==1.2.1",
-  "datasets==3.2.0",
+  "datasets",
   "bitsandbytes",
   "protobuf",
   "ipykernel",
