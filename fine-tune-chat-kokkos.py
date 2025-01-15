@@ -35,11 +35,15 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments,
 # %%
 from datasets import load_dataset
 
+# data_files = "/auto/projects/ChatHPC/datasets/ornl/kokkos-data/kokkos_create_context.json"
+# data_files = "/auto/projects/ChatHPC/.zfs/snapshot/zrepl_20241218_105321_000/datasets/ornl/kokkos-data/kokkos_create_context.json"
+data_files = "/home/7ry/Data/ellora/kokkos-data-2024-12-18/kokkos_create_context.json"
+
 train_dataset = load_dataset(
-    "json", data_files="/auto/projects/ChatHPC/datasets/ornl/kokkos-data/kokkos_create_context.json", split="train"
+    "json", data_files=data_files, split="train"
 )
 eval_dataset = load_dataset(
-    "json", data_files="/auto/projects/ChatHPC/datasets/ornl/kokkos-data/kokkos_create_context.json", split="train"
+    "json", data_files=data_files, split="train"
 )
 
 # %% [markdown]
