@@ -37,7 +37,8 @@ from datasets import load_dataset
 
 # data_files = "/auto/projects/ChatHPC/datasets/ornl/kokkos-data/kokkos_create_context.json"
 # data_files = "/auto/projects/ChatHPC/.zfs/snapshot/zrepl_20241218_105321_000/datasets/ornl/kokkos-data/kokkos_create_context.json"
-data_files = "/home/7ry/Data/ellora/kokkos-data-2024-12-18/kokkos_create_context.json"
+# data_files = "/home/7ry/Data/ellora/kokkos-data-2024-12-18/kokkos_create_context.json"
+data_files = "/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json"
 
 train_dataset = load_dataset(
     "json", data_files=data_files, split="train"
@@ -72,66 +73,66 @@ model = AutoModelForCausalLM.from_pretrained(
 # ## Test base model
 
 # %%
-eval_prompt = """You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
+# eval_prompt = """You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
 
-You must output the Kokkos question that answers the question.
-### Input:
-Which kind of Kokkos views are?
+# You must output the Kokkos question that answers the question.
+# ### Input:
+# Which kind of Kokkos views are?
 
-### Context:
-Introduction to Kokkos programming model
+# ### Context:
+# Introduction to Kokkos programming model
 
-### Response:
-"""
+# ### Response:
+# """
 
-model_input = tokenizer(eval_prompt, return_tensors="pt").to("cuda")
+# model_input = tokenizer(eval_prompt, return_tensors="pt").to("cuda")
 
-model.eval()
-with torch.no_grad():
-    output = model.generate(**model_input, max_new_tokens=700)[0]
-    stop = tokenizer.eos_token_id
-    if stop in output:
-        print("stop found")
-    print(tokenizer.decode(output))
-
-# %%
-eval_prompt = """You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
-
-You must output the Kokkos question that answers the question.
-### Input:
-Which compilers can I use to compile Kokkos codes?
-
-### Context:
-Kokkos installation
-
-### Response:
-"""
-# {'question': 'Name the comptroller for office of prohibition', 'context': 'CREATE TABLE table_22607062_1 (comptroller VARCHAR, ticket___office VARCHAR)', 'answer': 'SELECT comptroller FROM table_22607062_1 WHERE ticket___office = "Prohibition"'}
-
-model_input = tokenizer(eval_prompt, return_tensors="pt").to("cuda")
-
-model.eval()
-with torch.no_grad():
-    print(tokenizer.decode(model.generate(**model_input, max_new_tokens=100)[0]))
+# model.eval()
+# with torch.no_grad():
+#     output = model.generate(**model_input, max_new_tokens=700)[0]
+#     stop = tokenizer.eos_token_id
+#     if stop in output:
+#         print("stop found")
+#     print(tokenizer.decode(output))
 
 # %%
-eval_prompt = """You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
+# eval_prompt = """You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
 
-You must output the Kokkos question that answers the question.
-### Input:
-Can you give me an example of Kokkos parallel_reduce?
+# You must output the Kokkos question that answers the question.
+# ### Input:
+# Which compilers can I use to compile Kokkos codes?
 
-### Context:
-Introduction to Kokkos programming model
+# ### Context:
+# Kokkos installation
 
-### Response:
-"""
+# ### Response:
+# """
+# # {'question': 'Name the comptroller for office of prohibition', 'context': 'CREATE TABLE table_22607062_1 (comptroller VARCHAR, ticket___office VARCHAR)', 'answer': 'SELECT comptroller FROM table_22607062_1 WHERE ticket___office = "Prohibition"'}
 
-model_input = tokenizer(eval_prompt, return_tensors="pt").to("cuda")
+# model_input = tokenizer(eval_prompt, return_tensors="pt").to("cuda")
 
-model.eval()
-with torch.no_grad():
-    print(tokenizer.decode(model.generate(**model_input, max_new_tokens=400)[0], skip_special_tokens=True))
+# model.eval()
+# with torch.no_grad():
+#     print(tokenizer.decode(model.generate(**model_input, max_new_tokens=100)[0]))
+
+# %%
+# eval_prompt = """You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
+
+# You must output the Kokkos question that answers the question.
+# ### Input:
+# Can you give me an example of Kokkos parallel_reduce?
+
+# ### Context:
+# Introduction to Kokkos programming model
+
+# ### Response:
+# """
+
+# model_input = tokenizer(eval_prompt, return_tensors="pt").to("cuda")
+
+# model.eval()
+# with torch.no_grad():
+#     print(tokenizer.decode(model.generate(**model_input, max_new_tokens=400)[0], skip_special_tokens=True))
 
 # %% [markdown]
 # ## Tokenization
