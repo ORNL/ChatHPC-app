@@ -14,5 +14,5 @@ chatkokkos -h
 echo
 echo '*** Test basic script functionality ***'
 
-# echo ChatKokkos-add1 1.0
-# ChatKokkos-add1 1.0
+echo ChatKokkos config
+ChatKokkos config
