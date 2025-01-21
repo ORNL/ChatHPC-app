@@ -8,6 +8,9 @@ Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatKokkos/coverage>
 - [ChatKokkos](#chatkokkos)
     - [Installation](#installation)
     - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
+    - [Quick Start](#quick-start)
+        - [Train model](#train-model)
+        - [Export Trained model to Ollama.](#export-trained-model-to-ollama)
     - [CLI Interface](#cli-interface)
     - [Running with hatch](#running-with-hatch)
     - [Testing with hatch](#testing-with-hatch)
@@ -65,6 +68,21 @@ Note: The markdown linter requires Ruby gem to be installed to auto-install and 
 On Ubuntu this can be done with:
 ```bash
 sudo apt install ruby-full
+```
+
+## Quick Start
+
+### Train model
+
+1. Install package
+2. `chatkokkos train`
+
+### Export Trained model to Ollama.
+
+```bash
+module load ollama
+/home/7ry/Data/ellora/llama.cpp/convert_hf_to_gguf.py merged_adapters/     
+ollama create ChatKokkos
 ```
 
 ## CLI Interface
