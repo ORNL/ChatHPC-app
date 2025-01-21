@@ -4,21 +4,11 @@ Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatKokkos>
 
 Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatKokkos/coverage>
 
-# Quick Start with Template
-
-1. Fork the repository.
-2. Run `setup_template.sh` to setup the template for the new project.
-3. Remove `setup_template.sh`
-
-Note: If you are using gitlab and the runners are setup for the group/project and the entries into setup_template.sh are correct, the CI pipeline will start building and deploying the documentation to devdocs. There is currently a known bug with the first run of the pipeline where deploy coverage depends on deploy docs running first. If you enconder an rsync error with deploy coverage try rerunning it after deploy docs finishes.
-
-----
-
 **Table of Contents**
-- [ChatKokkos](#ChatKokkos)
-- [Quick Start with Template](#quick-start-with-template)
+- [ChatKokkos](#chatkokkos)
     - [Installation](#installation)
     - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
+    - [CLI Interface](#cli-interface)
     - [Running with hatch](#running-with-hatch)
     - [Testing with hatch](#testing-with-hatch)
     - [Format code with hatch](#format-code-with-hatch)
@@ -75,6 +65,57 @@ Note: The markdown linter requires Ruby gem to be installed to auto-install and 
 On Ubuntu this can be done with:
 ```bash
 sudo apt install ruby-full
+```
+
+## CLI Interface
+
+Get Help:
+```bash
+$ chatkokkos --help
+Usage: chatkokkos [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  config      Print current config
+  run         Interact with the model.
+  run-base    Interact with the base model.
+  run-fine    Interact with the finetuned model.
+  run-merged  Interact with the merged model.
+  train       Finetune the model.
+```
+
+Run interactively:
+```bash
+chatkokkos run
+```
+
+Example interactive session:
+```bash
+$ chatkokkos run
+chatkokkos ()> /context
+Context: Introduction to Kokkos programming model
+chatkokkos (Introduction to Kokkos programming model)> Which kind of Kokkos views are?
+<s> You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
+
+You must output the Kokkos question that answers the question.
+
+### Input:
+Which kind of Kokkos views are?
+
+### Context:
+Introduction to Kokkos programming model
+
+### Response:
+There are two different layouts; LayoutLeft and LayoutRight.
+</s>
+chatkokkos (Introduction to Kokkos programming model)> \bye
+```
+
+Train:
+```bash
+chatkokkos train
 ```
 
 ## Running with hatch
