@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 
 import torch
 from peft import (
@@ -20,59 +23,58 @@ from pytz import timezone
 
 import textwrap
 
+from typing import Any, Callable, Set, Type, Tuple
 
-class AppPreferences:
-    def __init__(self, path=None):
-        if path is None:
-            path = os.path.abspath(os.path.join(os.path.dirname(__file__), "config/default_preferences.json"))
-        self._config = common_utils.load_json_arg(path)
+from pydantic import (
+    AliasChoices,
+    AmqpDsn,
+    BaseModel,
+    Field,
+    ImportString,
+    PostgresDsn,
+    RedisDsn,
+)
 
-    @property
-    def data_file(self) -> str:
-        return self._config["data_file"]
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+    JsonConfigSettingsSource
+)
 
-    @data_file.setter
-    def data_file(self, value) -> str:
-        self._config["data_file"] = value
 
-    @property
-    def base_model_path(self) -> str:
-        return self._config["base_model_path"]
+DEFAULT_APP_CONFIG_FILE = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), "config/default_app_settings.json")))
+class AppConfig(BaseSettings):
+    data_file: str = "init"
+    base_model_path: str = "init"
+    finetuned_model_path: str = "init"
+    merged_model_path: str = "init"
 
-    @base_model_path.setter
-    def base_model_path(self, value) -> str:
-        self._config["base_model_path"] = value
+    model_config = SettingsConfigDict(
+        cli_parse_args=False,
+        env_prefix="CHATKOKKOS_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        json_file=DEFAULT_APP_CONFIG_FILE,
+        json_file_encoding="utf-8",
+    )
 
-    @property
-    def finetuned_model_path(self) -> str:
-        return self._config["finetuned_model_path"]
-
-    @finetuned_model_path.setter
-    def finetuned_model_path(self, value) -> str:
-        self._config["finetuned_model_path"] = value
-
-    @property
-    def merged_model_path(self) -> str:
-        return self._config["merged_model_path"]
-
-    @merged_model_path.setter
-    def merged_model_path(self, value) -> str:
-        self._config["merged_model_path"] = value
-
-    def update(self, config):
-        self._config.update(config)
-
-    def update_with_json_file(self, json_path):
-        self._config.update(common_utils.load_json_arg(json_path))
-
-    def __str__(self):
-        return str(self._config)
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        return (env_settings, dotenv_settings, init_settings, JsonConfigSettingsSource(settings_cls), file_secret_settings)
 
 
 class App:
     def __init__(self, config_file=None):
         """Initialize the Application object."""
-        self.preferences = AppPreferences(config_file)
+        self.preferences = AppConfig()
 
     def load_base_model(self) -> None:
         """Load model from base path."""

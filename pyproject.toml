@@ -38,6 +38,7 @@ dependencies = [
   "nbdime",
   "wandb",
   "click",
+  "pydantic-settings",
 ]
 
 [tool.hatch.metadata]
