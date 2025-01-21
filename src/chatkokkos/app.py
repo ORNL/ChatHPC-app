@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import atexit
 import logging
 import os
+import readline
 import sys
 import textwrap
 from datetime import datetime
@@ -19,6 +21,7 @@ from peft import (
 )
 from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 from pytz import timezone
+from tabulate import tabulate
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
 
 logger = logging.getLogger(__name__)
@@ -31,20 +34,40 @@ DEFAULT_APP_CONFIG_FILE = Path(
 class AppConfig(BaseSettings):
     """Configuration settings for the application.
 
-    This class inherits from [Pydantic Settings - BaseSettings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) and defines the configuration
-    parameters for the ChatKokkos application.
+    This class inherits from [Pydantic Settings - BaseSettings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
+    and defines the configuration parameters for the ChatKokkos application.
 
     Attributes:
-        data_file (str): Path to the training data file.
-        base_model_path (str): Path to the base LLM model.
-        finetuned_model_path (str): Path to the finetuned LLM layers.
-        merged_model_path (str): Path to the merged LLM model.
+        data_file (str): Path to the JSON file containing training data for model fine-tuning.
+        base_model_path (str): Path to the pre-trained base LLM model directory.
+        finetuned_model_path (str): Path where fine-tuned model layers will be saved.
+        merged_model_path (str): Path where the complete merged model will be saved.
+        max_response_tokens (int): Maximum number of tokens to generate in model responses.
+
+    Configuration:
+        The settings can be loaded from:
+        - Environment variables with prefix 'CHATKOKKOS_'
+        - .env file
+        - JSON configuration file (default: config/default_app_settings.json)
+        - Direct initialization
+
+    Example:
+        ```python
+        config = AppConfig()
+        print(config.base_model_path)
+        ```
+
+    Note:
+        Settings priority follows Pydantic's source order: explicite values in constructor > env vars > .env file >
+        config file > defaults
     """
 
-    data_file: str = "init"
-    base_model_path: str = "init"
-    finetuned_model_path: str = "init"
-    merged_model_path: str = "init"
+    data_file: str
+    base_model_path: str
+    finetuned_model_path: str
+    merged_model_path: str
+    max_response_tokens: int
+    prompt_history_file: str
 
     model_config = SettingsConfigDict(
         cli_parse_args=False,
@@ -91,7 +114,7 @@ class App:
 
     def __init__(self):
         """Initialize the Application object."""
-        self.preferences = AppConfig()
+        self.config = AppConfig()
 
     def load_base_model(self) -> None:
         """Load and initialize the base Large Language Model.
@@ -119,12 +142,12 @@ class App:
             for optimal performance on available hardware.
         """
 
-        logger.info("Loading the base model from %s", self.preferences.base_model_path)
+        logger.info("Loading the base model from %s", self.config.base_model_path)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(self.preferences.base_model_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.config.base_model_path)
 
         self.model = AutoModelForCausalLM.from_pretrained(
-            self.preferences.base_model_path,
+            self.config.base_model_path,
             load_in_8bit=False,
             torch_dtype=torch.float16,
             device_map="auto",
@@ -158,11 +181,11 @@ class App:
             before applying the finetuned layers.
         """
 
-        logger.info("Loading the finetuned model from %s", self.preferences.finetuned_model_path)
+        logger.info("Loading the finetuned model from %s", self.config.finetuned_model_path)
 
         self.load_base_model()
 
-        self.model = PeftModel.from_pretrained(self.model, self.preferences.finetuned_model_path)
+        self.model = PeftModel.from_pretrained(self.model, self.config.finetuned_model_path)
 
     def load_merged_model(self) -> None:
         """Load and initialize the merged Large Language Model.
@@ -192,12 +215,12 @@ class App:
             for optimal performance on available hardware.
         """
 
-        logger.info("Loading the merged model from %s", self.preferences.merged_model_path)
+        logger.info("Loading the merged model from %s", self.config.merged_model_path)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(self.preferences.base_model_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(self.config.base_model_path)
 
         self.model = AutoModelForCausalLM.from_pretrained(
-            self.preferences.merged_model_path,
+            self.config.merged_model_path,
             load_in_8bit=False,
             torch_dtype=torch.float16,
             device_map="auto",
@@ -222,33 +245,58 @@ class App:
             - The data file must be in JSON format
             - The data file path must be set in preferences.data_file
         """
-        logger.info("Loading the dataset from %s", self.preferences.data_file)
+        logger.info("Loading the dataset from %s", self.config.data_file)
 
         from datasets import load_dataset
 
-        self.train_dataset = load_dataset("json", data_files=self.preferences.data_file, split="train")
-        self.eval_dataset = load_dataset("json", data_files=self.preferences.data_file, split="train")
+        self.train_dataset = load_dataset("json", data_files=self.config.data_file, split="train")
+        self.eval_dataset = load_dataset("json", data_files=self.config.data_file, split="train")
 
-    def evaluate_model(self, prompt: str, max_new_tokens: int = 800) -> str:
+    def evaluate_model(self, prompt: str, max_new_tokens: int | None = None) -> str:
         """Evaluate the model on a given prompt and generate a response.
 
         Args:
             prompt (str): The input text prompt to be evaluated by the model.
-            max_new_tokens (int, optional): Maximum number of tokens to generate in the response.
-                Defaults to 800.
+            max_new_tokens (int|None, optional): Maximum number of tokens to generate in the response.
+                If None, uses the value from config.max_response_tokens.
 
         Returns:
             str: The generated text response from the model, decoded from output tokens.
 
+        Requires:
+            - A model must be loaded via one of:
+                - load_base_model()
+                - load_finetuned_model()
+                - load_merged_model()
+            - The tokenizer must be initialized
+
+        Example:
+            ```python
+            >>> app = App()
+            >>> app.load_base_model()
+            >>> response = app.evaluate_model(
+            ...     "What is Kokkos?",
+            ...     max_new_tokens=100
+            ... )
+            >>> print(response)
+            "Kokkos is a programming model..."
+            ```
+
         Note:
-            This method requires the model and tokenizer to be loaded first through either
-            load_base_model(), load_finetuned_model(), or load_merged_model().
+            The model is automatically put into evaluation mode and uses
+            torch.no_grad() for inference. The input is processed on CUDA
+            if available.
         """
         model_input = self.tokenizer(prompt, return_tensors="pt").to("cuda")
 
+        if max_new_tokens is None:
+            max_new_tokens = self.config.max_response_tokens
+
         self.model.eval()
         with torch.no_grad():
-            output = self.model.generate(**model_input, max_new_tokens=max_new_tokens)[0]
+            output = self.model.generate(
+                **model_input, max_new_tokens=max_new_tokens, pad_token_id=self.tokenizer.eos_token_id
+            )[0]
             return self.tokenizer.decode(output)
 
     @staticmethod
@@ -502,19 +550,95 @@ class App:
 
         trainer.train()
 
-        trainer.model.save_pretrained(self.preferences.finetuned_model_path)
+        trainer.model.save_pretrained(self.config.finetuned_model_path)
         self.model = trainer.model.merge_and_unload()
-        self.model.save_pretrained(self.preferences.merged_model_path)
+        self.model.save_pretrained(self.config.merged_model_path)
 
-    def print_preferences(self) -> None:
-        """Print the current preferences of the application.
+    def interactive(self, prompt="chatkokkos") -> None:
+        """Start an interactive chat session with the model.
 
-        This method displays all the preferences stored in the self.preferences
-        attribute, which typically includes configuration settings for the
-        application such as model paths, dataset locations, and other parameters.
+        This method provides a command-line interface for interacting with the model.
+        It maintains a command history and supports context setting for conversations.
 
-        Note:
-            The output format depends on the __str__ implementation of the
-            Preferences class.
+        Commands:
+            /bye: Exit the interactive session
+            /context: Set a new context for subsequent questions
+
+        Args:
+            prompt (str, optional): The prompt prefix to display. Defaults to "chatkokkos".
+
+        Requires:
+            - A model must be loaded via one of:
+                - load_base_model()
+                - load_finetuned_model()
+                - load_merged_model()
+            - The tokenizer must be initialized
+
+        Example:
+            ```python
+            >>> app = App()
+            >>> app.load_merged_model()
+            >>> app.interactive()
+            chatkokkos ()> What is Kokkos?
         """
-        print(self.preferences)
+        history_file = Path(self.config.prompt_history_file).expanduser()
+        try:
+            readline.read_history_file(history_file)
+            h_len = readline.get_current_history_length()
+        except FileNotFoundError:
+            open(history_file, "wb+").close()
+            readline.add_history("/context")
+            readline.add_history("/bye")
+            h_len = readline.get_current_history_length()
+
+        def save_history(prev_h_len, histfile):
+            new_h_len = readline.get_current_history_length()
+            readline.set_history_length(1000)
+            readline.append_history_file(new_h_len - prev_h_len, histfile)
+
+        atexit.register(save_history, h_len, history_file)
+
+        context = ""
+        print("Use '/bye' to exit.\nUse '/context' to set context.")
+        while True:
+            user_input = input(f"{prompt} ({context})> ")
+            if user_input == "/bye":
+                break
+            if user_input == "/context":
+                context = input("Context: ")
+                continue
+            print(self.chatkokkos_evaluate(user_input, context))
+
+    def print_config(self) -> None:
+        """Print the current configurations of the application in a formatted table.
+
+        This method displays all configuration settings from self.preferences in a
+        formatted table using the tabulate library. The output includes paths for:
+        - Data files
+        - Base model
+        - Finetuned model layers
+        - Merged model
+
+        Example:
+            >>> app = App()
+            >>> app.print_config()
+            =====================  ==========================
+            Setting               Value
+            =====================  ==========================
+            data_file             /path/to/data.json
+            base_model_path       /path/to/base/model
+            finetuned_model_path  /path/to/finetuned/model
+            merged_model_path     /path/to/merged/model
+            =====================  ==========================
+        """
+        # Get configuration as dict, excluding internal pydantic fields
+        config_dict = self.config.model_dump()
+
+        # Format as table rows
+        table_data = [[setting, value] for setting, value in config_dict.items()]
+
+        # Define table headers
+        headers = ["Setting", "Value"]
+
+        # Print formatted table
+        print(tabulate(table_data, headers=headers, tablefmt="simple"))

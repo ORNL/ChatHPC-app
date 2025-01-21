@@ -39,6 +39,7 @@ dependencies = [
   "wandb",
   "click",
   "pydantic-settings",
+  "tabulate",
 ]
 
 [tool.hatch.metadata]
@@ -51,8 +52,8 @@ Issues = "https://code.ornl.gov/ChatHPC/ChatKokkos/-/issues"
 Source = "https://code.ornl.gov/ChatHPC/ChatKokkos"
 
 [project.scripts]
-ChatKokkos = "chatkokkos.__main__:main"
-chatkokkos = "chatkokkos.__main__:main"
+ChatKokkos = "chatkokkos.__main__:cli"
+chatkokkos = "chatkokkos.__main__:cli"
 
 [tool.hatch.version]
 path = "src/chatkokkos/__about__.py"
