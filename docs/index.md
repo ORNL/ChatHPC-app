@@ -399,7 +399,7 @@ hatch run docs:serve -a 0.0.0.0:8000
 
 ### Setup CI
 
-See [Devdocs](devdocs.md) and [gitlab-ci](gitlab-ci.md).
+See [Devdocs](https://docs.excl.ornl.gov/quick-start-guides/devdocs) and [gitlab-ci](https://docs.excl.ornl.gov/quick-start-guides/gitlab-ci).
 
 Example `.gitlab-ci.yml`:
 
