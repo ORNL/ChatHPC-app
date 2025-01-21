@@ -1,4 +1,5 @@
 """App Module: used to construct an app for training ChatHPC LLMs."""
+
 from __future__ import annotations
 
 import logging
@@ -22,7 +23,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_APP_CONFIG_FILE = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), "config/default_app_settings.json")))
+DEFAULT_APP_CONFIG_FILE = Path(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "config/default_app_settings.json"))
+)
+
+
 class AppConfig(BaseSettings):
     """Configuration settings for the application.
 
@@ -35,6 +40,7 @@ class AppConfig(BaseSettings):
         finetuned_model_path (str): Path to the finetuned LLM layers.
         merged_model_path (str): Path to the merged LLM model.
     """
+
     data_file: str = "init"
     base_model_path: str = "init"
     finetuned_model_path: str = "init"
@@ -58,7 +64,13 @@ class AppConfig(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        return (env_settings, dotenv_settings, init_settings, JsonConfigSettingsSource(settings_cls), file_secret_settings)
+        return (
+            env_settings,
+            dotenv_settings,
+            init_settings,
+            JsonConfigSettingsSource(settings_cls),
+            file_secret_settings,
+        )
 
 
 class App:
@@ -76,6 +88,7 @@ class App:
         train_dataset: Dataset used for training.
         eval_dataset: Dataset used for evaluation.
     """
+
     def __init__(self):
         """Initialize the Application object."""
         self.preferences = AppConfig()
@@ -212,14 +225,11 @@ class App:
         logger.info("Loading the dataset from %s", self.preferences.data_file)
 
         from datasets import load_dataset
-        self.train_dataset = load_dataset(
-            "json", data_files=self.preferences.data_file, split="train"
-        )
-        self.eval_dataset = load_dataset(
-            "json", data_files=self.preferences.data_file, split="train"
-        )
 
-    def evaluate_model(self, prompt:str, max_new_tokens:int=800) -> str:
+        self.train_dataset = load_dataset("json", data_files=self.preferences.data_file, split="train")
+        self.eval_dataset = load_dataset("json", data_files=self.preferences.data_file, split="train")
+
+    def evaluate_model(self, prompt: str, max_new_tokens: int = 800) -> str:
         """Evaluate the model on a given prompt and generate a response.
 
         Args:
@@ -242,7 +252,7 @@ class App:
             return self.tokenizer.decode(output)
 
     @staticmethod
-    def chatkokkos_prompt(question:str, context:str) -> str:
+    def chatkokkos_prompt(question: str, context: str) -> str:
         """Create a formatted prompt for Kokkos-related questions.
 
         This method generates a structured prompt that includes the question and context
@@ -367,7 +377,6 @@ class App:
                 """)
             return tokenize(full_prompt)
 
-
         self.tokenizer.add_eos_token = True
 
         self.tokenized_train_dataset = self.train_dataset.map(generate_and_tokenize_prompt)
@@ -435,7 +444,6 @@ class App:
         #     else:
         #         print(f"Checkpoint {resume_from_checkpoint} not found")
 
-
         wandb_project = "ChatKokkos"
         if len(wandb_project) > 0:
             os.environ["WANDB_PROJECT"] = wandb_project
@@ -474,7 +482,9 @@ class App:
             args=self.training_args,
             train_dataset=self.tokenized_train_dataset,
             eval_dataset=self.tokenized_val_dataset,
-            data_collator=DataCollatorForSeq2Seq(self.tokenizer, pad_to_multiple_of=8, return_tensors="pt", padding=True),
+            data_collator=DataCollatorForSeq2Seq(
+                self.tokenizer, pad_to_multiple_of=8, return_tensors="pt", padding=True
+            ),
         )
 
         self.model.config.use_cache = False
@@ -496,7 +506,6 @@ class App:
         self.model = trainer.model.merge_and_unload()
         self.model.save_pretrained(self.preferences.merged_model_path)
 
-
     def print_preferences(self) -> None:
         """Print the current preferences of the application.
 
@@ -509,4 +518,3 @@ class App:
             Preferences class.
         """
         print(self.preferences)
-
