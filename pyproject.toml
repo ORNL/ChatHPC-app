@@ -37,6 +37,7 @@ dependencies = [
   "jupyter",
   "nbdime",
   "wandb",
+  "click",
 ]
 
 [tool.hatch.metadata]
@@ -49,7 +50,8 @@ Issues = "https://code.ornl.gov/ChatHPC/ChatKokkos/-/issues"
 Source = "https://code.ornl.gov/ChatHPC/ChatKokkos"
 
 [project.scripts]
-ChatKokkos-add1 = "chatkokkos.add:main"
+ChatKokkos = "chatkokkos.__main__:main"
+chatkokkos = "chatkokkos.__main__:main"
 
 [tool.hatch.version]
 path = "src/chatkokkos/__about__.py"
