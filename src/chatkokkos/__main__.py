@@ -23,6 +23,7 @@ def train():
     app = App()
     app.load_base_model()
     app.load_datasets()
+    app.tokenize_training_set()
     app.train()
 
 
