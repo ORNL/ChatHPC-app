@@ -1,7 +1,13 @@
 *_output.html
 *_output.ipynb
 *_output.txt
+*_out.json
+out*.txt
 requirements-lock.txt
 /jupyter_app/
 /app/
 /wandb/
+/kokkos-code-llama/
+/merged_adapters/
+/peft_adapter/
+/tokenizer/
