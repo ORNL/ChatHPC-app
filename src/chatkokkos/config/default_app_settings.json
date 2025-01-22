@@ -3,6 +3,7 @@
     "base_model_path": "/auto/projects/ChatHPC/models/cache/meta-llama/CodeLlama-7b-hf",
     "finetuned_model_path": "./peft_adapter",
     "merged_model_path": "./merged_adapters",
+    "training_output_dir": "./kokkos-code-llama",
     "max_response_tokens": 500,
     "prompt_history_file": "~/.chatkokkos_history"
 }

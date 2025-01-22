@@ -66,6 +66,7 @@ class AppConfig(BaseSettings):
     base_model_path: str
     finetuned_model_path: str
     merged_model_path: str
+    training_output_dir: str
     max_response_tokens: int
     prompt_history_file: str
 
@@ -480,7 +481,7 @@ class App:
         batch_size = 128
         per_device_train_batch_size = 32
         gradient_accumulation_steps = batch_size // per_device_train_batch_size
-        output_dir = "kokkos-code-llama"
+        output_dir = self.config.training_output_dir
 
         # resume_from_checkpoint = os.path.join(base_model_path, "pytorch_model-00001-of-00003.bin")
 
