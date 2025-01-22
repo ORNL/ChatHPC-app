@@ -7,7 +7,6 @@ import logging
 import os
 import readline
 import sys
-import textwrap
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -322,19 +321,18 @@ class App:
             "You are a powerful LLM model for Kokkos..."
             ```
         """
-        return textwrap.dedent(f"""\
-            You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
+        return f"""You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
 
-            You must output the Kokkos question that answers the question.
+You must output the Kokkos question that answers the question.
 
-            ### Input:
-            {question}
+### Input:
+{question}
 
-            ### Context:
-            {context}
+### Context:
+{context}
 
-            ### Response:
-            """)
+### Response:
+"""
 
     def chatkokkos_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> str:
         """Evaluate a Kokkos-related question with provided context.
@@ -410,20 +408,19 @@ class App:
             return result
 
         def generate_and_tokenize_prompt(data_point):
-            full_prompt = textwrap.dedent(f"""\
-                You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
+            full_prompt = f"""You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
 
-                You must output the Kokkos question that answers the question.
+You must output the Kokkos question that answers the question.
 
-                ### Input:
-                {data_point["question"]}
+### Input:
+{data_point["question"]}
 
-                ### Context:
-                {data_point["context"]}
+### Context:
+{data_point["context"]}
 
-                ### Response:
-                {data_point["answer"]}
-                """)
+### Response:
+{data_point["answer"]}
+"""
             return tokenize(full_prompt)
 
         self.tokenizer.add_eos_token = True
