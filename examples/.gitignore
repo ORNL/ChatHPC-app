@@ -2,3 +2,6 @@
 *_output.ipynb
 *_output.txt
 requirements-lock.txt
+/jupyter_app/
+/app/
+/wandb/
