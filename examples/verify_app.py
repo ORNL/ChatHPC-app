@@ -215,6 +215,61 @@ def ignore_minor(string:str):
     s = "\n".join(l)
     return s
 
+def run_ollama():
+    from ollama import GenerateResponse, generate
+
+    from chatkokkos.app import App as ChatApp
+    experiment = 'ollama'
+    chat_app = ChatApp()
+    chat_app.load_datasets()
+
+    def get_ol():
+        ol = []
+        for item in tqdm(chat_app.train_dataset, "Run ol"):
+            prompt = chat_app.chatkokkos_prompt(item['question'], item['context'])
+            response: GenerateResponse = generate(model="ChatKokkos", prompt=prompt, options={"temperature": 0.0})
+            datapoint = {
+                "question": item['question'],
+                "context": item['context'],
+                "answer": item['answer'],
+                # "response": extract_answer(response.response),
+                "response": response.response,
+            }
+            ol.append(datapoint)
+        return ol
+    ol = read_or_new_json(f'{experiment}_ol_out', get_ol)
+
+    return ol
+
+
+def verify_ollama():
+    (finetuned, merged) = run_app()
+    ol = run_ollama()
+
+    ol_errors = 0
+
+    for i, (fine, o) in tqdm(enumerate(zip(merged, ol)), "Compare"):
+        if fine['answer'] != o['answer']:
+            print("Error: answer mismatch")
+            print(f"Sample {i}")
+            print(f"Finetuned:\n{fine['answer']}")
+            print(f"Ollama:\n{o['answer']}")
+            print(f"**********************************************************")
+            print()
+            assert False, "Answer Mismatch"
+        if ignore_minor(fine['response']) != ignore_minor(o['response']):
+            ol_errors += 1
+            print("Error: ollama mismatch")
+            print(f"Sample {i}")
+            print(f"Finetuned:\n{fine['response']}")
+            print(f"Ollama:\n{o['response']}")
+            print(f"**********************************************************")
+            print()
+
+    print(f'Ollama Errors: {ol_errors}')
+    return ol_errors
+
+
 def verify_app(runner):
     (finetuned, merged) = runner()
 
@@ -276,17 +331,23 @@ def main(raw_args=None):
     print('Response Errors: {}, Merge Errors: {}'.format(*notebook_errors))
     print('Response Errors: {}, Merge Errors: {}'.format(*notebook_errors), file=sys.stderr)
 
-    print("** Running Notebook App **")
-    print("** Running Notebook App **", file=sys.stderr)
+    print("\n\n** Running Notebook App **")
+    print("\n\n** Running Notebook App **", file=sys.stderr)
     notebook_app_errors = verify_app(run_notebook_app)
     print('Response Errors: {}, Merge Errors: {}'.format(*notebook_app_errors))
     print('Response Errors: {}, Merge Errors: {}'.format(*notebook_app_errors), file=sys.stderr)
 
-    print("** Running App **")
-    print("** Running App **", file=sys.stderr)
+    print("\n\n** Running App **")
+    print("\n\n** Running App **", file=sys.stderr)
     app_errors = verify_app(run_app)
     print('Response Errors: {}, Merge Errors: {}'.format(*app_errors))
     print('Response Errors: {}, Merge Errors: {}'.format(*app_errors), file=sys.stderr)
+
+    print("\n\n** Running Ollama **")
+    print("\n\n** Running Ollama **", file=sys.stderr)
+    ol_errors = verify_ollama()
+    print(f'Ollama Errors: {ol_errors}')
+    print(f'Ollama Errors: {ol_errors}', file=sys.stderr)
 
 if __name__ == "__main__":
     main()

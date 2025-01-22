@@ -550,6 +550,7 @@ You must output the Kokkos question that answers the question.
 
         trainer.model.save_pretrained(self.config.finetuned_model_path)
         self.model = trainer.model.merge_and_unload()
+        self.tokenizer.save_pretrained(self.config.merged_model_path)
         self.model.save_pretrained(self.config.merged_model_path)
 
     def interactive(self, prompt="chatkokkos") -> None:
