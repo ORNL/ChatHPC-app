@@ -82,8 +82,7 @@ def extract_answer(response: str):
         return None
     return response[index + len(matchstr):]\
         .replace('<s>', '')\
-        .replace('</s>', '')\
-        .strip()
+        .replace('</s>', '')
 
 
 def run_notebook():
@@ -226,25 +225,25 @@ def verify_app(runner):
         if fine['answer'] != merge['answer']:
             print("Error: answer mismatch")
             print(f"Sample {i}")
-            print(f"Finetuned: {fine['answer']}")
-            print(f"Merged: {merge['answer']}")
+            print(f"Finetuned:\n{fine['answer']}")
+            print(f"Merged:\n{merge['answer']}")
             print(f"**********************************************************")
             print()
-            assert False, "Answer Missmatch"
+            assert False, "Answer Mismatch"
         if ignore_minor(fine['answer']) != ignore_minor(fine['response']):
             response_errors += 1
             print("Error: response mismatch")
             print(f"Sample {i}")
-            print(f"Answer:   {ignore_minor(fine['answer'])}")
-            print(f"Response: {ignore_minor(fine['response'])}")
+            print(f"Answer:\n{fine['answer']}")
+            print(f"Response:\n{fine['response']}")
             print(f"**********************************************************")
             print()
         if ignore_minor(fine['response']) != ignore_minor(merge['response']):
             merge_errors += 1
             print("Error: merge mismatch")
             print(f"Sample {i}")
-            print(f"Finetuned: {ignore_minor(fine['response'])}")
-            print(f"Merged:    {ignore_minor(merge['response'])}")
+            print(f"Finetuned:\n{fine['response']}")
+            print(f"Merged:\n{merge['response']}")
             print(f"**********************************************************")
             print()
 

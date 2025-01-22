@@ -4,6 +4,6 @@
     "finetuned_model_path": "./peft_adapter",
     "merged_model_path": "./merged_adapters",
     "training_output_dir": "./kokkos-code-llama",
-    "max_response_tokens": 500,
+    "max_response_tokens": 600,
     "prompt_history_file": "~/.chatkokkos_history"
 }
