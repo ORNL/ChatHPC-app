@@ -22,3 +22,11 @@ An alternative approach is to use date-based versioning.
 With this method, the version is YEAR.MONTH.RELEASE. To increment this version, use the year and the date without 0 padding for the first two numbers. I prefer to use the year without the centary. Then increment the RELEASE number to a unique release. This process is done automatically by the `scripts/version_bump.py` script. Using this script is the prefered method for versioning without planned backporting of fixes.
 
 ## [Unreleased]
+
+Initial version of the ChatKokkos Application.
+
+This version has been verified to work for the full finetuning to Ollama model for the 3 main interfaces.
+
+### Added
+
+- Traing and inferece supported via Jupyter Notebook, ChatKokkos API, or CLI application.
