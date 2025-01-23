@@ -23,6 +23,8 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+## [25.1.0] - 2025-01-23
+
 Initial version of the ChatKokkos Application.
 
 This version has been verified to work for the full finetuning to Ollama model for the 3 main interfaces.
