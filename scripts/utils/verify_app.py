@@ -3,21 +3,15 @@
 """Uses the output from scripts/test_training.sh to verify the the models trained properly."""
 
 import argparse
-import sys
 import contextlib
 import os
-import datetime
 import subprocess
-import time
-import functools
-import random
-import re
-import json
+import sys
 import traceback
-from multiprocessing import Pool
 from subprocess import check_output
-from tqdm import tqdm
+
 from datastore.datastore import read_or_new_json
+from tqdm import tqdm
 
 GIT_ROOT = check_output("git rev-parse --show-toplevel", shell=True).decode().strip()  # noqa S602
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -75,19 +69,19 @@ def shell_source(script):
     env = dict(line.split("=", 1) for line in output.splitlines())
     os.environ.update(env)
 
+
 def extract_answer(response: str):
-    matchstr = '### Response:\n'
+    matchstr = "### Response:\n"
     index = response.find(matchstr)
     if index == -1:
         return None
-    return response[index + len(matchstr):]\
-        .replace('<s>', '')\
-        .replace('</s>', '')
+    return response[index + len(matchstr) :].replace("<s>", "").replace("</s>", "")
 
 
 def run_notebook():
     from chatkokkos.app import App as ChatApp
-    experiment = 'jupyter'
+
+    experiment = "jupyter"
     os.environ["CHATKOKKOS_FINETUNED_MODEL_PATH"] = "./peft_adapter"
     os.environ["CHATKOKKOS_MERGED_MODEL_PATH"] = "./merged_adapters"
     os.environ["CHATKOKKOS_TRAINING_OUTPUT_DIR"] = "./kokkos-code-llama"
@@ -98,37 +92,41 @@ def run_notebook():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chatkokkos_evaluate(item['question'], item['context'])
+            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
             datapoint = {
-                "question": item['question'],
-                "context": item['context'],
-                "answer": item['answer'],
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
                 "response": extract_answer(response),
             }
             finetune.append(datapoint)
         return finetune
-    finetune = read_or_new_json(f'{experiment}_finetune_out', get_finetuned)
+
+    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
 
     def get_merged():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chatkokkos_evaluate(item['question'], item['context'])
+            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
             datapoint = {
-                "question": item['question'],
-                "context": item['context'],
-                "answer": item['answer'],
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
                 "response": extract_answer(response),
             }
             merged.append(datapoint)
         return merged
-    merged = read_or_new_json(f'{experiment}_merged_out', get_merged)
+
+    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
 
     return (finetune, merged)
 
+
 def run_notebook_app():
     from chatkokkos.app import App as ChatApp
-    experiment = 'jupyter_app'
+
+    experiment = "jupyter_app"
     os.environ["CHATKOKKOS_FINETUNED_MODEL_PATH"] = "./jupyter_app/peft_adapter"
     os.environ["CHATKOKKOS_MERGED_MODEL_PATH"] = "./jupyter_app/merged_adapters"
     os.environ["CHATKOKKOS_TRAINING_OUTPUT_DIR"] = "./jupyter_app/kokkos-code-llama"
@@ -139,37 +137,41 @@ def run_notebook_app():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chatkokkos_evaluate(item['question'], item['context'])
+            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
             datapoint = {
-                "question": item['question'],
-                "context": item['context'],
-                "answer": item['answer'],
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
                 "response": extract_answer(response),
             }
             finetune.append(datapoint)
         return finetune
-    finetune = read_or_new_json(f'{experiment}_finetune_out', get_finetuned)
+
+    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
 
     def get_merged():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chatkokkos_evaluate(item['question'], item['context'])
+            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
             datapoint = {
-                "question": item['question'],
-                "context": item['context'],
-                "answer": item['answer'],
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
                 "response": extract_answer(response),
             }
             merged.append(datapoint)
         return merged
-    merged = read_or_new_json(f'{experiment}_merged_out', get_merged)
+
+    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
 
     return (finetune, merged)
 
+
 def run_app():
     from chatkokkos.app import App as ChatApp
-    experiment = 'app'
+
+    experiment = "app"
     os.environ["CHATKOKKOS_FINETUNED_MODEL_PATH"] = "./app/peft_adapter"
     os.environ["CHATKOKKOS_MERGED_MODEL_PATH"] = "./app/merged_adapters"
     os.environ["CHATKOKKOS_TRAINING_OUTPUT_DIR"] = "./app/kokkos-code-llama"
@@ -180,66 +182,69 @@ def run_app():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chatkokkos_evaluate(item['question'], item['context'])
+            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
             datapoint = {
-                "question": item['question'],
-                "context": item['context'],
-                "answer": item['answer'],
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
                 "response": extract_answer(response),
             }
             finetune.append(datapoint)
         return finetune
-    finetune = read_or_new_json(f'{experiment}_finetune_out', get_finetuned)
+
+    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
 
     def get_merged():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chatkokkos_evaluate(item['question'], item['context'])
+            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
             datapoint = {
-                "question": item['question'],
-                "context": item['context'],
-                "answer": item['answer'],
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
                 "response": extract_answer(response),
             }
             merged.append(datapoint)
         return merged
-    merged = read_or_new_json(f'{experiment}_merged_out', get_merged)
+
+    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
 
     return (finetune, merged)
 
-def ignore_minor(string:str):
+
+def ignore_minor(string: str):
     s = string.strip()
-    l = s.splitlines()
-    l = [x.strip() for x in l]
-    s = "\n".join(l)
-    return s
+    line = s.splitlines()
+    line = [x.strip() for x in line]
+    return "\n".join(line)
+
 
 def run_ollama():
     from ollama import GenerateResponse, generate
 
     from chatkokkos.app import App as ChatApp
-    experiment = 'ollama'
+
+    experiment = "ollama"
     chat_app = ChatApp()
     chat_app.load_datasets()
 
     def get_ol():
         ol = []
         for item in tqdm(chat_app.train_dataset, "Run ol"):
-            prompt = chat_app.chatkokkos_prompt(item['question'], item['context'])
+            prompt = chat_app.chatkokkos_prompt(item["question"], item["context"])
             response: GenerateResponse = generate(model="ChatKokkos", prompt=prompt, options={"temperature": 0.0})
             datapoint = {
-                "question": item['question'],
-                "context": item['context'],
-                "answer": item['answer'],
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
                 # "response": extract_answer(response.response),
                 "response": response.response,
             }
             ol.append(datapoint)
         return ol
-    ol = read_or_new_json(f'{experiment}_ol_out', get_ol)
 
-    return ol
+    return read_or_new_json(f"{experiment}_ol_out", get_ol)
 
 
 def verify_ollama(expected_reponse_errors=0):
@@ -250,15 +255,15 @@ def verify_ollama(expected_reponse_errors=0):
     ol_errors = 0
 
     for i, (fine, o) in tqdm(enumerate(zip(merged, ol)), "Compare"):
-        if fine['answer'] != o['answer']:
+        if fine["answer"] != o["answer"]:
             print("Error: answer mismatch")
             print(f"Sample {i}")
             print(f"Finetuned:\n{fine['answer']}")
             print(f"Ollama:\n{o['answer']}")
-            print(f"**********************************************************")
+            print("**********************************************************")
             print()
-            assert False, "Answer Mismatch"
-        if ignore_minor(o['answer']) != ignore_minor(o['response']):
+            raise RuntimeError("Answer Mismatch")
+        if ignore_minor(o["answer"]) != ignore_minor(o["response"]):
             response_errors += 1
             # print("Error: response mismatch")
             # print(f"Sample {i}")
@@ -266,20 +271,20 @@ def verify_ollama(expected_reponse_errors=0):
             # print(f"Response:\n{o['response']}")
             # print(f"**********************************************************")
             # print()
-        if ignore_minor(fine['response']) != ignore_minor(o['response']):
+        if ignore_minor(fine["response"]) != ignore_minor(o["response"]):
             ol_errors += 1
             print("Error: ollama mismatch")
             print(f"Sample {i}")
             print(f"Finetuned:\n{fine['response']}")
             print(f"Ollama:\n{o['response']}")
-            print(f"**********************************************************")
+            print("**********************************************************")
             print()
 
     if response_errors != expected_reponse_errors:
-        print(f'Error: Response Errors do not match expected: {response_errors} != {expected_reponse_errors}')
+        print(f"Error: Response Errors do not match expected: {response_errors} != {expected_reponse_errors}")
         ol_errors += 1
 
-    print(f'Ollama Errors: {ol_errors}')
+    print(f"Ollama Errors: {ol_errors}")
     return ol_errors
 
 
@@ -290,39 +295,39 @@ def verify_app(runner):
     merge_errors = 0
 
     for i, (fine, merge) in tqdm(enumerate(zip(finetuned, merged)), "Compare"):
-        if fine['answer'] != merge['answer']:
+        if fine["answer"] != merge["answer"]:
             print("Error: answer mismatch")
             print(f"Sample {i}")
             print(f"Finetuned:\n{fine['answer']}")
             print(f"Merged:\n{merge['answer']}")
-            print(f"**********************************************************")
+            print("**********************************************************")
             print()
-            assert False, "Answer Mismatch"
-        if ignore_minor(fine['answer']) != ignore_minor(fine['response']):
+            raise RuntimeError("Answer Mismatch")
+        if ignore_minor(fine["answer"]) != ignore_minor(fine["response"]):
             response_errors += 1
             print("Error: response mismatch")
             print(f"Sample {i}")
             print(f"Answer:\n{fine['answer']}")
             print(f"Response:\n{fine['response']}")
-            print(f"**********************************************************")
+            print("**********************************************************")
             print()
-        if ignore_minor(fine['response']) != ignore_minor(merge['response']):
+        if ignore_minor(fine["response"]) != ignore_minor(merge["response"]):
             merge_errors += 1
             print("Error: merge mismatch")
             print(f"Sample {i}")
             print(f"Finetuned:\n{fine['response']}")
             print(f"Merged:\n{merge['response']}")
-            print(f"**********************************************************")
+            print("**********************************************************")
             print()
 
-    print(f'Response Errors: {response_errors}, Merge Errors: {merge_errors}')
+    print(f"Response Errors: {response_errors}, Merge Errors: {merge_errors}")
     return response_errors, merge_errors
 
 
 def init_parser(parser):
     # parser.add_argument('-d', '--dir', type=str, default=OUTPUT_DIR)
     parser.add_argument("--debug", action="store_true", help="Open debug port (5678).")
-    parser.add_argument('files', metavar='p', type=str, nargs='*')
+    parser.add_argument("files", metavar="p", type=str, nargs="*")
 
 
 def main(raw_args=None):
@@ -341,27 +346,27 @@ def main(raw_args=None):
     print("** Running Notebook **")
     print("** Running Notebook **", file=sys.stderr)
     notebook_errors = verify_app(run_notebook)
-    print('Response Errors: {}, Merge Errors: {}'.format(*notebook_errors))
-    print('Response Errors: {}, Merge Errors: {}'.format(*notebook_errors), file=sys.stderr)
+    print("Response Errors: {}, Merge Errors: {}".format(*notebook_errors))
+    print("Response Errors: {}, Merge Errors: {}".format(*notebook_errors), file=sys.stderr)
 
     print("\n\n** Running Notebook App **")
     print("\n\n** Running Notebook App **", file=sys.stderr)
     notebook_app_errors = verify_app(run_notebook_app)
-    print('Response Errors: {}, Merge Errors: {}'.format(*notebook_app_errors))
-    print('Response Errors: {}, Merge Errors: {}'.format(*notebook_app_errors), file=sys.stderr)
+    print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors))
+    print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors), file=sys.stderr)
 
     print("\n\n** Running App **")
     print("\n\n** Running App **", file=sys.stderr)
     app_errors = verify_app(run_app)
-    print('Response Errors: {}, Merge Errors: {}'.format(*app_errors))
-    print('Response Errors: {}, Merge Errors: {}'.format(*app_errors), file=sys.stderr)
+    print("Response Errors: {}, Merge Errors: {}".format(*app_errors))
+    print("Response Errors: {}, Merge Errors: {}".format(*app_errors), file=sys.stderr)
 
     print("\n\n** Running Ollama **")
     print("\n\n** Running Ollama **", file=sys.stderr)
     ol_errors = verify_ollama(expected_reponse_errors=app_errors[0])
-    print(f'Ollama Errors: {ol_errors}')
-    print(f'Ollama Errors: {ol_errors}', file=sys.stderr)
+    print(f"Ollama Errors: {ol_errors}")
+    print(f"Ollama Errors: {ol_errors}", file=sys.stderr)
+
 
 if __name__ == "__main__":
     main()
-

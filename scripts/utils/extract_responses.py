@@ -3,18 +3,12 @@
 """Extract example output from jupyter notebook."""
 
 import argparse
-import sys
 import contextlib
-import os
-import datetime
-import subprocess
-import time
-import functools
-import random
-import re
 import json
+import os
+import subprocess
+import sys
 import traceback
-from multiprocessing import Pool
 from subprocess import check_output
 
 GIT_ROOT = check_output("git rev-parse --show-toplevel", shell=True).decode().strip()  # noqa S602
@@ -73,40 +67,42 @@ def shell_source(script):
     env = dict(line.split("=", 1) for line in output.splitlines())
     os.environ.update(env)
 
+
 def check_words_in_string(words, string):
-    for word in words:
-        if word in string:
-            return True
-    return False
+    return any(word in string for word in words)
+
 
 def extract_output(file: str):
     # Load the notebook
-    with open(file, 'r') as file:
+    with open(file) as file:
         notebook = json.load(file)
 
     # Iterate through the cells and print outputs
-    for cell in notebook['cells']:
-        if cell['cell_type'] == 'code':
+    for cell in notebook["cells"]:
+        if cell["cell_type"] == "code":
             generate = False
 
-            for input in cell.get('source', []):
-                if check_words_in_string(['model.generate', '_evaluate', 'chat_app.tokenize_training_set()', 'generate_and_tokenize_prompt'], input):
+            for i in cell.get("source", []):
+                if check_words_in_string(
+                    ["model.generate", "_evaluate", "chat_app.tokenize_training_set()", "generate_and_tokenize_prompt"],
+                    i,
+                ):
                     generate = True
                     break
 
             if generate:
-                for output in cell.get('outputs', []):
-                    if 'text' in output:
-                        print(''.join(output['text']))
-                    elif 'data' in output:
-                        for mime_type, data in output['data'].items():
+                for output in cell.get("outputs", []):
+                    if "text" in output:
+                        print("".join(output["text"]))
+                    elif "data" in output:
+                        for data in output["data"].values():
                             print(data)
 
 
 def init_parser(parser):
     # parser.add_argument('-d', '--dir', type=str, default=OUTPUT_DIR)
     parser.add_argument("--debug", action="store_true", help="Open debug port (5678).")
-    parser.add_argument('files', metavar='p', type=str, nargs='*')
+    parser.add_argument("files", metavar="p", type=str, nargs="*")
 
 
 def main(raw_args=None):
