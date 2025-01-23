@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Description"""
+"""Extract example output from jupyter notebook."""
 
 import argparse
 import sys

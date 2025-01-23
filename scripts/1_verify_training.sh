@@ -10,6 +10,6 @@ pip install papermill
 
 pushd $GIT_ROOT/examples
 
-python ./verify_app.py > verify_training.txt
+python $GIT_ROOT/scripts/utils/verify_app.py > verify_training.txt
 
 popd
