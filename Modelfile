@@ -1,1 +1,1 @@
-FROM examples/app/merged_adapters/Merged_Adapters-6.7B-F16.gguf
+FROM merged_adapters/Merged_Adapters-6.7B-F16.gguf

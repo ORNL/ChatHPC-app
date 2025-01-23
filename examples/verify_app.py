@@ -242,10 +242,11 @@ def run_ollama():
     return ol
 
 
-def verify_ollama():
+def verify_ollama(expected_reponse_errors=0):
     (finetuned, merged) = run_app()
     ol = run_ollama()
 
+    response_errors = 0
     ol_errors = 0
 
     for i, (fine, o) in tqdm(enumerate(zip(merged, ol)), "Compare"):
@@ -257,6 +258,14 @@ def verify_ollama():
             print(f"**********************************************************")
             print()
             assert False, "Answer Mismatch"
+        if ignore_minor(o['answer']) != ignore_minor(o['response']):
+            response_errors += 1
+            # print("Error: response mismatch")
+            # print(f"Sample {i}")
+            # print(f"Answer:\n{o['answer']}")
+            # print(f"Response:\n{o['response']}")
+            # print(f"**********************************************************")
+            # print()
         if ignore_minor(fine['response']) != ignore_minor(o['response']):
             ol_errors += 1
             print("Error: ollama mismatch")
@@ -265,6 +274,10 @@ def verify_ollama():
             print(f"Ollama:\n{o['response']}")
             print(f"**********************************************************")
             print()
+
+    if response_errors != expected_reponse_errors:
+        print(f'Error: Response Errors do not match expected: {response_errors} != {expected_reponse_errors}')
+        ol_errors += 1
 
     print(f'Ollama Errors: {ol_errors}')
     return ol_errors
@@ -345,7 +358,7 @@ def main(raw_args=None):
 
     print("\n\n** Running Ollama **")
     print("\n\n** Running Ollama **", file=sys.stderr)
-    ol_errors = verify_ollama()
+    ol_errors = verify_ollama(expected_reponse_errors=app_errors[0])
     print(f'Ollama Errors: {ol_errors}')
     print(f'Ollama Errors: {ol_errors}', file=sys.stderr)
 
