@@ -31,4 +31,4 @@ This version has been verified to work for the full finetuning to Ollama model f
 
 ### Added
 
-- Traing and inferece supported via Jupyter Notebook, ChatKokkos API, or CLI application.
+- Training and inference supported via Jupyter Notebook, ChatKokkos API, or CLI application.
