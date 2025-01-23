@@ -32,3 +32,6 @@ This version has been verified to work for the full finetuning to Ollama model f
 ### Added
 
 - Training and inference supported via Jupyter Notebook, ChatKokkos API, or CLI application.
+
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatKokkos/-/compare/v25.1.0...main
+[25.1.0]: https://code.ornl.gov/ChatHPC/ChatKokkos/-/releases/v25.1.0

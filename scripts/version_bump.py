@@ -11,6 +11,7 @@ import os
 import subprocess
 import sys
 import traceback
+from itertools import pairwise
 from subprocess import check_output
 
 from pytz import timezone
@@ -149,19 +150,39 @@ def get_next_version(version_override: str | None = None, use_last_commit_date: 
     return Version(year=year, month=month, revision=revision)
 
 
-def update_changelog(version: Version, filename: str):
+def collect_versions(changelog: list[str]) -> list[str]:
+    """Collect all versions from the changelog.
+
+    Args:
+        changelog (list[str]): Content of the changelog file by line.
+
+    Returns:
+        list[str]: List of version numbers found in the changelog.
+    """
+    versions = []
+    for line in changelog:
+        # Look for version headers like "## [23.1.0]"
+        if line.startswith("## [") and "]" in line:
+            version = line[4:line.index("]")]
+            if version.lower() != "unreleased":
+                versions.append(version)
+    return versions
+
+
+def update_changelog(version: Version, filename: str, base_url: str | None = None):
     """Update the changelog on version bump.
 
     Args:
         version (Version): version
         filename (str): Changelog filename.
+        base_url (str): Base url for links.
     """
 
     # Read the file.
     with open(filename) as fd:
         changelog = fd.readlines()
 
-    # Find the insertion point.
+    # Find the insertion line index.
     try:
         unreleased_loc = changelog.index("## [Unreleased]\n")
     except ValueError as e:
@@ -169,7 +190,31 @@ def update_changelog(version: Version, filename: str):
         raise
 
     # Insert the new version
-    changelog.insert(unreleased_loc + 1, f'\n## [{version}] - {datetime.datetime.now(tz=TZ).strftime("%Y-%m-%d")}\n')
+    changelog[unreleased_loc+1:unreleased_loc+1] = ['\n', f'## [{version}] - {datetime.datetime.now(tz=TZ).strftime("%Y-%m-%d")}\n']
+
+    # Update links if base url is provided.
+    if base_url is not None:
+
+        # Collect versions
+        versions = collect_versions(changelog)
+
+        # Find the link line index.
+        unreleased_loc = next((i for i, s in enumerate(changelog) if "[unreleased]: " in s.lower()), -1)
+
+        # If link point found.
+        if unreleased_loc != -1:
+            # Constructure new links
+            new_links = []
+            new_links.append(f'[unreleased]: {base_url}/-/compare/v{versions[0]}...main\n')
+            for version_pair in pairwise(versions):
+                new_links.append(f'[{version_pair[0]}]: {base_url}/-/compare/v{version_pair[1]}...v{version_pair[0]}\n')  # noqa: PERF401
+            new_links.append(f'[{versions[-1]}]: {base_url}/-/releases/v{versions[-1]}\n')
+
+            # Insert the new links
+            changelog = changelog[:unreleased_loc] + new_links
+
+        else:
+            print("Error: could not find the start of the links.", file=sys.stderr)
 
     # Write the file
     with open(filename, "w") as fd:
@@ -225,7 +270,7 @@ def main(raw_args=None):
 
     # Update the CHANGELOG.md
     print("Updating CHANGELOG.md")
-    update_changelog(version, "CHANGELOG.md")
+    update_changelog(version, "CHANGELOG.md", 'https://code.ornl.gov/ChatHPC/ChatKokkos')
 
     # Commit Change.
     print("Committing change.")
