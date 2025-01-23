@@ -235,7 +235,7 @@ def main(raw_args=None):
 
     # Instruct to push to remote.
     branch_name = run("git rev-parse --abbrev-ref HEAD").strip()
-    print(f"\nPush tag to remote with: `git push origin {branch_name} {version}`.")
+    print(f"\nPush tag to remote with: `git push origin {branch_name} v{version}`.")
 
 
 if __name__ == "__main__":
