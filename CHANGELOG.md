@@ -23,6 +23,14 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+### Changed
+
+- Updated `setup_template.sh` to work for generating new ChatHPC applications.
+
+### Fixed
+
+- Improved `version_bump.py` to include links.
+
 ## [25.1.0] - 2025-01-23
 
 Initial version of the ChatKokkos Application.
