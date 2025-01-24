@@ -22,7 +22,7 @@ echo "*****************************************"
 
 read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
-FILES=".editorconfig .gitignore .gitlab-ci.yml .pre-commit-config.yaml CHANGELOG.md README.md docs/api.md docs/index.md mkdocs.yml pyproject.toml ruff_defaults.toml scripts/test_commands.sh src/chatkokkos/__about__.py src/chatkokkos/__init__.py src/chatkokkos/add.py tests/__init__.py tests/test_add.py scripts/version_bump.py"
+FILES=".editorconfig .gitignore .gitlab-ci.yml .pre-commit-config.yaml CHANGELOG.md README.md docs/api.md docs/index.md mkdocs.yml pyproject.toml ruff_defaults.toml scripts/**.py scripts/**.sh src/chatkokkos/**.py tests/__init__.py tests/**.py examples/**.ipynb"
 
 echo Project Name:
 echo sed -i "s#ChatKokkos#$project_name#g" $FILES
