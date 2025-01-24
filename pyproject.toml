@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ChatHPC Application"
+name = "chathpc-app"
 dynamic = ["version"]
 description = "Base ChatHPC Application"
 readme = "README.md"
@@ -48,10 +48,10 @@ dependencies = [
 allow-direct-references = true
 
 [project.urls]
-Documentation = "https://code.ornl.gov/ChatHPC/ChatHPC Application#readme"
-Homepage = "https://code.ornl.gov/ChatHPC/ChatHPC Application"
-Issues = "https://code.ornl.gov/ChatHPC/ChatHPC Application/-/issues"
-Source = "https://code.ornl.gov/ChatHPC/ChatHPC Application"
+Documentation = "https://code.ornl.gov/ChatHPC/ChatHPC-app#readme"
+Homepage = "https://code.ornl.gov/ChatHPC/ChatHPC-app"
+Issues = "https://code.ornl.gov/ChatHPC/ChatHPC-app/-/issues"
+Source = "https://code.ornl.gov/ChatHPC/ChatHPC-app"
 
 [project.scripts]
 ChatHPC = "chathpc.app.__main__:cli"
@@ -59,6 +59,9 @@ chathpc = "chathpc.app.__main__:cli"
 
 [tool.hatch.version]
 path = "src/chathpc/app/__about__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chathpc"]
 
 [tool.hatch.env]
 requires = [
@@ -113,7 +116,7 @@ omit = [
 ]
 
 [tool.coverage.paths]
-chathpc_app = ["src/chathpc/app", "*/ChatHPC Application/src/chathpc/app"]
+chathpc_app = ["src/chathpc/app", "*/chathpc-app/src/chathpc/app"]
 tests = ["tests", "*/ChatHPC Application/tests"]
 
 [tool.coverage.report]
