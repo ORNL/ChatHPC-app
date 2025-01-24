@@ -1,39 +1,5 @@
 # ChatHPC Application
 
-ChatHPC project for Kokkos.
-
-## Steps taken to get started in ExCL with ChatHPC Application.
-
-### Step 1: Fork the template repo
-
-### Step 2: Setup and install dependencies
-
-Add dependencies to `pyproject.toml`.
-
-Install virtual python environment, by following the [Chat Application Readme](https://code.ornl.gov/ChatHPC/ChatHPC Application#installation).
-
-### Step 3: Collect Data
-
-Data should be created and stored in `/auto/projects/ChatHPC/datasets/ornl/kokkos-data`.
-
-### Step 4: Create fine-tunning notebook
-
-Create `fine-tune-chat-kokkos.ipynb`.
-
-### Step 5: Run notebook
-
-Run `fine-tune-chat-kokkos.ipynb`.
-
-### Step 6: Save agent and Load agent into ollama
-
-Create `Modelfile`.
-
-Export to ollama:
-```bash
-/home/7ry/Data/ellora/llama.cpp/convert_hf_to_gguf.py merged_adapters/     
-ollama create ChatHPC Application
-```
-
 ## Tools Used
 
 - [Hatch](https://hatch.pypa.io/) --- Python Build System.
@@ -42,8 +8,8 @@ ollama create ChatHPC Application
     - [mkdocstrings](https://mkdocstrings.github.io/) --- Automatic documentation generation from sources.
     - [DevDocs](https://docs.excl.ornl.gov/quick-start-guides/devdocs) --- Internal to ORNL document website hosting.
 - [GitLab CI](https://docs.gitlab.com/ee/ci/) --- Continuous Integration.
-    - [Example Pipeline](https://code.ornl.gov/ChatHPC/ChatHPC Application/-/pipelines)
-    - [Example Pipeline Source](https://code.ornl.gov/ChatHPC/ChatHPC Application/-/blob/main/.gitlab-ci.yml?ref_type=heads)
+    - [Example Pipeline](https://code.ornl.gov/ChatHPC/ChatHPC-app/-/pipelines)
+    - [Example Pipeline Source](https://code.ornl.gov/ChatHPC/ChatHPC-app/-/blob/main/.gitlab-ci.yml?ref_type=heads)
 - [Ruff](https://docs.astral.sh/ruff/) --- Python linter and code formater.
     - [Ruff Rules](https://docs.astral.sh/ruff/rules/) --- Rules used by Ruff.
 - [EditorConfig](https://editorconfig.org/) --- Maintain consistent coding styles between different editors and IDEs.
@@ -219,13 +185,6 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
 **Table of Contents**
 
 - [ChatHPC Application](#chathpc-application)
-    - [Steps taken to get started in ExCL with ChatHPC Application.](#steps-taken-to-get-started-in-excl-with-chathpc-application)
-        - [Step 1: Fork the template repo](#step-1-fork-the-template-repo)
-        - [Step 2: Setup and install dependencies](#step-2-setup-and-install-dependencies)
-        - [Step 3: Collect Data](#step-3-collect-data)
-        - [Step 4: Create fine-tunning notebook](#step-4-create-fine-tunning-notebook)
-        - [Step 5: Run notebook](#step-5-run-notebook)
-        - [Step 6: Save agent and Load agent into ollama](#step-6-save-agent-and-load-agent-into-ollama)
     - [Tools Used](#tools-used)
     - [Quick Start with this Template](#quick-start-with-this-template)
     - [Steps to Manually Setup Hatch and MkDocs Python Repo with CI Setup](#steps-to-manually-setup-hatch-and-mkdocs-python-repo-with-ci-setup)
@@ -468,36 +427,36 @@ coverage-job:
   stage: deploy_coverage
   needs: [coverage-job]
   script:
-    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatHPC Application/coverage
+    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatHPC-app/coverage
 
 deploy_coverage-job:
   extends: .deploy_coverage_common
   only:
-    - main@ChatHPC/ChatHPC Application
+    - main@ChatHPC/ChatHPC-app
 
 deploy_coverage_manual-job:
   extends: .deploy_coverage_common
   when: manual
   only:
-    - branches@ChatHPC/ChatHPC Application
+    - branches@ChatHPC/ChatHPC-app
 
 .deploy_docs_common:
   tags: [devdocs]
   stage: deploy_docs
   needs: [docs-job]
   script:
-    - rsync -a --delete site/ ~/www/ChatHPC/ChatHPC Application
+    - rsync -a --delete site/ ~/www/ChatHPC/ChatHPC-app
 
 deploy_docs-job:
   extends: .deploy_docs_common
   only:
-    - main@ChatHPC/ChatHPC Application
+    - main@ChatHPC/ChatHPC-app
 
 deploy_docs_manual-job:
   extends: .deploy_docs_common
   when: manual
   only:
-    - branches@ChatHPC/ChatHPC Application
+    - branches@ChatHPC/ChatHPC-app
 ```
 <!-- editorconfig-checker-enable -->
 

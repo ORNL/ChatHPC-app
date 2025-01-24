@@ -117,7 +117,7 @@ omit = [
 
 [tool.coverage.paths]
 chathpc_app = ["src/chathpc/app", "*/chathpc-app/src/chathpc/app"]
-tests = ["tests", "*/ChatHPC Application/tests"]
+tests = ["tests", "*/chathpc-app/tests"]
 
 [tool.coverage.report]
 exclude_lines = [

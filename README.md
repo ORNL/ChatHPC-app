@@ -1,8 +1,8 @@
 # ChatHPC Application
 
-Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatHPC Application>
+Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app>
 
-Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC Application/coverage>
+Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage>
 
 **Table of Contents**
 - [ChatHPC Application](#chathpc-application)
@@ -27,8 +27,8 @@ Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC Application/coverage>
 For development in folder:
 
 ```bash
-git clone git@code.ornl.gov:ChatHPC/ChatHPC Application.git
-cd ChatHPC Application
+git clone git@code.ornl.gov:ChatHPC/ChatHPC-app.git
+cd ChatHPC-app
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
 pip install -e .
@@ -39,7 +39,7 @@ For use in virtual environment:
 ```bash
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
-pip install git+ssh://git@code.ornl.gov/ChatHPC/ChatHPC Application.git
+pip install git+ssh://git@code.ornl.gov/ChatHPC/ChatHPC-app.git
 ```
 
 ## Setup pre-commit Git hooks
@@ -82,7 +82,7 @@ sudo apt install ruby-full
 ```bash
 module load ollama
 /home/7ry/Data/ellora/llama.cpp/convert_hf_to_gguf.py merged_adapters/     
-ollama create ChatHPC Application
+ollama create <appname>
 ```
 
 ## CLI Interface

@@ -91,33 +91,33 @@ coverage-job:
   stage: deploy_coverage
   needs: [coverage-job]
   script:
-    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatHPC Application/coverage
+    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatHPC-app/coverage
 
 deploy_coverage-job:
   extends: .deploy_coverage_common
   only:
-    - main@ChatHPC/ChatHPC Application
+    - main@ChatHPC/ChatHPC-app
 
 deploy_coverage_manual-job:
   extends: .deploy_coverage_common
   when: manual
   only:
-    - branches@ChatHPC/ChatHPC Application
+    - branches@ChatHPC/ChatHPC-app
 
 .deploy_docs_common:
   tags: [devdocs]
   stage: deploy_docs
   needs: [docs-job]
   script:
-    - rsync -a --delete site/ ~/www/ChatHPC/ChatHPC Application
+    - rsync -a --delete site/ ~/www/ChatHPC/ChatHPC-app
 
 deploy_docs-job:
   extends: .deploy_docs_common
   only:
-    - main@ChatHPC/ChatHPC Application
+    - main@ChatHPC/ChatHPC-app
 
 deploy_docs_manual-job:
   extends: .deploy_docs_common
   when: manual
   only:
-    - branches@ChatHPC/ChatHPC Application
+    - branches@ChatHPC/ChatHPC-app

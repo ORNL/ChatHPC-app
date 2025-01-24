@@ -4,8 +4,8 @@ set -e
 # Test help functions
 echo '*** Test -h for scripts ***'
 
-echo ChatHPC Application -h
-ChatHPC Application -h
+echo ChatHPC -h
+ChatHPC -h
 echo
 echo chathpc -h
 chathpc -h

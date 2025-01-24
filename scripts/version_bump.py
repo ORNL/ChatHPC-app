@@ -272,7 +272,7 @@ def main(raw_args=None):
 
     # Update the CHANGELOG.md
     print("Updating CHANGELOG.md")
-    update_changelog(version, "CHANGELOG.md", "https://code.ornl.gov/ChatHPC/ChatHPC Application")
+    update_changelog(version, "CHANGELOG.md", "https://code.ornl.gov/ChatHPC/ChatHPC-app")
 
     # Commit Change.
     print("Committing change.")

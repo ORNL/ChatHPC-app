@@ -23,26 +23,4 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
-## [25.1.1] - 2025-01-24
-
-### Changed
-
-- Updated `setup_template.sh` to work for generating new ChatHPC applications.
-
-### Fixed
-
-- Improved `version_bump.py` to include links.
-
-## [25.1.0] - 2025-01-23
-
-Initial version of the ChatHPC Application Application.
-
-This version has been verified to work for the full finetuning to Ollama model for the 3 main interfaces.
-
-### Added
-
-- Training and inference supported via Jupyter Notebook, ChatHPC Application API, or CLI application.
-
-[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC Application/-/compare/v25.1.1...main
-[25.1.1]: https://code.ornl.gov/ChatHPC/ChatHPC Application/-/compare/v25.1.0...v25.1.1
-[25.1.0]: https://code.ornl.gov/ChatHPC/ChatHPC Application/-/releases/v25.1.0
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/

@@ -34,7 +34,7 @@ class AppConfig(BaseSettings):
     """Configuration settings for the application.
 
     This class inherits from [Pydantic Settings - BaseSettings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
-    and defines the configuration parameters for the ChatHPC Application application.
+    and defines the configuration parameters for the ChatHPC application.
 
     Attributes:
         data_file (str): Path to the JSON file containing training data for model fine-tuning.
@@ -100,7 +100,7 @@ class App:
     """Main application class for ChatHPC Application.
 
     This class handles the initialization, loading, and management of models,
-    datasets, and training processes for the ChatHPC Application application. It provides
+    datasets, and training processes for the ChatHPC application. It provides
     methods for loading different types of models, evaluating prompts, and
     fine-tuning the model.
 
@@ -490,7 +490,7 @@ You must output the Kokkos question that answers the question.
         #     else:
         #         print(f"Checkpoint {resume_from_checkpoint} not found")
 
-        wandb_project = "ChatHPC Application"
+        wandb_project = "ChatHPC"
         if len(wandb_project) > 0:
             os.environ["WANDB_PROJECT"] = wandb_project
 
