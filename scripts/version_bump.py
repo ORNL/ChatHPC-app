@@ -163,7 +163,7 @@ def collect_versions(changelog: list[str]) -> list[str]:
     for line in changelog:
         # Look for version headers like "## [23.1.0]"
         if line.startswith("## [") and "]" in line:
-            version = line[4:line.index("]")]
+            version = line[4 : line.index("]")]
             if version.lower() != "unreleased":
                 versions.append(version)
     return versions
@@ -190,11 +190,13 @@ def update_changelog(version: Version, filename: str, base_url: str | None = Non
         raise
 
     # Insert the new version
-    changelog[unreleased_loc+1:unreleased_loc+1] = ['\n', f'## [{version}] - {datetime.datetime.now(tz=TZ).strftime("%Y-%m-%d")}\n']
+    changelog[unreleased_loc + 1 : unreleased_loc + 1] = [
+        "\n",
+        f'## [{version}] - {datetime.datetime.now(tz=TZ).strftime("%Y-%m-%d")}\n',
+    ]
 
     # Update links if base url is provided.
     if base_url is not None:
-
         # Collect versions
         versions = collect_versions(changelog)
 
@@ -205,10 +207,10 @@ def update_changelog(version: Version, filename: str, base_url: str | None = Non
         if unreleased_loc != -1:
             # Constructure new links
             new_links = []
-            new_links.append(f'[unreleased]: {base_url}/-/compare/v{versions[0]}...main\n')
+            new_links.append(f"[unreleased]: {base_url}/-/compare/v{versions[0]}...main\n")
             for version_pair in pairwise(versions):
-                new_links.append(f'[{version_pair[0]}]: {base_url}/-/compare/v{version_pair[1]}...v{version_pair[0]}\n')  # noqa: PERF401
-            new_links.append(f'[{versions[-1]}]: {base_url}/-/releases/v{versions[-1]}\n')
+                new_links.append(f"[{version_pair[0]}]: {base_url}/-/compare/v{version_pair[1]}...v{version_pair[0]}\n")  # noqa: PERF401
+            new_links.append(f"[{versions[-1]}]: {base_url}/-/releases/v{versions[-1]}\n")
 
             # Insert the new links
             changelog = changelog[:unreleased_loc] + new_links
@@ -270,7 +272,7 @@ def main(raw_args=None):
 
     # Update the CHANGELOG.md
     print("Updating CHANGELOG.md")
-    update_changelog(version, "CHANGELOG.md", 'https://code.ornl.gov/ChatHPC/ChatKokkos')
+    update_changelog(version, "CHANGELOG.md", "https://code.ornl.gov/ChatHPC/ChatKokkos")
 
     # Commit Change.
     print("Committing change.")
