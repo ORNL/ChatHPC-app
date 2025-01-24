@@ -22,6 +22,16 @@ echo "*****************************************"
 
 read -p "Continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
 
+# Save response to setup_template_input.txt
+echo "${project_name}" > setup_template_input.txt
+echo "${project_description}" >> setup_template_input.txt
+echo "${project_slug}" >> setup_template_input.txt
+echo "${project_path}" >> setup_template_input.txt
+echo "${project_gitlab_path}" >> setup_template_input.txt
+echo "${author_name}" >> setup_template_input.txt
+echo "${author_email}" >> setup_template_input.txt
+echo "y" >> setup_template_input.txt
+
 FILES=".editorconfig .gitignore .gitlab-ci.yml .pre-commit-config.yaml CHANGELOG.md README.md docs/api.md docs/index.md mkdocs.yml pyproject.toml ruff_defaults.toml scripts/**.py scripts/**.sh src/chatkokkos/**.py tests/__init__.py tests/**.py examples/**.ipynb"
 
 echo Project Name:
