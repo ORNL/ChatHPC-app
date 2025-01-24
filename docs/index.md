@@ -1,40 +1,16 @@
-# ChatKokkos
+# ChatHPC Application
 
 ChatHPC project for Kokkos.
 
-## Steps taken to get started in ExCL with ChatKokkos.
+## Steps taken to get started in ExCL with ChatHPC Application.
 
 ### Step 1: Fork the template repo
-
-Follow [How to create a new ChatHPC/ChatX application repo](https://devdocs.ornl.gov/ChatHPC/ChatHPC-project/#how-to-create-a-new-chathpcchatx-application-repo) to create a new project repository. I used these settings when running `setup_template.sh`:
-
-```bash
-$ ./setup_template.sh
-Note: Please fill in every field. This script is not smart enought to handle missing entries.
-Enter new project name (i.e. Python Project Template): ChatKokkos
-Enter new project description. ChatHPC project for Kokkos.
-Enter new project slug (i.e. python-project-template): ChatKokkos
-Enter new python project name (i.e. python_project_template): chatkokkos
-Enter new project group/user (i.e. 7ry): ChatHPC
-Enter new author (i.e. Aaron Young): Aaron Young
-Enter new author email (i.e. youngar@ornl.gov): youngar@ornl.gov
-****** Update Template for project ******
-*** Project Name        = ChatKokkos
-*** Project Description = ChatHPC project for Kokkos.
-*** Project Slug        = ChatKokkos
-*** Project Path        = chatkokkos
-*** Project GitLab Path = ChatHPC
-*** Author Name         = Aaron Young
-*** Author Email        = youngar@ornl.gov
-*****************************************
-Continue? (Y/N): y
-```
 
 ### Step 2: Setup and install dependencies
 
 Add dependencies to `pyproject.toml`.
 
-Install virtual python environment, by following the [Chat Application Readme](https://code.ornl.gov/ChatHPC/ChatKokkos#installation).
+Install virtual python environment, by following the [Chat Application Readme](https://code.ornl.gov/ChatHPC/ChatHPC Application#installation).
 
 ### Step 3: Collect Data
 
@@ -55,7 +31,7 @@ Create `Modelfile`.
 Export to ollama:
 ```bash
 /home/7ry/Data/ellora/llama.cpp/convert_hf_to_gguf.py merged_adapters/     
-ollama create ChatKokkos
+ollama create ChatHPC Application
 ```
 
 ## Tools Used
@@ -66,8 +42,8 @@ ollama create ChatKokkos
     - [mkdocstrings](https://mkdocstrings.github.io/) --- Automatic documentation generation from sources.
     - [DevDocs](https://docs.excl.ornl.gov/quick-start-guides/devdocs) --- Internal to ORNL document website hosting.
 - [GitLab CI](https://docs.gitlab.com/ee/ci/) --- Continuous Integration.
-    - [Example Pipeline](https://code.ornl.gov/ChatHPC/ChatKokkos/-/pipelines)
-    - [Example Pipeline Source](https://code.ornl.gov/ChatHPC/ChatKokkos/-/blob/main/.gitlab-ci.yml?ref_type=heads)
+    - [Example Pipeline](https://code.ornl.gov/ChatHPC/ChatHPC Application/-/pipelines)
+    - [Example Pipeline Source](https://code.ornl.gov/ChatHPC/ChatHPC Application/-/blob/main/.gitlab-ci.yml?ref_type=heads)
 - [Ruff](https://docs.astral.sh/ruff/) --- Python linter and code formater.
     - [Ruff Rules](https://docs.astral.sh/ruff/rules/) --- Rules used by Ruff.
 - [EditorConfig](https://editorconfig.org/) --- Maintain consistent coding styles between different editors and IDEs.
@@ -242,8 +218,8 @@ Coverage Report: <https://devdocs.ornl.gov/example/coverage>
 
 **Table of Contents**
 
-- [ChatKokkos](#chatkokkos)
-    - [Steps taken to get started in ExCL with ChatKokkos.](#steps-taken-to-get-started-in-excl-with-chatkokkos)
+- [ChatHPC Application](#chathpc-application)
+    - [Steps taken to get started in ExCL with ChatHPC Application.](#steps-taken-to-get-started-in-excl-with-chathpc-application)
         - [Step 1: Fork the template repo](#step-1-fork-the-template-repo)
         - [Step 2: Setup and install dependencies](#step-2-setup-and-install-dependencies)
         - [Step 3: Collect Data](#step-3-collect-data)
@@ -428,7 +404,7 @@ build-job:
   stage: build
   script:
     - pip install .
-    - python3 -c "import chatkokkos; print(chatkokkos.__doc__)"
+    - python3 -c "import chathpc.app; print(chathpc.app.__doc__)"
 
 check_format-job:
   extends: [.zenith]
@@ -492,36 +468,36 @@ coverage-job:
   stage: deploy_coverage
   needs: [coverage-job]
   script:
-    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatKokkos/coverage
+    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatHPC Application/coverage
 
 deploy_coverage-job:
   extends: .deploy_coverage_common
   only:
-    - main@ChatHPC/ChatKokkos
+    - main@ChatHPC/ChatHPC Application
 
 deploy_coverage_manual-job:
   extends: .deploy_coverage_common
   when: manual
   only:
-    - branches@ChatHPC/ChatKokkos
+    - branches@ChatHPC/ChatHPC Application
 
 .deploy_docs_common:
   tags: [devdocs]
   stage: deploy_docs
   needs: [docs-job]
   script:
-    - rsync -a --delete site/ ~/www/ChatHPC/ChatKokkos
+    - rsync -a --delete site/ ~/www/ChatHPC/ChatHPC Application
 
 deploy_docs-job:
   extends: .deploy_docs_common
   only:
-    - main@ChatHPC/ChatKokkos
+    - main@ChatHPC/ChatHPC Application
 
 deploy_docs_manual-job:
   extends: .deploy_docs_common
   when: manual
   only:
-    - branches@ChatHPC/ChatKokkos
+    - branches@ChatHPC/ChatHPC Application
 ```
 <!-- editorconfig-checker-enable -->
 

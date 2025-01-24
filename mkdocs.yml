@@ -1,4 +1,4 @@
-site_name: ChatKokkos
+site_name: ChatHPC Application
 nav:
   - index.md
   - api.md

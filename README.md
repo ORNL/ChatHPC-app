@@ -1,11 +1,11 @@
-# ChatKokkos
+# ChatHPC Application
 
-Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatKokkos>
+Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatHPC Application>
 
-Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatKokkos/coverage>
+Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC Application/coverage>
 
 **Table of Contents**
-- [ChatKokkos](#chatkokkos)
+- [ChatHPC Application](#chathpc-application)
     - [Installation](#installation)
     - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
     - [Quick Start](#quick-start)
@@ -27,8 +27,8 @@ Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatKokkos/coverage>
 For development in folder:
 
 ```bash
-git clone git@code.ornl.gov:ChatHPC/ChatKokkos.git
-cd ChatKokkos
+git clone git@code.ornl.gov:ChatHPC/ChatHPC Application.git
+cd ChatHPC Application
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
 pip install -e .
@@ -39,7 +39,7 @@ For use in virtual environment:
 ```bash
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
-pip install git+ssh://git@code.ornl.gov/ChatHPC/ChatKokkos.git
+pip install git+ssh://git@code.ornl.gov/ChatHPC/ChatHPC Application.git
 ```
 
 ## Setup pre-commit Git hooks
@@ -75,22 +75,22 @@ sudo apt install ruby-full
 ### Train model
 
 1. Install package
-2. `chatkokkos train`
+2. `chathpc train`
 
 ### Export Trained model to Ollama.
 
 ```bash
 module load ollama
 /home/7ry/Data/ellora/llama.cpp/convert_hf_to_gguf.py merged_adapters/     
-ollama create ChatKokkos
+ollama create ChatHPC Application
 ```
 
 ## CLI Interface
 
 Get Help:
 ```bash
-$ chatkokkos --help
-Usage: chatkokkos [OPTIONS] COMMAND [ARGS]...
+$ chathpc --help
+Usage: chathpc [OPTIONS] COMMAND [ARGS]...
 
 Options:
   -h, --help  Show this message and exit.
@@ -106,15 +106,15 @@ Commands:
 
 Run interactively:
 ```bash
-chatkokkos run
+chathpc run
 ```
 
 Example interactive session:
 ```bash
-$ chatkokkos run
-chatkokkos ()> /context
+$ chathpc run
+chathpc ()> /context
 Context: Introduction to Kokkos programming model
-chatkokkos (Introduction to Kokkos programming model)> Which kind of Kokkos views are?
+chathpc (Introduction to Kokkos programming model)> Which kind of Kokkos views are?
 <s> You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
 
 You must output the Kokkos question that answers the question.
@@ -128,12 +128,12 @@ Introduction to Kokkos programming model
 ### Response:
 There are two different layouts; LayoutLeft and LayoutRight.
 </s>
-chatkokkos (Introduction to Kokkos programming model)> \bye
+chathpc (Introduction to Kokkos programming model)> \bye
 ```
 
 Train:
 ```bash
-chatkokkos train
+chathpc train
 ```
 
 ## Running with hatch

@@ -34,7 +34,7 @@ class AppConfig(BaseSettings):
     """Configuration settings for the application.
 
     This class inherits from [Pydantic Settings - BaseSettings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
-    and defines the configuration parameters for the ChatKokkos application.
+    and defines the configuration parameters for the ChatHPC Application application.
 
     Attributes:
         data_file (str): Path to the JSON file containing training data for model fine-tuning.
@@ -97,10 +97,10 @@ class AppConfig(BaseSettings):
 
 
 class App:
-    """Main application class for ChatKokkos.
+    """Main application class for ChatHPC Application.
 
     This class handles the initialization, loading, and management of models,
-    datasets, and training processes for the ChatKokkos application. It provides
+    datasets, and training processes for the ChatHPC Application application. It provides
     methods for loading different types of models, evaluating prompts, and
     fine-tuning the model.
 
@@ -300,7 +300,7 @@ class App:
             return self.tokenizer.decode(output)
 
     @staticmethod
-    def chatkokkos_prompt(question: str, context: str) -> str:
+    def chathpc_app_prompt(question: str, context: str) -> str:
         """Create a formatted prompt for Kokkos-related questions.
 
         This method generates a structured prompt that includes the question and context
@@ -317,7 +317,7 @@ class App:
 
         Example:
             ```python
-            >>> app.chatkokkos_prompt("How do I use Views?", "Views are memory spaces in Kokkos...")
+            >>> app.chathpc_app_prompt("How do I use Views?", "Views are memory spaces in Kokkos...")
             "You are a powerful LLM model for Kokkos..."
             ```
         """
@@ -334,7 +334,7 @@ You must output the Kokkos question that answers the question.
 ### Response:
 """
 
-    def chatkokkos_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> str:
+    def chathpc_app_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> str:
         """Evaluate a Kokkos-related question with provided context.
 
         This method processes a Kokkos-related question by combining it with context
@@ -360,7 +360,7 @@ You must output the Kokkos question that answers the question.
             ```
             >>> app = App()
             >>> app.load_base_model()
-            >>> response = app.chatkokkos_evaluate(
+            >>> response = app.chathpc_app_evaluate(
             ...     "How do I create a 2D View?",
             ...     "Kokkos::View is a multidimensional array class"
             ... )
@@ -368,7 +368,7 @@ You must output the Kokkos question that answers the question.
             "To create a 2D Kokkos View..."
             ```
         """
-        prompt = self.chatkokkos_prompt(question, context)
+        prompt = self.chathpc_app_prompt(question, context)
         return self.evaluate_model(prompt, **kwargs)
 
     def tokenize_training_set(self) -> None:
@@ -490,7 +490,7 @@ You must output the Kokkos question that answers the question.
         #     else:
         #         print(f"Checkpoint {resume_from_checkpoint} not found")
 
-        wandb_project = "ChatKokkos"
+        wandb_project = "ChatHPC Application"
         if len(wandb_project) > 0:
             os.environ["WANDB_PROJECT"] = wandb_project
 
@@ -553,7 +553,7 @@ You must output the Kokkos question that answers the question.
         self.tokenizer.save_pretrained(self.config.merged_model_path)
         self.model.save_pretrained(self.config.merged_model_path)
 
-    def interactive(self, prompt="chatkokkos") -> None:
+    def interactive(self, prompt="chathpc") -> None:
         """Start an interactive chat session with the model.
 
         This method provides a command-line interface for interacting with the model.
@@ -564,7 +564,7 @@ You must output the Kokkos question that answers the question.
             /context: Set a new context for subsequent questions
 
         Args:
-            prompt (str, optional): The prompt prefix to display. Defaults to "chatkokkos".
+            prompt (str, optional): The prompt prefix to display. Defaults to "chathpc_app".
 
         Requires:
             - A model must be loaded via one of:
@@ -578,7 +578,7 @@ You must output the Kokkos question that answers the question.
             >>> app = App()
             >>> app.load_merged_model()
             >>> app.interactive()
-            chatkokkos ()> What is Kokkos?
+            chathpc_app ()> What is Kokkos?
         """
         history_file = Path(self.config.prompt_history_file).expanduser()
         try:
@@ -606,7 +606,7 @@ You must output the Kokkos question that answers the question.
             if user_input == "/context":
                 context = input("Context: ")
                 continue
-            print(self.chatkokkos_evaluate(user_input, context))
+            print(self.chathpc_app_evaluate(user_input, context))
 
     def print_config(self) -> None:
         """Print the current configurations of the application in a formatted table.

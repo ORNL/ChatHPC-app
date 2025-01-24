@@ -2,8 +2,8 @@ import json
 import os
 import unittest
 
-from chatkokkos.app import DEFAULT_APP_CONFIG_FILE, AppConfig
-from chatkokkos.utils.common_utils import load_json_arg
+from chathpc.app.app import DEFAULT_APP_CONFIG_FILE, AppConfig
+from chathpc.app.utils.common_utils import load_json_arg
 
 
 class TestAppConfig(unittest.TestCase):

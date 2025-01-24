@@ -1,4 +1,4 @@
 # API Reference
 
-## Documentation for ChatKokkos
-### ::: chatkokkos
+## Documentation for ChatHPC Application
+### ::: chathpc.app

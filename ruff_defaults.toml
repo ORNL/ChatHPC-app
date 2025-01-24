@@ -553,7 +553,7 @@ select = [
 ban-relative-imports = "all"
 
 [lint.isort]
-known-first-party = ["chatkokkos"]
+known-first-party = ["chathpc_app"]
 
 [lint.flake8-pytest-style]
 fixture-parentheses = false

@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "ChatKokkos"
+name = "ChatHPC Application"
 dynamic = ["version"]
-description = "ChatHPC project for Kokkos."
+description = "Base ChatHPC Application"
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = []
@@ -48,17 +48,17 @@ dependencies = [
 allow-direct-references = true
 
 [project.urls]
-Documentation = "https://code.ornl.gov/ChatHPC/ChatKokkos#readme"
-Homepage = "https://code.ornl.gov/ChatHPC/ChatKokkos"
-Issues = "https://code.ornl.gov/ChatHPC/ChatKokkos/-/issues"
-Source = "https://code.ornl.gov/ChatHPC/ChatKokkos"
+Documentation = "https://code.ornl.gov/ChatHPC/ChatHPC Application#readme"
+Homepage = "https://code.ornl.gov/ChatHPC/ChatHPC Application"
+Issues = "https://code.ornl.gov/ChatHPC/ChatHPC Application/-/issues"
+Source = "https://code.ornl.gov/ChatHPC/ChatHPC Application"
 
 [project.scripts]
-ChatKokkos = "chatkokkos.__main__:cli"
-chatkokkos = "chatkokkos.__main__:cli"
+ChatHPC = "chathpc.app.__main__:cli"
+chathpc = "chathpc.app.__main__:cli"
 
 [tool.hatch.version]
-path = "src/chatkokkos/__about__.py"
+path = "src/chathpc/app/__about__.py"
 
 [tool.hatch.env]
 requires = [
@@ -102,19 +102,19 @@ dependencies = [
   "mypy>=1.0.0",
 ]
 [tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/chatkokkos tests}"
+check = "mypy --install-types --non-interactive {args:src/chathpc/app tests}"
 
 [tool.coverage.run]
-source_pkgs = ["chatkokkos", "tests"]
+source_pkgs = ["chathpc.app", "tests"]
 branch = true
 parallel = true
 omit = [
-  "src/chatkokkos/__about__.py",
+  "src/chathpc/app/__about__.py",
 ]
 
 [tool.coverage.paths]
-chatkokkos = ["src/chatkokkos", "*/ChatKokkos/src/chatkokkos"]
-tests = ["tests", "*/ChatKokkos/tests"]
+chathpc_app = ["src/chathpc/app", "*/ChatHPC Application/src/chathpc/app"]
+tests = ["tests", "*/ChatHPC Application/tests"]
 
 [tool.coverage.report]
 exclude_lines = [

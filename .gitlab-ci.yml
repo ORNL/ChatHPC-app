@@ -20,7 +20,7 @@ build-job:
   stage: build
   script:
     - pip install .
-    - python3 -c "import chatkokkos; print(chatkokkos.__doc__)"
+    - python3 -c "import chathpc.app; print(chathpc.app.__doc__)"
 
 check_format-job:
   extends: [.zenith]
@@ -91,33 +91,33 @@ coverage-job:
   stage: deploy_coverage
   needs: [coverage-job]
   script:
-    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatKokkos/coverage
+    - rsync -a --delete coverage_html_report/ ~/www/ChatHPC/ChatHPC Application/coverage
 
 deploy_coverage-job:
   extends: .deploy_coverage_common
   only:
-    - main@ChatHPC/ChatKokkos
+    - main@ChatHPC/ChatHPC Application
 
 deploy_coverage_manual-job:
   extends: .deploy_coverage_common
   when: manual
   only:
-    - branches@ChatHPC/ChatKokkos
+    - branches@ChatHPC/ChatHPC Application
 
 .deploy_docs_common:
   tags: [devdocs]
   stage: deploy_docs
   needs: [docs-job]
   script:
-    - rsync -a --delete site/ ~/www/ChatHPC/ChatKokkos
+    - rsync -a --delete site/ ~/www/ChatHPC/ChatHPC Application
 
 deploy_docs-job:
   extends: .deploy_docs_common
   only:
-    - main@ChatHPC/ChatKokkos
+    - main@ChatHPC/ChatHPC Application
 
 deploy_docs_manual-job:
   extends: .deploy_docs_common
   when: manual
   only:
-    - branches@ChatHPC/ChatKokkos
+    - branches@ChatHPC/ChatHPC Application

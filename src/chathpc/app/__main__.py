@@ -1,6 +1,6 @@
 import click
 
-from chatkokkos.app import App
+from chathpc.app import App
 
 CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
 

@@ -19,6 +19,6 @@ do
     $GIT_ROOT/scripts/utils/extract_responses.py "${f%.*}_output.ipynb" > "${f%.*}_output.txt"
 done
 
-CHATKOKKOS_FINETUNED_MODEL_PATH="./app/peft_adapter" CHATKOKKOS_MERGED_MODEL_PATH="./app/merged_adapters" CHATKOKKOS_TRAINING_OUTPUT_DIR="./app/kokkos-code-llama" chatkokkos train
+CHATKOKKOS_FINETUNED_MODEL_PATH="./app/peft_adapter" CHATKOKKOS_MERGED_MODEL_PATH="./app/merged_adapters" CHATKOKKOS_TRAINING_OUTPUT_DIR="./app/kokkos-code-llama" chathpc train
 
 popd
