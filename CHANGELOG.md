@@ -23,6 +23,8 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+## [25.1.1] - 2025-01-24
+
 ### Changed
 
 - Updated `setup_template.sh` to work for generating new ChatHPC applications.
@@ -41,5 +43,6 @@ This version has been verified to work for the full finetuning to Ollama model f
 
 - Training and inference supported via Jupyter Notebook, ChatKokkos API, or CLI application.
 
-[unreleased]: https://code.ornl.gov/ChatHPC/ChatKokkos/-/compare/v25.1.0...main
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatKokkos/-/compare/v25.1.1...main
+[25.1.1]: https://code.ornl.gov/ChatHPC/ChatKokkos/-/compare/v25.1.0...v25.1.1
 [25.1.0]: https://code.ornl.gov/ChatHPC/ChatKokkos/-/releases/v25.1.0
