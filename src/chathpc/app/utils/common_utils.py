@@ -11,3 +11,7 @@ def load_json_arg(str_or_fn):
             params = json.loads(f.read())
             f.close()
     return params
+
+
+def evaluate_fstring(fstring, **kwargs):
+    return eval(f"f'''{fstring}'''", {}, kwargs)

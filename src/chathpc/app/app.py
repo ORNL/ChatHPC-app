@@ -23,6 +23,7 @@ from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBa
 from pytz import timezone
 from tabulate import tabulate
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
+from chathpc.app.utils.common_utils import evaluate_fstring
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +69,9 @@ class AppConfig(BaseSettings):
     merged_model_path: Path = Field("./merged_adapters", validation_alias=AliasChoices("merged_model_path", "m"), description="Path where the complete merged model will be saved.")
     training_output_dir: Path = Field("./training_checkpoints", validation_alias=AliasChoices("training_output_dir", "o"), description="Path where training output will be saved.")
     max_response_tokens: int = Field(600, validation_alias=AliasChoices("max_response_tokens","t"), description="Maximum number of tokens to generate in model responses.", gt=0)
-    prompt_history_file: Path = Field("~/.chathpc_history", validation_alias=AliasChoices("prompt_history_file"), description="Path to the file containing interactive prompt history.")
+    prompt_history_file: Path = Field("~/.chathpc_history", description="Path to the file containing interactive prompt history.")
+    training_prompt: str = Field(..., description="Prompt template to use for training.")
+    inferfence_prompt: str = Field(..., description="Prompt template to use for inference.")
 
     model_config = SettingsConfigDict(
         cli_parse_args=True,
@@ -303,8 +306,7 @@ class App:
             )[0]
             return self.tokenizer.decode(output)
 
-    @staticmethod
-    def chathpc_app_prompt(question: str, context: str) -> str:
+    def chat_prompt(self, question: str, context: str) -> str:
         """Create a formatted prompt for Kokkos-related questions.
 
         This method generates a structured prompt that includes the question and context
@@ -321,24 +323,13 @@ class App:
 
         Example:
             ```python
-            >>> app.chathpc_app_prompt("How do I use Views?", "Views are memory spaces in Kokkos...")
+            >>> app.chat_prompt("How do I use Views?", "Views are memory spaces in Kokkos...")
             "You are a powerful LLM model for Kokkos..."
             ```
         """
-        return f"""You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
+        return evaluate_fstring(self.config.inferfence_prompt, question=question, context=context)
 
-You must output the Kokkos question that answers the question.
-
-### Input:
-{question}
-
-### Context:
-{context}
-
-### Response:
-"""
-
-    def chathpc_app_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> str:
+    def chat_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> str:
         """Evaluate a Kokkos-related question with provided context.
 
         This method processes a Kokkos-related question by combining it with context
@@ -364,7 +355,7 @@ You must output the Kokkos question that answers the question.
             ```
             >>> app = App()
             >>> app.load_base_model()
-            >>> response = app.chathpc_app_evaluate(
+            >>> response = app.chat_evaluate(
             ...     "How do I create a 2D View?",
             ...     "Kokkos::View is a multidimensional array class"
             ... )
@@ -372,7 +363,7 @@ You must output the Kokkos question that answers the question.
             "To create a 2D Kokkos View..."
             ```
         """
-        prompt = self.chathpc_app_prompt(question, context)
+        prompt = self.chat_prompt(question, context)
         return self.evaluate_model(prompt, **kwargs)
 
     def tokenize_training_set(self) -> None:
@@ -412,19 +403,7 @@ You must output the Kokkos question that answers the question.
             return result
 
         def generate_and_tokenize_prompt(data_point):
-            full_prompt = f"""You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.
-
-You must output the Kokkos question that answers the question.
-
-### Input:
-{data_point["question"]}
-
-### Context:
-{data_point["context"]}
-
-### Response:
-{data_point["answer"]}
-"""
+            full_prompt = evaluate_fstring(self.config.training_prompt, **data_point)
             return tokenize(full_prompt)
 
         self.tokenizer.add_eos_token = True
@@ -610,7 +589,7 @@ You must output the Kokkos question that answers the question.
             if user_input == "/context":
                 context = input("Context: ")
                 continue
-            print(self.chathpc_app_evaluate(user_input, context))
+            print(self.chat_evaluate(user_input, context))
 
     def print_config(self) -> None:
         """Print the current configurations of the application in a formatted table.
