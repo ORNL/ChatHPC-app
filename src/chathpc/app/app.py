@@ -39,18 +39,24 @@ class AppConfig(BaseSettings):
     and defines the configuration parameters for the ChatHPC application.
 
     Attributes:
-        data_file (str): Path to the JSON file containing training data for model fine-tuning.
-        base_model_path (str): Path to the pre-trained base LLM model directory.
-        finetuned_model_path (str): Path where fine-tuned model layers will be saved.
-        merged_model_path (str): Path where the complete merged model will be saved.
+        data_file (Path): Path to the JSON file containing training data for model fine-tuning.
+        base_model_path (Path): Path to the pre-trained base LLM model directory.
+        finetuned_model_path (Path): Path where fine-tuned model layers will be saved.
+        merged_model_path (Path): Path where the complete merged model will be saved.
+        training_output_dir (Path): Path where training output and checkpoints will be saved.
         max_response_tokens (int): Maximum number of tokens to generate in model responses.
+        prompt_history_file (Path): Path to store interactive chat history.
+        training_prompt (str): Template string for formatting training prompts.
+        inference_prompt (str): Template string for formatting inference prompts.
+        use_wandb (bool): Flag to enable/disable Weights & Biases logging.
 
     Configuration:
-        The settings can be loaded from:
-        - Environment variables with prefix 'CHATKOKKOS_'
-        - .env file
-        - JSON configuration file (default: config/default_app_settings.json)
-        - Direct initialization
+        The settings can be loaded from multiple sources in the following priority order:
+        1. Environment variables with prefix 'CHATHPC_'
+        2. .env file
+        3. Direct initialization values
+        4. JSON configuration file
+        5. File secrets
 
     Example:
         ```python
@@ -59,8 +65,8 @@ class AppConfig(BaseSettings):
         ```
 
     Note:
-        Settings priority follows Pydantic's source order: explicite values in constructor > env vars > .env file >
-        config file > defaults
+        All path attributes are handled as Path objects internally for better path manipulation.
+        The configuration uses UTF-8 encoding for all file operations.
     """
 
     data_file: Path = Field(..., description="Path to the JSON file containing training data for model fine-tuning.")
@@ -110,15 +116,59 @@ class App:
     fine-tuning the model.
 
     Attributes:
-        preferences (AppConfig): Configuration settings for the application.
+        config (AppConfig): Configuration settings for the application.
         tokenizer: Tokenizer for processing input text.
         model: The language model used for text generation and fine-tuning.
         train_dataset: Dataset used for training.
         eval_dataset: Dataset used for evaluation.
+        tokenized_train_dataset: Tokenized version of training dataset.
+        tokenized_val_dataset: Tokenized version of validation dataset.
+        peft_config: Configuration for LoRA fine-tuning.
+        training_args: Arguments for model training.
+
+    Methods:
+        load_base_model(): Loads the base LLM model.
+        load_finetuned_model(): Loads a model with fine-tuned layers.
+        load_merged_model(): Loads a complete merged model.
+        load_datasets(): Loads training and evaluation datasets.
+        evaluate_model(): Generates responses for given prompts.
+        chat_prompt(): Creates formatted prompts for questions.
+        chat_evaluate(): Evaluates questions with context.
+        tokenize_training_set(): Prepares datasets for training.
+        train(): Executes model fine-tuning process.
+        interactive(): Starts interactive chat session.
+        print_config(): Displays current configuration settings.
     """
 
     def __init__(self, app_config: AppConfig=None):
-        """Initialize the Application object."""
+        """Initialize the Application object.
+
+        This method initializes a new ChatHPC application instance with the provided
+        configuration settings. If no configuration is provided, it creates a default
+        configuration using AppConfig.
+
+        Args:
+            app_config (AppConfig, optional): Configuration settings for the application.
+                If None, creates default AppConfig instance.
+
+        Sets:
+            - self.config: Application configuration settings
+
+        Example:
+            ```python
+            # Initialize with default settings
+            app = App()
+
+            # Initialize with custom settings
+            config = AppConfig(base_model_path="/path/to/model")
+            app = App(app_config=config)
+            ```
+
+        Note:
+            The initialization only sets up the configuration. Model loading and other
+            initializations must be performed explicitly by calling the appropriate
+            methods.
+        """
         if app_config is None:
             app_config = AppConfig()
 
@@ -261,39 +311,36 @@ class App:
         self.eval_dataset = load_dataset("json", data_files=self.config.data_file.as_posix(), split="train")
 
     def evaluate_model(self, prompt: str, max_new_tokens: int | None = None) -> str:
-        """Evaluate the model on a given prompt and generate a response.
+        """Generate a model response for a given input prompt.
 
         Args:
-            prompt (str): The input text prompt to be evaluated by the model.
-            max_new_tokens (int|None, optional): Maximum number of tokens to generate in the response.
-                If None, uses the value from config.max_response_tokens.
+            prompt (str): Input text prompt for model evaluation.
+            max_new_tokens (int|None): Maximum tokens to generate. Defaults to config.max_response_tokens.
 
         Returns:
-            str: The generated text response from the model, decoded from output tokens.
+            str: Generated text response from the model.
 
         Requires:
-            - A model must be loaded via one of:
+            - Initialized model via one of:
                 - load_base_model()
                 - load_finetuned_model()
                 - load_merged_model()
-            - The tokenizer must be initialized
+            - Initialized tokenizer
 
         Example:
             ```python
-            >>> app = App()
-            >>> app.load_base_model()
-            >>> response = app.evaluate_model(
-            ...     "What is Kokkos?",
-            ...     max_new_tokens=100
-            ... )
-            >>> print(response)
-            "Kokkos is a programming model..."
+            app = App()
+            app.load_base_model()
+            response = app.evaluate_model(
+                "What is Kokkos?",
+                max_new_tokens=100
+            )
+            print(response)  # "Kokkos is a programming model..."
             ```
 
         Note:
-            The model is automatically put into evaluation mode and uses
-            torch.no_grad() for inference. The input is processed on CUDA
-            if available.
+            Uses evaluation mode and torch.no_grad() for inference.
+            Input is processed on CUDA if available.
         """
         model_input = self.tokenizer(prompt, return_tensors="pt").to("cuda")
 
@@ -308,61 +355,75 @@ class App:
             return self.tokenizer.decode(output)
 
     def chat_prompt(self, question: str, context: str) -> str:
-        """Create a formatted prompt for Kokkos-related questions.
+        """Create a formatted prompt for chat questions.
 
-        This method generates a structured prompt that includes the question and context
-        for the Kokkos programming model queries. The prompt follows a specific format
-        that instructs the model about its role and expected output.
+        This method generates a structured prompt by combining the question and context
+        using the inference prompt template defined in the application configuration.
 
         Args:
-            question (str): The question about Kokkos to be answered.
-            context (str): Additional context or information related to the question.
+            question (str): The question to be answered.
+            context (str): Supporting context or documentation related to the question.
 
         Returns:
-            str: A formatted prompt string containing the question and context with
-                 appropriate instructions for the model.
+            str: A formatted prompt string following the template defined in config.inference_prompt.
+
+        Requires:
+            - config.inference_prompt must contain a valid f-string template with {question}
+              and {context} placeholders.
 
         Example:
             ```python
-            >>> app.chat_prompt("How do I use Views?", "Views are memory spaces in Kokkos...")
-            "You are a powerful LLM model for Kokkos..."
+            app = App()
+            prompt = app.chat_prompt(
+                "How do I use Views?",
+                "Views are memory spaces in Kokkos..."
+            )
+            print(prompt)  # Returns formatted prompt based on template
             ```
+
+        Note:
+            The actual prompt format is determined by the inference_prompt template in
+            the application configuration.
         """
         return evaluate_fstring(self.config.inference_prompt, question=question, context=context)
 
     def chat_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> str:
-        """Evaluate a Kokkos-related question with provided context.
+        """Evaluate a question with supporting context using the model.
 
-        This method processes a Kokkos-related question by combining it with context
-        into a formatted prompt and generating a response using the loaded model.
+        This method combines chat prompt formatting with model evaluation to generate
+        responses for questions that include additional context information.
 
         Args:
-            question (str): The question about Kokkos programming model to be answered.
+            question (str): The question to be answered by the model.
             context (str): Supporting context or documentation related to the question.
-            **kwargs (dict[str, Any]): Additional keyword arguments passed to evaluate_model(),
-                such as max_new_tokens.
+            **kwargs: Additional keyword arguments passed to evaluate_model().
 
         Returns:
-            respose (str): The model-generated response addressing the Kokkos question.
+            str: Generated response from the model.
 
         Requires:
-            - A model must be loaded via one of:
+            - Initialized model via one of:
                 - load_base_model()
                 - load_finetuned_model()
                 - load_merged_model()
-            - The tokenizer must be initialized
+            - Initialized tokenizer
 
         Example:
+            ```python
+            app = App()
+            app.load_merged_model()
+            response = app.chat_evaluate(
+                "How do I use Views?",
+                "Views are memory spaces in Kokkos...",
+                max_new_tokens=200
+            )
+            print(response)  # Returns model's response
             ```
-            >>> app = App()
-            >>> app.load_base_model()
-            >>> response = app.chat_evaluate(
-            ...     "How do I create a 2D View?",
-            ...     "Kokkos::View is a multidimensional array class"
-            ... )
-            >>> print(response)
-            "To create a 2D Kokkos View..."
-            ```
+
+        Note:
+            This method combines chat_prompt() to format the input and
+            evaluate_model() to generate the response. The actual prompt format
+            is determined by the inference_prompt template in the configuration.
         """
         prompt = self.chat_prompt(question, context)
         return self.evaluate_model(prompt, **kwargs)
@@ -370,21 +431,30 @@ class App:
     def tokenize_training_set(self) -> None:
         """Tokenize the training and validation datasets.
 
-        This method processes the loaded datasets by tokenizing the text data using the model's
-        tokenizer. It creates formatted prompts combining questions, context, and answers, then
-        tokenizes them for model training.
+        This method processes the loaded datasets by tokenizing text data for model training.
+        It handles padding configuration and EOS token management during tokenization.
 
         Requires:
-            - The datasets must be loaded first through App.load_datasets()
-            - A tokenizer must be initialized through loading a model
+            - Initialized datasets via load_datasets()
+            - Initialized tokenizer via loading a model
 
         Sets:
-            - self.tokenized_train_dataset: Tokenized dataset for training
-            - self.tokenized_val_dataset: Tokenized dataset for validation
+            - self.tokenized_train_dataset: Processed training dataset
+            - self.tokenized_val_dataset: Processed validation dataset
+
+        Example:
+            ```python
+            app = App()
+            app.load_base_model()
+            app.load_datasets()
+            app.tokenize_training_set()
+            ```
 
         Note:
-            This method also handles padding token configuration and adds/removes EOS tokens
-            as needed for the tokenization process.
+            - The method uses the training_prompt template from config to format inputs
+              before tokenization.
+            - This method also handles padding token configuration and adds/removes EOS tokens
+              as needed for the tokenization process.
         """
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.unk_token
@@ -548,7 +618,7 @@ class App:
             /context: Set a new context for subsequent questions
 
         Args:
-            prompt (str, optional): The prompt prefix to display. Defaults to "chathpc_app".
+            prompt (str, optional): The prompt prefix to display. Defaults to "chathpc".
 
         Requires:
             - A model must be loaded via one of:
@@ -562,7 +632,7 @@ class App:
             >>> app = App()
             >>> app.load_merged_model()
             >>> app.interactive()
-            chathpc_app ()> What is Kokkos?
+            chathpc ()> What is Kokkos?
         """
         history_file = Path(self.config.prompt_history_file).expanduser()
         try:
@@ -595,24 +665,33 @@ class App:
     def print_config(self) -> None:
         """Print the current configurations of the application in a formatted table.
 
-        This method displays all configuration settings from self.preferences in a
-        formatted table using the tabulate library. The output includes paths for:
-        - Data files
-        - Base model
-        - Finetuned model layers
-        - Merged model
+        This method displays all configuration settings from self.config in a
+        formatted table using the tabulate library.
+
+        The table includes all configuration parameters like:
+        - File paths (data, models, checkpoints)
+        - Model parameters
+        - Training settings
+        - Other application settings
 
         Example:
-            >>> app = App()
-            >>> app.print_config()
-            =====================  ==========================
-            Setting               Value
-            =====================  ==========================
-            data_file             /path/to/data.json
-            base_model_path       /path/to/base/model
-            finetuned_model_path  /path/to/finetuned/model
-            merged_model_path     /path/to/merged/model
-            =====================  ==========================
+            ```python
+            app = App()
+            app.print_config()
+            # Outputs:
+            # =====================  ==========================
+            # Setting               Value
+            # =====================  ==========================
+            # data_file             /path/to/data.json
+            # base_model_path       /path/to/base/model
+            # max_response_tokens   600
+            # use_wandb            False
+            # =====================  ==========================
+            ```
+
+        Note:
+            The output format uses the 'simple' table format from the tabulate library
+            for clean and readable presentation of settings.
         """
         # Get configuration as dict, excluding internal pydantic fields
         config_dict = self.config.model_dump()

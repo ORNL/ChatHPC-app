@@ -1,7 +1,25 @@
 import json
+from ast import literal_eval
 
 
 def load_json_arg(str_or_fn):
+    """Load and parse JSON data from either a string or file.
+
+    Args:
+        str_or_fn (str): Either a JSON string starting with '{' or a path to a JSON file.
+            If None, returns an empty dict.
+
+    Returns:
+        dict: Parsed JSON data as a dictionary. Returns empty dict if input is None.
+
+    Examples:
+        >>> load_json_arg('{"key": "value"}')
+        {'key': 'value'}
+        >>> load_json_arg('path/to/file.json')
+        {'contents': 'from file'}
+        >>> load_json_arg(None)
+        {}
+    """
     if str_or_fn is None:
         return {}
     if str_or_fn is str and str_or_fn[0] == "{":
@@ -14,4 +32,20 @@ def load_json_arg(str_or_fn):
 
 
 def evaluate_fstring(fstring, **kwargs):
-    return eval(f"f'''{fstring}'''", {}, kwargs)
+    """Evaluate a string as an f-string with provided keyword arguments.
+
+    Args:
+        fstring (str): The string to be evaluated as an f-string. Can contain
+            Python expressions inside curly braces {}.
+        **kwargs: Keyword arguments that will be used to format the f-string.
+
+    Returns:
+        str: The evaluated f-string with all expressions replaced with their values.
+
+    Examples:
+        >>> evaluate_fstring("Hello {name}!", name="World")
+        'Hello World!'
+        >>> evaluate_fstring("The sum is {x + y}", x=1, y=2)
+        'The sum is 3'
+    """
+    return literal_eval(f"f'''{fstring}'''", {}, kwargs)
