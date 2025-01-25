@@ -18,6 +18,7 @@ from peft import (
     get_peft_model,
     prepare_model_for_kbit_training,
 )
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 from pytz import timezone
 from tabulate import tabulate
@@ -61,20 +62,20 @@ class AppConfig(BaseSettings):
         config file > defaults
     """
 
-    data_file: str
-    base_model_path: str
-    finetuned_model_path: str
-    merged_model_path: str
-    training_output_dir: str
-    max_response_tokens: int
-    prompt_history_file: str
+    data_file: Path = Field(..., validation_alias=AliasChoices("data_file",'d'), description="Path to the JSON file containing training data for model fine-tuning.")
+    base_model_path: Path = Field("/auto/projects/ChatHPC/models/cache/meta-llama/CodeLlama-7b-hf", validation_alias=AliasChoices("base_model_path", 'b'), description= "Path to the pre-trained base LLM model directory.")
+    finetuned_model_path: Path = Field("./peft_adapter", validation_alias=AliasChoices("finetuned_model_path",'f'), description="Path where fine-tuned model layers will be saved.")
+    merged_model_path: Path = Field("./merged_adapters", validation_alias=AliasChoices("merged_model_path", "m"), description="Path where the complete merged model will be saved.")
+    training_output_dir: Path = Field("./training_checkpoints", validation_alias=AliasChoices("training_output_dir", "o"), description="Path where training output will be saved.")
+    max_response_tokens: int = Field(600, validation_alias=AliasChoices("max_response_tokens","t"), description="Maximum number of tokens to generate in model responses.", gt=0)
+    prompt_history_file: Path = Field("~/.chathpc_history", validation_alias=AliasChoices("prompt_history_file"), description="Path to the file containing interactive prompt history.")
 
     model_config = SettingsConfigDict(
-        cli_parse_args=False,
-        env_prefix="CHATKOKKOS_",
+        cli_parse_args=True,
+        env_prefix="CHATHPC",
         env_file=".env",
         env_file_encoding="utf-8",
-        json_file=DEFAULT_APP_CONFIG_FILE,
+        # json_file=DEFAULT_APP_CONFIG_FILE,
         json_file_encoding="utf-8",
     )
 
@@ -112,9 +113,12 @@ class App:
         eval_dataset: Dataset used for evaluation.
     """
 
-    def __init__(self):
+    def __init__(self, app_config: AppConfig=None):
         """Initialize the Application object."""
-        self.config = AppConfig()
+        if app_config is None:
+            app_config = AppConfig()
+
+        self.config = app_config
 
     def load_base_model(self) -> None:
         """Load and initialize the base Large Language Model.

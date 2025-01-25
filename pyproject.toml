@@ -37,7 +37,6 @@ dependencies = [
   "jupyter",
   "nbdime",
   "wandb",
-  "click",
   "pydantic-settings",
   "tabulate",
   "ollama",
