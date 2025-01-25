@@ -71,7 +71,8 @@ class AppConfig(BaseSettings):
     max_response_tokens: int = Field(600, validation_alias=AliasChoices("max_response_tokens","t"), description="Maximum number of tokens to generate in model responses.", gt=0)
     prompt_history_file: Path = Field("~/.chathpc_history", description="Path to the file containing interactive prompt history.")
     training_prompt: str = Field(..., description="Prompt template to use for training.")
-    inferfence_prompt: str = Field(..., description="Prompt template to use for inference.")
+    inference_prompt: str = Field(..., description="Prompt template to use for inference.")
+    use_wandb: bool = Field(False, description="Whether to use Weights & Biases for logging.")
 
     model_config = SettingsConfigDict(
         cli_parse_args=True,
@@ -256,8 +257,8 @@ class App:
 
         from datasets import load_dataset
 
-        self.train_dataset = load_dataset("json", data_files=self.config.data_file, split="train")
-        self.eval_dataset = load_dataset("json", data_files=self.config.data_file, split="train")
+        self.train_dataset = load_dataset("json", data_files=self.config.data_file.as_posix(), split="train")
+        self.eval_dataset = load_dataset("json", data_files=self.config.data_file.as_posix(), split="train")
 
     def evaluate_model(self, prompt: str, max_new_tokens: int | None = None) -> str:
         """Evaluate the model on a given prompt and generate a response.
@@ -327,7 +328,7 @@ class App:
             "You are a powerful LLM model for Kokkos..."
             ```
         """
-        return evaluate_fstring(self.config.inferfence_prompt, question=question, context=context)
+        return evaluate_fstring(self.config.inference_prompt, question=question, context=context)
 
     def chat_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> str:
         """Evaluate a Kokkos-related question with provided context.
@@ -502,7 +503,7 @@ class App:
             load_best_model_at_end=False,
             # ddp_find_unused_parameters=False if ddp else None,
             group_by_length=True,  # group sequences of roughly the same length together to speed up training
-            report_to="wandb",  # if use_wandb else "none",
+            report_to="wandb" if self.config.use_wandb else "none",
             run_name=f"codellama-{datetime.now(tz=timezone('EST')).strftime('%Y-%m-%d-%H-%M')}",  # if use_wandb else None,
         )
 

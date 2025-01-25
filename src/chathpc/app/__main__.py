@@ -12,48 +12,48 @@ from chathpc.app import App, AppConfig
 from chathpc.app.utils.common_utils import load_json_arg
 
 
-def config():
-    app = App()
+def config(config):
+    app = App(config)
     app.print_config()
 
 
-def train():
-    app = App()
+def train(config):
+    app = App(config)
     app.load_base_model()
     app.load_datasets()
     app.tokenize_training_set()
     app.train()
 
 
-def run_base():
-    app = App()
+def run_base(config):
+    app = App(config)
     app.load_base_model()
     app.interactive("base")
 
 
-def _run_fine():
-    app = App()
+def _run_fine(config):
+    app = App(config)
     app.load_finetuned_model()
     app.interactive()
 
 
-def run_fine():
-    _run_fine()
+def run_fine(config):
+    _run_fine(config)
 
 
-def run_merged():
-    app = App()
+def run_merged(config):
+    app = App(config)
     app.load_merged_model()
     app.interactive("merged")
 
 
-def run():
-    _run_fine()
+def run(config):
+    _run_fine(config)
 
 
 def init_parser(parser):
     parser.add_argument("--debug", action="store_true", help="Open debug port (5678).")
-    parser.add_argument("--config", type=Path, help="Path to config json file.")
+    parser.add_argument("--config", type=str, help="Path to config json file.")
     parser.set_defaults(func=config)
 
     subparsers = parser.add_subparsers(title='subcommands', description="valid subcommands")
@@ -77,7 +77,7 @@ def cli(raw_args=None):
     args = parser.parse_args(raw_args)
     try:
         json_config = load_json_arg(args.config)
-        s = CliApp.run(AppConfig, cli_args=args, cli_settings_source=cli_settings, **json_config)
+        app_config = CliApp.run(AppConfig, cli_args=args, cli_settings_source=cli_settings, **json_config)
     except ValidationError as e:
         parser.print_help()
         print()
@@ -91,7 +91,7 @@ def cli(raw_args=None):
         print("Attach debugger to continue.")
         debugpy.wait_for_client()  # noqa: T100
 
-    args.func()
+    args.func(app_config)
 
 if __name__ == "__main__":
     cli()
