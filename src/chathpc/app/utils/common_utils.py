@@ -1,5 +1,4 @@
 import json
-from ast import literal_eval
 
 
 def load_json_arg(str_or_fn):
@@ -15,7 +14,7 @@ def load_json_arg(str_or_fn):
     Examples:
         >>> load_json_arg('{"key": "value"}')
         {'key': 'value'}
-        >>> load_json_arg('path/to/file.json')
+        >>> load_json_arg("path/to/file.json")
         {'contents': 'from file'}
         >>> load_json_arg(None)
         {}
@@ -49,3 +48,11 @@ def evaluate_fstring(fstring, **kwargs):
         'The sum is 3'
     """
     return eval(f"f'''{fstring}'''", {}, kwargs)  # noqa: S307
+
+
+def extract_answer(response: str):
+    matchstr = "### Response:\n"
+    index = response.find(matchstr)
+    if index == -1:
+        return None
+    return response[index + len(matchstr) :].replace("<s>", "").replace("</s>", "")

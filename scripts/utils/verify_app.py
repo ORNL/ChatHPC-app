@@ -13,6 +13,8 @@ from subprocess import check_output
 from datastore.datastore import read_or_new_json
 from tqdm import tqdm
 
+from chathpc.app.utils.common_utils import extract_answer
+
 GIT_ROOT = check_output("git rev-parse --show-toplevel", shell=True).decode().strip()  # noqa S602
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -68,14 +70,6 @@ def shell_source(script):
     output = pipe.communicate()[0].decode()
     env = dict(line.split("=", 1) for line in output.splitlines())
     os.environ.update(env)
-
-
-def extract_answer(response: str):
-    matchstr = "### Response:\n"
-    index = response.find(matchstr)
-    if index == -1:
-        return None
-    return response[index + len(matchstr) :].replace("<s>", "").replace("</s>", "")
 
 
 def run_notebook():
@@ -347,8 +341,12 @@ def main(raw_args=None):
     # os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./peft_adapter"
     # os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./merged_adapters"
     # os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./kokkos-code-llama"
-    os.environ["CHATHPC_TRAINING_PROMPT"] = "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n{answer}\n"
-    os.environ["CHATHPC_INFERENCE_PROMPT"] = "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n"
+    os.environ["CHATHPC_TRAINING_PROMPT"] = (
+        "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n{answer}\n"
+    )
+    os.environ["CHATHPC_INFERENCE_PROMPT"] = (
+        "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n"
+    )
 
     print("** Running Notebook **")
     print("** Running Notebook **", file=sys.stderr)
