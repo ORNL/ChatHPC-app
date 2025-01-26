@@ -18,11 +18,12 @@ from peft import (
     get_peft_model,
     prepare_model_for_kbit_training,
 )
-from pydantic import AliasChoices, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 from pytz import timezone
 from tabulate import tabulate
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
+
 from chathpc.app.utils.common_utils import evaluate_fstring, load_json_arg
 
 logger = logging.getLogger(__name__)
@@ -70,12 +71,19 @@ class AppConfig(BaseSettings):
     """
 
     data_file: Path = Field(..., description="Path to the JSON file containing training data for model fine-tuning.")
-    base_model_path: Path = Field("/auto/projects/ChatHPC/models/cache/meta-llama/CodeLlama-7b-hf", description= "Path to the pre-trained base LLM model directory.")
-    finetuned_model_path: Path = Field("./peft_adapter", description="Path where fine-tuned model layers will be saved.")
-    merged_model_path: Path = Field("./merged_adapters", description="Path where the complete merged model will be saved.")
-    training_output_dir: Path = Field("./training_checkpoints", description="Path where training output will be saved.")
+    base_model_path: Path = Field(
+        "/auto/projects/ChatHPC/models/cache/meta-llama/CodeLlama-7b-hf",
+        description="Path to the pre-trained base LLM model directory.",
+    )
+    finetuned_model_path: Path = Field("peft_adapter", description="Path where fine-tuned model layers will be saved.")
+    merged_model_path: Path = Field(
+        "merged_adapters", description="Path where the complete merged model will be saved."
+    )
+    training_output_dir: Path = Field("training_checkpoints", description="Path where training output will be saved.")
     max_response_tokens: int = Field(600, gt=0, description="Maximum number of tokens to generate in model responses.")
-    prompt_history_file: Path = Field("~/.chathpc_history", description="Path to the file containing interactive prompt history.")
+    prompt_history_file: Path = Field(
+        "~/.chathpc_history", description="Path to the file containing interactive prompt history."
+    )
     training_prompt: str = Field(..., description="Prompt template to use for training.")
     inference_prompt: str = Field(..., description="Prompt template to use for inference.")
     use_wandb: bool = Field(False, description="Whether to use Weights & Biases for logging.")
@@ -105,7 +113,6 @@ class AppConfig(BaseSettings):
             JsonConfigSettingsSource(settings_cls),
             file_secret_settings,
         )
-
 
     @classmethod
     def from_json(cls, json_or_file: str | Path | dict) -> AppConfig:
@@ -171,7 +178,7 @@ class App:
         print_config(): Displays current configuration settings.
     """
 
-    def __init__(self, app_config: AppConfig=None):
+    def __init__(self, app_config: AppConfig = None):
         """Initialize the Application object.
 
         This method initializes a new ChatHPC application instance with the provided
@@ -225,10 +232,9 @@ class App:
             app = App.from_json("config.json")
 
             # From dictionary
-            app = App.from_json({
-                "data_file": "data.json",
-                "base_model_path": "/path/to/model"
-            })
+            app = App.from_json(
+                {"data_file": "data.json", "base_model_path": "/path/to/model"}
+            )
             ```
 
         Note:
@@ -395,10 +401,7 @@ class App:
             ```python
             app = App()
             app.load_base_model()
-            response = app.evaluate_model(
-                "What is Kokkos?",
-                max_new_tokens=100
-            )
+            response = app.evaluate_model("What is Kokkos?", max_new_tokens=100)
             print(response)  # "Kokkos is a programming model..."
             ```
 
@@ -432,15 +435,13 @@ class App:
             str: A formatted prompt string following the template defined in config.inference_prompt.
 
         Requires:
-            - config.inference_prompt must contain a valid f-string template with {question}
-              and {context} placeholders.
+            - config.inference_prompt must contain a valid f-string template with {question} and {context} placeholders.
 
         Example:
             ```python
             app = App()
             prompt = app.chat_prompt(
-                "How do I use Views?",
-                "Views are memory spaces in Kokkos..."
+                "How do I use Views?", "Views are memory spaces in Kokkos..."
             )
             print(prompt)  # Returns formatted prompt based on template
             ```
@@ -479,7 +480,7 @@ class App:
             response = app.chat_evaluate(
                 "How do I use Views?",
                 "Views are memory spaces in Kokkos...",
-                max_new_tokens=200
+                max_new_tokens=200,
             )
             print(response)  # Returns model's response
             ```
@@ -515,10 +516,8 @@ class App:
             ```
 
         Note:
-            - The method uses the training_prompt template from config to format inputs
-              before tokenization.
-            - This method also handles padding token configuration and adds/removes EOS tokens
-              as needed for the tokenization process.
+            - The method uses the training_prompt template from config to format inputs before tokenization.
+            - This method also handles padding token configuration and adds/removes EOS tokens as needed for the tokenization process.
         """
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.unk_token
