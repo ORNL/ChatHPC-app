@@ -23,10 +23,13 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+## [25.1.0] - 2025-01-25
+
 Verified initial working version of the ChatHPC App.
 
 ### Added
 
 - Initial version of ChatHPC App. Created from the working ChatKokkos Example.
 
-[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.1.0...main
+[25.1.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/releases/v25.1.0
