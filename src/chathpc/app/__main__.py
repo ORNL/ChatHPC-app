@@ -1,6 +1,5 @@
 import argparse
 import sys
-from pathlib import Path
 
 from pydantic import ValidationError
 from pydantic_settings import (
@@ -19,6 +18,7 @@ def config(config):
 
 def train(config):
     app = App(config)
+    app.print_config()
     app.load_base_model()
     app.load_datasets()
     app.tokenize_training_set()
@@ -56,18 +56,21 @@ def init_parser(parser):
     parser.add_argument("--config", type=str, help="Path to config json file.")
     parser.set_defaults(func=config)
 
-    subparsers = parser.add_subparsers(title='subcommands', description="valid subcommands")
+    subparsers = parser.add_subparsers(title="subcommands", description="valid subcommands")
 
-    subparsers.add_parser('config', help='Print current config').set_defaults(func=config)
-    subparsers.add_parser('train', help='Finetune the model').set_defaults(func=train)
-    subparsers.add_parser('run', help='Interact with the model').set_defaults(func=run)
-    subparsers.add_parser('run_base', help='Interact with the base model').set_defaults(func=run_base)
-    subparsers.add_parser('run_fine', help='Interact with the finetuned model').set_defaults(func=run_fine)
-    subparsers.add_parser('run_merged', help='Interact with the merged model').set_defaults(func=run_merged)
+    subparsers.add_parser("config", help="Print current config").set_defaults(func=config)
+    subparsers.add_parser("train", help="Finetune the model").set_defaults(func=train)
+    subparsers.add_parser("run", help="Interact with the model").set_defaults(func=run)
+    subparsers.add_parser("run_base", help="Interact with the base model").set_defaults(func=run_base)
+    subparsers.add_parser("run_fine", help="Interact with the finetuned model").set_defaults(func=run_fine)
+    subparsers.add_parser("run_merged", help="Interact with the merged model").set_defaults(func=run_merged)
+
 
 def cli(raw_args=None):
     # Parse the arguments
-    parser = argparse.ArgumentParser(description="""ChatHPC Application. Used to train and interact with ChatX applications which are part of ChatHPC.""")
+    parser = argparse.ArgumentParser(
+        description="""ChatHPC Application. Used to train and interact with ChatX applications which are part of ChatHPC."""
+    )
     init_parser(parser)
 
     # Set existing `parser` as the `root_parser` object for the user defined settings source
@@ -92,6 +95,7 @@ def cli(raw_args=None):
         debugpy.wait_for_client()  # noqa: T100
 
     args.func(app_config)
+
 
 if __name__ == "__main__":
     cli()
