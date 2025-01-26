@@ -48,4 +48,4 @@ def evaluate_fstring(fstring, **kwargs):
         >>> evaluate_fstring("The sum is {x + y}", x=1, y=2)
         'The sum is 3'
     """
-    return literal_eval(f"f'''{fstring}'''", {}, kwargs)
+    return eval(f"f'''{fstring}'''", {}, kwargs)  # noqa: S307

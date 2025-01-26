@@ -23,7 +23,7 @@ from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBa
 from pytz import timezone
 from tabulate import tabulate
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
-from chathpc.app.utils.common_utils import evaluate_fstring
+from chathpc.app.utils.common_utils import evaluate_fstring, load_json_arg
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +107,37 @@ class AppConfig(BaseSettings):
         )
 
 
+    @classmethod
+    def from_json(cls, json_or_file: str | Path | dict) -> AppConfig:
+        """Create an AppConfig instance from a JSON file or dictionary.
+
+        This class method provides a convenient way to create an AppConfig instance
+        from either a JSON file path or a dictionary containing configuration values.
+
+        Args:
+            json_or_file (Union[str, Path, dict]): Either a path to a JSON file,
+                or a dictionary containing configuration values.
+
+        Returns:
+            AppConfig: A new AppConfig instance initialized with the provided settings.
+
+        Example:
+            ```python
+            # From JSON file
+            config = AppConfig.from_json("config.json")
+
+            # From dictionary
+            config = AppConfig.from_json({"data_file": "data.json"})
+            ```
+
+        Note:
+            This method uses the load_json_arg utility function which handles both
+            file paths and dictionaries, ensuring consistent JSON loading behavior.
+        """
+        json_config = load_json_arg(json_or_file)
+        return cls(**json_config)
+
+
 class App:
     """Main application class for ChatHPC Application.
 
@@ -173,6 +204,39 @@ class App:
             app_config = AppConfig()
 
         self.config = app_config
+
+    @classmethod
+    def from_json(cls, json_or_file: str | Path | dict) -> App:
+        """Create an App instance from a JSON file or dictionary.
+
+        This class method provides a convenient way to create an App instance
+        from either a JSON file path or a dictionary containing configuration values.
+
+        Args:
+            json_or_file (Union[str, Path, dict]): Either a path to a JSON file,
+                or a dictionary containing configuration values.
+
+        Returns:
+            App: A new App instance initialized with the provided configuration.
+
+        Example:
+            ```python
+            # From JSON file
+            app = App.from_json("config.json")
+
+            # From dictionary
+            app = App.from_json({
+                "data_file": "data.json",
+                "base_model_path": "/path/to/model"
+            })
+            ```
+
+        Note:
+            This method uses the AppConfig.from_json() method internally to create
+            the configuration before initializing the App instance.
+        """
+        config = AppConfig.from_json(json_or_file)
+        return cls(app_config=config)
 
     def load_base_model(self) -> None:
         """Load and initialize the base Large Language Model.

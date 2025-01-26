@@ -8,20 +8,20 @@ from chathpc.app.utils.common_utils import load_json_arg
 
 class TestAppConfig(unittest.TestCase):
     def setUp(self):
-        os.environ["CHATKOKKOS_DATA_FILE"] = "files/data_file.json"
-        os.environ["CHATKOKKOS_BASE_MODEL_PATH"] = "files/base_model"
-        os.environ["CHATKOKKOS_FINETUNED_MODEL_PATH"] = "files/finetuned_model"
-        os.environ["CHATKOKKOS_MERGED_MODEL_PATH"] = "files/merged_model"
+        os.environ["CHATHPC_DATA_FILE"] = "files/data_file.json"
+        os.environ["CHATHPC_BASE_MODEL_PATH"] = "files/base_model"
+        os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "files/finetuned_model"
+        os.environ["CHATHPC_MERGED_MODEL_PATH"] = "files/merged_model"
 
     def test_test_config(self):
         preferences = AppConfig()
         assert preferences.data_file == "files/data_file.json"
 
     def tearDown(self):
-        os.environ.pop("CHATKOKKOS_DATA_FILE")
-        os.environ.pop("CHATKOKKOS_BASE_MODEL_PATH")
-        os.environ.pop("CHATKOKKOS_FINETUNED_MODEL_PATH")
-        os.environ.pop("CHATKOKKOS_MERGED_MODEL_PATH")
+        os.environ.pop("CHATHPC_DATA_FILE")
+        os.environ.pop("CHATHPC_BASE_MODEL_PATH")
+        os.environ.pop("CHATHPC_FINETUNED_MODEL_PATH")
+        os.environ.pop("CHATHPC_MERGED_MODEL_PATH")
 
 
 class TestAppPreferences(unittest.TestCase):

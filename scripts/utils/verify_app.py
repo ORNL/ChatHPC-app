@@ -79,12 +79,12 @@ def extract_answer(response: str):
 
 
 def run_notebook():
-    from chatkokkos.app import App as ChatApp
+    from chathpc.app import App as ChatApp
 
     experiment = "jupyter"
-    os.environ["CHATKOKKOS_FINETUNED_MODEL_PATH"] = "./peft_adapter"
-    os.environ["CHATKOKKOS_MERGED_MODEL_PATH"] = "./merged_adapters"
-    os.environ["CHATKOKKOS_TRAINING_OUTPUT_DIR"] = "./kokkos-code-llama"
+    os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./peft_adapter"
+    os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./merged_adapters"
+    os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./kokkos-code-llama"
     chat_app = ChatApp()
     chat_app.load_datasets()
 
@@ -92,7 +92,7 @@ def run_notebook():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
+            response = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
@@ -108,7 +108,7 @@ def run_notebook():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
+            response = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
@@ -124,12 +124,12 @@ def run_notebook():
 
 
 def run_notebook_app():
-    from chatkokkos.app import App as ChatApp
+    from chathpc.app import App as ChatApp
 
     experiment = "jupyter_app"
-    os.environ["CHATKOKKOS_FINETUNED_MODEL_PATH"] = "./jupyter_app/peft_adapter"
-    os.environ["CHATKOKKOS_MERGED_MODEL_PATH"] = "./jupyter_app/merged_adapters"
-    os.environ["CHATKOKKOS_TRAINING_OUTPUT_DIR"] = "./jupyter_app/kokkos-code-llama"
+    os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./jupyter_app/peft_adapter"
+    os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./jupyter_app/merged_adapters"
+    os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./jupyter_app/kokkos-code-llama"
     chat_app = ChatApp()
     chat_app.load_datasets()
 
@@ -137,7 +137,7 @@ def run_notebook_app():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
+            response = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
@@ -153,7 +153,7 @@ def run_notebook_app():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
+            response = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
@@ -169,12 +169,12 @@ def run_notebook_app():
 
 
 def run_app():
-    from chatkokkos.app import App as ChatApp
+    from chathpc.app import App as ChatApp
 
     experiment = "app"
-    os.environ["CHATKOKKOS_FINETUNED_MODEL_PATH"] = "./app/peft_adapter"
-    os.environ["CHATKOKKOS_MERGED_MODEL_PATH"] = "./app/merged_adapters"
-    os.environ["CHATKOKKOS_TRAINING_OUTPUT_DIR"] = "./app/kokkos-code-llama"
+    os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./app/peft_adapter"
+    os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./app/merged_adapters"
+    os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./app/kokkos-code-llama"
     chat_app = ChatApp()
     chat_app.load_datasets()
 
@@ -182,7 +182,7 @@ def run_app():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
+            response = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
@@ -198,7 +198,7 @@ def run_app():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chatkokkos_evaluate(item["question"], item["context"])
+            response = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
@@ -223,7 +223,7 @@ def ignore_minor(string: str):
 def run_ollama():
     from ollama import GenerateResponse, generate
 
-    from chatkokkos.app import App as ChatApp
+    from chathpc.app import App as ChatApp
 
     experiment = "ollama"
     chat_app = ChatApp()
@@ -232,7 +232,7 @@ def run_ollama():
     def get_ol():
         ol = []
         for item in tqdm(chat_app.train_dataset, "Run ol"):
-            prompt = chat_app.chatkokkos_prompt(item["question"], item["context"])
+            prompt = chat_app.chat_prompt(item["question"], item["context"])
             response: GenerateResponse = generate(model="ChatKokkos", prompt=prompt, options={"temperature": 0.0})
             datapoint = {
                 "question": item["question"],
@@ -342,6 +342,13 @@ def main(raw_args=None):
         debugpy.listen(5678)  # noqa: T100
         print("Attach debugger to continue.")
         debugpy.wait_for_client()  # noqa: T100
+
+    os.environ["CHATHPC_DATA_FILE"] = "/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json"
+    # os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./peft_adapter"
+    # os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./merged_adapters"
+    # os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./kokkos-code-llama"
+    os.environ["CHATHPC_TRAINING_PROMPT"] = "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n{answer}\n"
+    os.environ["CHATHPC_INFERENCE_PROMPT"] = "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n"
 
     print("** Running Notebook **")
     print("** Running Notebook **", file=sys.stderr)
