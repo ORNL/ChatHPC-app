@@ -40,6 +40,7 @@ dependencies = [
   "pydantic-settings",
   "tabulate",
   "ollama",
+  "readline>=3.5",
   "datastore-ayoung48 @ git+ssh://git@github.com/Geekdude/Datastore.git",
 ]
 

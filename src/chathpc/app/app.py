@@ -697,7 +697,8 @@ class App:
             >>> app.interactive()
             chathpc ()> What is Kokkos?
         """
-        history_file = Path(self.config.prompt_history_file).expanduser()
+        history_file = self.config.prompt_history_file.expanduser().as_posix()
+        print(history_file)
         try:
             readline.read_history_file(history_file)
             h_len = readline.get_current_history_length()
