@@ -26,6 +26,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 ### Fixed
 
 - load_json_arg(): Fixed bug with json string as input.
+- Fixed bug in interactive run mode.
 
 ## [25.1.0] - 2025-01-25
 
