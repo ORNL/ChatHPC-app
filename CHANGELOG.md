@@ -23,6 +23,10 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+### Fixed
+
+- load_json_arg(): Fixed bug with json string as input.
+
 ## [25.1.0] - 2025-01-25
 
 Verified initial working version of the ChatHPC App.
