@@ -4,6 +4,7 @@ tmp/
 *.whl
 *.old
 *.o
+*.code-workspace
 __pycache__/
 pyvenv.cfg
 finder.txt
@@ -20,3 +21,4 @@ finder.txt
 .coverage
 coverage.xml
 metrics.txt
+setup_template_input.txt
