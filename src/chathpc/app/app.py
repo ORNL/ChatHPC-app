@@ -80,6 +80,9 @@ class AppConfig(BaseSettings):
         "merged_adapters", description="Path where the complete merged model will be saved."
     )
     training_output_dir: Path = Field("training_checkpoints", description="Path where training output will be saved.")
+    max_training_tokens: int = Field(
+        512, gt=0, description="Maximum number of tokens to use to tokenize the training sets."
+    )
     max_response_tokens: int = Field(600, gt=0, description="Maximum number of tokens to generate in model responses.")
     prompt_history_file: Path = Field(
         "~/.chathpc_history", description="Path to the file containing interactive prompt history."
@@ -526,7 +529,7 @@ class App:
             result = self.tokenizer(
                 prompt,
                 truncation=True,
-                max_length=512,
+                max_length=self.config.max_training_tokens,
                 padding=False,
                 return_tensors=None,
             )
