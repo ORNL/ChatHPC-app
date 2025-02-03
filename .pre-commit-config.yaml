@@ -36,3 +36,7 @@ repos:
   rev: v0.13.0
   hooks:
   - id: markdownlint
+# - repo: https://github.com/RobertCraigie/pyright-python
+#   rev: v1.1.393
+#   hooks:
+#   - id: pyright

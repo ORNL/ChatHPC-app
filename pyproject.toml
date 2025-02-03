@@ -41,6 +41,7 @@ dependencies = [
   "tabulate",
   "ollama",
   "readline>=3.5",
+  "loguru",
   "datastore-ayoung48 @ git+ssh://git@github.com/Geekdude/Datastore.git",
 ]
 
@@ -149,3 +150,7 @@ extend-ignore = [
   "EM101",  # Raw string in Exception
   "TRY003", # Avoid long strings in Exception Class.
 ]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"

@@ -74,8 +74,8 @@ def check_words_in_string(words, string):
 
 def extract_output(file: str):
     # Load the notebook
-    with open(file) as file:
-        notebook = json.load(file)
+    with open(file) as f:
+        notebook = json.load(f)
 
     # Iterate through the cells and print outputs
     for cell in notebook["cells"]:

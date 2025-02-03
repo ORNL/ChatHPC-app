@@ -169,7 +169,7 @@ def collect_versions(changelog: list[str]) -> list[str]:
     return versions
 
 
-def update_changelog(version: Version, filename: str, base_url: str | None = None):
+def update_changelog(version: Version | str, filename: str, base_url: str | None = None):
     """Update the changelog on version bump.
 
     Args:

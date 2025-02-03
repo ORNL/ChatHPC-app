@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import atexit
-import logging
 import os
 import readline
 import sys
@@ -12,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import torch
+from loguru import logger
 from peft import (
     LoraConfig,
     PeftModel,
@@ -25,8 +25,6 @@ from tabulate import tabulate
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
 
 from chathpc.app.utils.common_utils import evaluate_fstring, load_json_arg
-
-logger = logging.getLogger(__name__)
 
 DEFAULT_APP_CONFIG_FILE = Path(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "config/default_app_settings.json"))
