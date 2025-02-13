@@ -7,10 +7,12 @@ stages:
   - deploy_coverage
   - deploy_docs
 
+variables:
+  HATCH_DATA_DIR: ".hatch"
+
 before_script:
-  - python3 -m venv venv
-  - source venv/bin/activate
-  - pip install --upgrade pip
+  - python3 -m venv --upgrade-deps .venv
+  - source .venv/bin/activate
 
 .zenith:
   tags: [ubuntu, zenith]
@@ -27,7 +29,7 @@ check_format-job:
   stage: check_format
   needs: []
   script:
-    - pip install hatch
+    - pip install --upgrade hatch
     - pip install --upgrade hatch-mkdocs
     - (hatch fmt | tee fmt.out && echo "lint_errors 0" > metrics.txt) || (cat fmt.out | grep -e 'Found .* errors' | sed 's/Found \(.*\) errors.*/lint_errors \1/' > metrics.txt)
     - cat metrics.txt
@@ -59,7 +61,6 @@ test-job:
   needs: [build-job]
   script:
     - pip install --upgrade hatch
-    - hatch env prune # Needed when framework changes since version is not updated.
     - hatch run test
 
 test-scripts:
@@ -75,7 +76,6 @@ coverage-job:
   needs: [build-job]
   script:
     - pip install --upgrade hatch
-    - hatch env prune # Needed when framework changes since version is not updated.
     - hatch run cov-html
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
