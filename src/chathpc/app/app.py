@@ -494,6 +494,41 @@ class App:
         prompt = self.chat_prompt(question, context)
         return self.evaluate_model(prompt, **kwargs)
 
+    def training_prompt(self, question, context, answer):
+        """Create a formatted prompt for training data.
+
+        This method generates a structured prompt by combining the question, context, and answer
+        using the training prompt template defined in the application configuration.
+
+        Args:
+            question (str): The question to be used in training.
+            context (str): Supporting context or documentation related to the question.
+            answer (str): The expected answer or response for the question.
+
+        Returns:
+            str: A formatted prompt string following the template defined in config.training_prompt.
+
+        Requires:
+            - config.training_prompt must contain a valid f-string template with {question},
+            {context}, and {answer} placeholders.
+
+        Example:
+            ```python
+            app = App()
+            prompt = app.training_prompt(
+                "How do I use Views?",
+                "Views are memory spaces in Kokkos...",
+                "To use Views in Kokkos...",
+            )
+            print(prompt)  # Returns formatted prompt based on template
+            ```
+
+        Note:
+            The actual prompt format is determined by the training_prompt template in
+            the application configuration.
+        """
+        return evaluate_fstring(self.config.training_prompt, question=question, context=context, answer=answer)
+
     def tokenize_training_set(self) -> None:
         """Tokenize the training and validation datasets.
 
@@ -538,7 +573,7 @@ class App:
             return result
 
         def generate_and_tokenize_prompt(data_point):
-            full_prompt = evaluate_fstring(self.config.training_prompt, **data_point)
+            full_prompt = self.training_prompt(**data_point)
             return tokenize(full_prompt)
 
         self.tokenizer.add_eos_token = True
