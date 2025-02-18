@@ -35,6 +35,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 - load_json_arg(): Fixed bug with json string as input.
 - Fixed bug in interactive run mode.
+- Fixed extract_answer() utility to use the prompt and end string to extract the answer portion.
 
 ## [25.1.0] - 2025-01-25
 

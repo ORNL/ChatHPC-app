@@ -453,7 +453,7 @@ class App:
         """
         return evaluate_fstring(self.config.inference_prompt, question=question, context=context)
 
-    def chat_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> str:
+    def chat_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> tuple[str, str]:
         """Evaluate a question with supporting context using the model.
 
         This method combines chat prompt formatting with model evaluation to generate
@@ -465,7 +465,7 @@ class App:
             **kwargs: Additional keyword arguments passed to evaluate_model().
 
         Returns:
-            str: Generated response from the model.
+            tuple[str, str]: A tuple containing the generated response from the model and the formatted prompt.
 
         Requires:
             - Initialized model via one of:
@@ -492,7 +492,8 @@ class App:
             is determined by the inference_prompt template in the configuration.
         """
         prompt = self.chat_prompt(question, context)
-        return self.evaluate_model(prompt, **kwargs)
+        response = self.evaluate_model(prompt, **kwargs)
+        return (response, prompt)
 
     def training_prompt(self, question, context, answer):
         """Create a formatted prompt for training data.
