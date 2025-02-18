@@ -37,9 +37,11 @@ class TestLoadJson(unittest.TestCase):
 class TestExtractAnswer(unittest.TestCase):
     def test_extract_answer_simple(self):
         app = App.from_json("tests/files/config.json")
-        app.config.inference_prompt = "System\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n"
+        app.config.inference_prompt = (
+            "System\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n"
+        )
         app.config.training_prompt = (
-            "System\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n{answer}\n\n"
+            "System\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n\n"
         )
         tinput_prompt = app.chat_prompt("Question", "Context")
         tinput = app.training_prompt("Question", "Context", "Answer")
@@ -51,10 +53,10 @@ class TestExtractAnswer(unittest.TestCase):
     def test_extract_answer_simple2(self):
         app = App.from_json("tests/files/config.json")
         app.config.inference_prompt = (
-            "Goal\n\n### Question:\n{question}\n\n### Additional Info:\n{context}\n\n### Answer:\n"
+            "Goal\n\n### Question:\n{{question}}\n\n### Additional Info:\n{{context}}\n\n### Answer:\n"
         )
         app.config.training_prompt = (
-            "Goal\n\n### Question:\n{question}\n\n### Additional Info:\n{context}\n\n### Answer:\n{answer}\n\n"
+            "Goal\n\n### Question:\n{{question}}\n\n### Additional Info:\n{{context}}\n\n### Answer:\n{{answer}}\n\n"
         )
         tinput_prompt = app.chat_prompt("Question", "Context")
         tinput = app.training_prompt("Question", "Context", "Answer")

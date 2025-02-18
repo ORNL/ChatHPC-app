@@ -30,6 +30,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 ## Changed
 
 - Logging: Switch from using logging module to loguru.
+- Template: Switch from format string to Jinja for the templates.
 
 ### Fixed
 

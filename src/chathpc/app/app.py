@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import jinja2
 import torch
 from loguru import logger
 from peft import (
@@ -24,7 +25,7 @@ from pytz import timezone
 from tabulate import tabulate
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
 
-from chathpc.app.utils.common_utils import evaluate_fstring, load_json_arg
+from chathpc.app.utils.common_utils import load_json_arg
 
 DEFAULT_APP_CONFIG_FILE = Path(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "config/default_app_settings.json"))
@@ -212,6 +213,7 @@ class App:
             app_config = AppConfig()
 
         self.config = app_config
+        self.jinja = jinja2.Environment(autoescape=jinja2.select_autoescape(), keep_trailing_newline=True)
 
     @classmethod
     def from_json(cls, json_or_file: str | Path | dict) -> App:
@@ -451,7 +453,10 @@ class App:
             The actual prompt format is determined by the inference_prompt template in
             the application configuration.
         """
-        return evaluate_fstring(self.config.inference_prompt, question=question, context=context)
+        if not hasattr(self, "inference_template"):
+            self.inference_template = self.jinja.from_string(self.config.inference_prompt)
+
+        return self.inference_template.render(question=question, context=context)
 
     def chat_evaluate(self, question: str, context: str, **kwargs: dict[str, Any]) -> tuple[str, str]:
         """Evaluate a question with supporting context using the model.
@@ -528,7 +533,10 @@ class App:
             The actual prompt format is determined by the training_prompt template in
             the application configuration.
         """
-        return evaluate_fstring(self.config.training_prompt, question=question, context=context, answer=answer)
+        if not hasattr(self, "training_template"):
+            self.training_template = self.jinja.from_string(self.config.training_prompt)
+
+        return self.training_template.render(question=question, context=context, answer=answer)
 
     def tokenize_training_set(self) -> None:
         """Tokenize the training and validation datasets.

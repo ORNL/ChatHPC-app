@@ -42,6 +42,7 @@ dependencies = [
   "ollama",
   "readline>=3.5",
   "loguru",
+  "jinja2",
   "datastore-ayoung48 @ git+ssh://git@github.com/Geekdude/Datastore.git",
 ]
 
