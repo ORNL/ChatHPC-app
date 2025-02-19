@@ -58,7 +58,7 @@ def extract_answer(response: str, prompt: str, stop: str | None = None):
     answer = response
     answer = answer.replace("<s>", "").replace("</s>", "")
 
-    if answer.startswith(answer):
+    if answer.startswith(prompt):
         answer = answer[len(prompt) :]
 
     if stop is not None and answer.endswith(stop):
