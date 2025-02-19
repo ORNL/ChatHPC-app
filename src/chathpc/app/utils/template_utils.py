@@ -102,7 +102,6 @@ def split_on_response(template: str) -> tuple[str, str]:
         ('User: {{prompt}} Bot: ', ' End')
     """
     pattern = r"{{\s*(response)\s*}}"
-    print(pattern)
 
     parts = list(re.split(pattern, template))
     if len(parts) != 3:  # noqa: PLR2004
