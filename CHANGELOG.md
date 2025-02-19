@@ -31,6 +31,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 - Logging: Switch from using logging module to loguru.
 - Template: Switch from format string to Jinja for the templates.
+- Template: Now only one template is used for both training and inference.
 
 ### Fixed
 
