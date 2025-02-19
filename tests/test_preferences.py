@@ -43,7 +43,7 @@ class TestAppPreferences(unittest.TestCase):
     def test_update(self):
         preferences = AppConfig()  # type: ignore
         preferences.data_file = Path("new_file.json")
-        assert preferences.data_file == "new_file.json", "incorrect default data_file"
+        assert preferences.data_file == Path("new_file.json"), "incorrect default data_file"
 
     def test_test_config(self):
         preferences = AppConfig(
