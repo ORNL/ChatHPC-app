@@ -13,11 +13,10 @@ class TestAppConfig(unittest.TestCase):
         os.environ["CHATHPC_BASE_MODEL_PATH"] = "files/base_model"
         os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "files/finetuned_model"
         os.environ["CHATHPC_MERGED_MODEL_PATH"] = "files/merged_model"
-        os.environ["CHATHPC_TRAINING_PROMPT"] = "train_prompt"
-        os.environ["CHATHPC_INFERENCE_PROMPT"] = "inference_prompt"
+        os.environ["CHATHPC_PROMPT_TEMPLATE"] = "prompt_template"
 
     def test_test_config(self):
-        preferences = AppConfig()
+        preferences = AppConfig()  # type: ignore
         assert preferences.data_file == Path("files/data_file.json")
 
     def tearDown(self):
@@ -25,28 +24,25 @@ class TestAppConfig(unittest.TestCase):
         os.environ.pop("CHATHPC_BASE_MODEL_PATH")
         os.environ.pop("CHATHPC_FINETUNED_MODEL_PATH")
         os.environ.pop("CHATHPC_MERGED_MODEL_PATH")
-        os.environ.pop("CHATHPC_TRAINING_PROMPT")
-        os.environ.pop("CHATHPC_INFERENCE_PROMPT")
+        os.environ.pop("CHATHPC_PROMPT_TEMPLATE")
 
 
 class TestAppPreferences(unittest.TestCase):
     def setUp(self):
         os.environ["CHATHPC_DATA_FILE"] = "files/data_file.json"
-        os.environ["CHATHPC_TRAINING_PROMPT"] = "train_prompt"
-        os.environ["CHATHPC_INFERENCE_PROMPT"] = "inference_prompt"
+        os.environ["CHATHPC_PROMPT_TEMPLATE"] = "prompt_template"
 
     def tearDown(self):
         os.environ.pop("CHATHPC_DATA_FILE")
-        os.environ.pop("CHATHPC_TRAINING_PROMPT")
-        os.environ.pop("CHATHPC_INFERENCE_PROMPT")
+        os.environ.pop("CHATHPC_PROMPT_TEMPLATE")
 
     def test_create(self):
-        preferences = AppConfig()
+        preferences = AppConfig()  # type: ignore
         assert preferences.data_file == Path("files/data_file.json"), "incorrect default data_file"
 
     def test_update(self):
-        preferences = AppConfig()
-        preferences.data_file = "new_file.json"
+        preferences = AppConfig()  # type: ignore
+        preferences.data_file = Path("new_file.json")
         assert preferences.data_file == "new_file.json", "incorrect default data_file"
 
     def test_test_config(self):
@@ -55,7 +51,7 @@ class TestAppPreferences(unittest.TestCase):
             base_model_path="files/base_model",
             finetuned_model_path="files/finetuned_model",
             merged_model_path="files/merged_model",
-        )
+        )  # type: ignore
         assert preferences.data_file == Path("files/data_file.json")
 
 

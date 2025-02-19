@@ -52,16 +52,3 @@ def evaluate_fstring(fstring, **kwargs):
         'The sum is 3'
     """
     return eval(f"f'''{fstring}'''", {}, kwargs)  # noqa: S307
-
-
-def extract_answer(response: str, prompt: str, stop: str | None = None):
-    answer = response
-    answer = answer.replace("<s>", "").replace("</s>", "")
-
-    if answer.startswith(answer):
-        answer = answer[len(prompt) :]
-
-    if stop is not None and answer.endswith(stop):
-        answer = answer[: -len(stop)]
-
-    return answer
