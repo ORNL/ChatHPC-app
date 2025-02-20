@@ -86,12 +86,12 @@ def run_notebook():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chat_evaluate(item["question"], item["context"])
+            response, prompt = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
-                "response": extract_answer(response),
+                "response": extract_answer(response, prompt, stop="\n\n"),
             }
             finetune.append(datapoint)
         return finetune
@@ -102,12 +102,12 @@ def run_notebook():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chat_evaluate(item["question"], item["context"])
+            response, prompt = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
-                "response": extract_answer(response),
+                "response": extract_answer(response, prompt, stop="\n\n"),
             }
             merged.append(datapoint)
         return merged
@@ -131,12 +131,12 @@ def run_notebook_app():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chat_evaluate(item["question"], item["context"])
+            response, prompt = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
-                "response": extract_answer(response),
+                "response": extract_answer(response, prompt, stop="\n\n"),
             }
             finetune.append(datapoint)
         return finetune
@@ -147,12 +147,12 @@ def run_notebook_app():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chat_evaluate(item["question"], item["context"])
+            response, prompt = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
-                "response": extract_answer(response),
+                "response": extract_answer(response, prompt, stop="\n\n"),
             }
             merged.append(datapoint)
         return merged
@@ -176,12 +176,12 @@ def run_app():
         chat_app.load_finetuned_model()
         finetune = []
         for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chat_evaluate(item["question"], item["context"])
+            response, prompt = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
-                "response": extract_answer(response),
+                "response": extract_answer(response, prompt, stop="\n\n"),
             }
             finetune.append(datapoint)
         return finetune
@@ -192,12 +192,12 @@ def run_app():
         chat_app.load_merged_model()
         merged = []
         for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chat_evaluate(item["question"], item["context"])
+            response, prompt = chat_app.chat_evaluate(item["question"], item["context"])
             datapoint = {
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
-                "response": extract_answer(response),
+                "response": extract_answer(response, prompt, stop="\n\n"),
             }
             merged.append(datapoint)
         return merged

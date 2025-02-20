@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 
@@ -52,9 +54,14 @@ def evaluate_fstring(fstring, **kwargs):
     return eval(f"f'''{fstring}'''", {}, kwargs)  # noqa: S307
 
 
-def extract_answer(response: str):
-    matchstr = "### Response:\n"
-    index = response.find(matchstr)
-    if index == -1:
-        return None
-    return response[index + len(matchstr) :].replace("<s>", "").replace("</s>", "")
+def extract_answer(response: str, prompt: str, stop: str | None = None):
+    answer = response
+    answer = answer.replace("<s>", "").replace("</s>", "")
+
+    if answer.startswith(prompt):
+        answer = answer[len(prompt) :]
+
+    if stop is not None and answer.endswith(stop):
+        answer = answer[: -len(stop)]
+
+    return answer
