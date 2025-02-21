@@ -29,7 +29,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 - Added `max_training_tokens` to specify the `max_length` parameter for the tokenizer when tokenizing the training set. Defaults to the prior setting of 512.
 
-## Changed
+### Changed
 
 - Logging: Switch from using logging module to loguru.
 
