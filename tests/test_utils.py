@@ -55,6 +55,7 @@ class TestExtractAnswer(unittest.TestCase):
         assert result == expected, "Extraction result is not as expected."
 
     def test_extract_answer_simple2(self):
+        """Test with different keywords."""
         app = App.from_json(
             "tests/files/config.json",
             extra_params={
@@ -68,6 +69,27 @@ class TestExtractAnswer(unittest.TestCase):
             "assistant": "Answer",
         }
         tinput = app.training_prompt(**kwinput)
+
+        expected = "Answer"
+        result = app.extract_answer(tinput, **kwinput)
+        assert result == expected, "Extraction result is not as expected."
+
+    def test_extract_answer_simple3(self):
+        """Test with bos tag."""
+        app = App.from_json(
+            "tests/files/config.json",
+            extra_params={
+                "prompt_template": "Goal\n\n### Question:\n{{question}}\n\n### Additional Info:\n{{context}}\n\n### Answer:\n{{answer}}\n\n",
+                "prompt_template_file": None,
+            },
+        )
+        kwinput = {
+            "user": "Question",
+            "context": "Context",
+            "assistant": "Answer",
+        }
+        tinput = app.training_prompt(**kwinput)
+        tinput = "<s> " + tinput + "</s>"
 
         expected = "Answer"
         result = app.extract_answer(tinput, **kwinput)

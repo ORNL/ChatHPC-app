@@ -1,5 +1,5 @@
 {
-    "data_file": "/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json",
+    "data_file": "/home/7ry/Data/ellora/ChatKokkos-data/kokkos_dataset_before_reinforcement.json",
     "base_model_path": "/auto/projects/ChatHPC/models/cache/meta-llama/CodeLlama-7b-hf",
     "finetuned_model_path": "peft_adapter",
     "merged_model_path": "merged_adapters",

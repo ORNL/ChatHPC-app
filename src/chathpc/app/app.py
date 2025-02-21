@@ -135,8 +135,10 @@ class AppConfig(BaseSettings):
             - Both prompt_template and prompt_template_file set
             - Neither prompt_template nor prompt_template_file set
         """
-        if not (bool(values.get("prompt_template_file")) ^ bool(values.get("prompt_template"))):
-            raise ValueError("Either prompt_template_file or prompt_template must be set, but not both.")
+        if not (bool(values.get("prompt_template_file")) | bool(values.get("prompt_template"))):
+            raise ValueError("Either prompt_template_file or prompt_template must be set.")
+        if bool(values.get("prompt_template_file")) & bool(values.get("prompt_template")):
+            raise ValueError("prompt_template_file and prompt_template should not both be set.")
         return values
 
     @classmethod
@@ -260,7 +262,7 @@ class App:
 
         self.config = app_config
 
-        self.jinja = jinja2.Environment(autoescape=jinja2.select_autoescape(), keep_trailing_newline=True)
+        self.jinja = jinja2.Environment(autoescape=False, keep_trailing_newline=True)  # noqa: S701
         self._load_templates()
 
     @classmethod
@@ -564,7 +566,7 @@ class App:
 
         return self.inference_template.render(**template_utils.map_keywords(kwargs))
 
-    def chat_evaluate(self, question: str, **kwargs: dict[str, Any]) -> str:
+    def chat_evaluate(self, **kwargs) -> str:
         """Evaluate a question with provided context using the model.
 
         This method processes a question-context pair through the model by:
@@ -607,8 +609,43 @@ class App:
             - Response format follows inference template structure
             - Template variables can be passed via kwargs
         """
-        prompt = self.chat_prompt(question=question, **kwargs)
+        prompt = self.chat_prompt(**kwargs)
         return self.evaluate_model(prompt)
+
+    def chat_evaluate_extract(self, **kwargs: dict[str, Any]) -> str:
+        """Extract the model's answer from a chat evaluation response.
+
+        This method combines chat_evaluate() with answer extraction, removing template
+        formatting and returning only the model's direct response.
+
+        Args:
+            **kwargs: Keyword arguments passed to chat_evaluate().
+                Common arguments include:
+                - question (str): The question to be answered
+                - context (str): Supporting context or documentation
+                - max_new_tokens (int): Override default token generation limit
+                Additional arguments can be used if defined in the template.
+
+        Returns:
+            str: The extracted answer from the model's response, without template formatting.
+
+        Example:
+            ```python
+            app = App()
+            app.load_merged_model()
+            answer = app.chat_evaluate_extract(
+                question="What is Kokkos?", context="Kokkos is a programming model..."
+            )
+            print(answer)  # Prints just the model's answer without template
+            ```
+
+        Note:
+            - Uses chat_evaluate() to generate the full response
+            - Automatically extracts the answer portion using template structure
+            - More concise than chat_evaluate() for direct answer retrieval
+        """
+        response = self.chat_evaluate(**kwargs)
+        return self.extract_answer(response, **kwargs)
 
     def training_prompt(self, **kwargs) -> str:
         """Create a formatted prompt for training data.
@@ -823,8 +860,8 @@ class App:
 
         trainer.train()
 
-        trainer.model.save_pretrained(self.config.finetuned_model_path)
-        self.model = trainer.model.merge_and_unload()
+        trainer.model.save_pretrained(self.config.finetuned_model_path)  # type: ignore
+        self.model = trainer.model.merge_and_unload()  # type: ignore
         self.tokenizer.save_pretrained(self.config.merged_model_path)
         self.model.save_pretrained(self.config.merged_model_path)
 
@@ -881,7 +918,7 @@ class App:
             if user_input == "/context":
                 context = input("Context: ")
                 continue
-            print(self.chat_evaluate(user_input, context))
+            print(self.chat_evaluate(question=user_input, context=context))
 
     def print_config(self) -> None:
         """Print the current configurations of the application in a formatted table.
@@ -952,7 +989,7 @@ class App:
             defined in the application configuration.
         """
         answer = response
-        answer = answer.replace("<s>", "").replace("</s>", "")
+        answer = answer.replace("<s> ", "").replace("</s>", "")
 
         prefix = self.inference_template.render(**template_utils.map_keywords(kwargs))
         postfix = self.postfix_template.render(**template_utils.map_keywords(kwargs))
