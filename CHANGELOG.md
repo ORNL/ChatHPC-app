@@ -23,13 +23,15 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+## [25.2.0] - 2025-02-21
+
 ### Added
 
 - Added `max_training_tokens` to specify the `max_length` parameter for the tokenizer when tokenizing the training set. Defaults to the prior setting of 512.
 - Added `prompt_template_file`.
 - Added `prompt_template`.
 
-## Changed
+### Changed
 
 - Logging: Switch from using logging module to loguru.
 - Template: Switch from format string to Jinja for the templates.
@@ -55,5 +57,6 @@ Verified initial working version of the ChatHPC App.
 
 - Initial version of ChatHPC App. Created from the working ChatKokkos Example.
 
-[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.1.0...main
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.0...main
+[25.2.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.1.0...v25.2.0
 [25.1.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/releases/v25.1.0
