@@ -56,7 +56,7 @@ def evaluate_fstring(fstring, **kwargs):
 
 def extract_answer(response: str, prompt: str, stop: str | None = None):
     answer = response
-    answer = answer.replace("<s>", "").replace("</s>", "")
+    answer = answer.replace("<s> ", "").replace("</s>", "")
 
     if answer.startswith(prompt):
         answer = answer[len(prompt) :]
