@@ -23,17 +23,13 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
-## [25.2.0] - 2025-02-21
-
 ### Added
 
-- Added `max_training_tokens` to specify the `max_length` parameter for the tokenizer when tokenizing the training set. Defaults to the prior setting of 512.
 - Added `prompt_template_file`.
 - Added `prompt_template`.
 
 ### Changed
 
-- Logging: Switch from using logging module to loguru.
 - Template: Switch from format string to Jinja for the templates.
 - Template: Now only one template is used for both training and inference.
 - Template: Can either be set by a file path or a string.
@@ -42,6 +38,16 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 - Removed `training_prompt`. Replaced by `prompt_template`.
 - Removed `inference_prompt`. Replaced by `prompt_template`.
+
+## [25.2.0] - 2025-02-21
+
+### Added
+
+- Added `max_training_tokens` to specify the `max_length` parameter for the tokenizer when tokenizing the training set. Defaults to the prior setting of 512.
+
+### Changed
+
+- Logging: Switch from using logging module to loguru.
 
 ### Fixed
 

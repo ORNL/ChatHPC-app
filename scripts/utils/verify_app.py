@@ -216,10 +216,60 @@ def run_app_old():
     experiment = "app_old"
     chat_app = ChatApp.from_json(
         {
-            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{ question }}\n\n### Context:\n{{ context }}\n\n### Response:\n{{ answer }}\n",
+            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n",
             "finetuned_model_path": "./app_old/peft_adapter",
             "merged_model_path": "./app_old/merged_adapters",
             "training_output_dir": "./app_old/kokkos-code-llama",
+        }
+    )
+
+    chat_app.load_datasets()
+
+    def get_finetuned():
+        chat_app.load_finetuned_model()
+        finetune = []
+        for item in tqdm(chat_app.train_dataset, "Run Finetune"):
+            response = chat_app.chat_evaluate_extract(**item)
+            datapoint = {
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
+                "response": response,
+            }
+            finetune.append(datapoint)
+        return finetune
+
+    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
+
+    def get_merged():
+        chat_app.load_merged_model()
+        merged = []
+        for item in tqdm(chat_app.train_dataset, "Run Merged"):
+            response = chat_app.chat_evaluate_extract(**item)
+            datapoint = {
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
+                "response": response,
+            }
+            merged.append(datapoint)
+        return merged
+
+    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
+
+    return (finetune, merged)
+
+
+def run_app_prior():
+    from chathpc.app import App as ChatApp
+
+    experiment = "app_prior"
+    chat_app = ChatApp.from_json(
+        {
+            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n",
+            "finetuned_model_path": "/home/7ry/Data/ellora/ChatHPC-app-main/examples/app/peft_adapter",
+            "merged_model_path": "/home/7ry/Data/ellora/ChatHPC-app-main/examples/app/merged_adapters",
+            "training_output_dir": "/home/7ry/Data/ellora/ChatHPC-app-main/examples/app/kokkos-code-llama",
         }
     )
 
@@ -389,7 +439,7 @@ def main(raw_args=None):
         print("Attach debugger to continue.")
         debugpy.wait_for_client()  # noqa: T100
 
-    os.environ["CHATHPC_DATA_FILE"] = "/home/7ry/Data/ellora/ChatKokkos-data/kokkos_dataset_before_reinforcement.json"
+    os.environ["CHATHPC_DATA_FILE"] = "/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json"
     # os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./peft_adapter"
     # os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./merged_adapters"
     # os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./kokkos-code-llama"
@@ -417,6 +467,12 @@ def main(raw_args=None):
     app_old_errors = verify_app(run_app_old)
     print("Response Errors: {}, Merge Errors: {}".format(*app_old_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*app_old_errors), file=sys.stderr)
+
+    print("\n\n** Running App Prior **")
+    print("\n\n** Running App Prior **", file=sys.stderr)
+    app_prior_errors = verify_app(run_app_prior)
+    print("Response Errors: {}, Merge Errors: {}".format(*app_prior_errors))
+    print("Response Errors: {}, Merge Errors: {}".format(*app_prior_errors), file=sys.stderr)
 
     # print("\n\n** Running Ollama **")
     # print("\n\n** Running Ollama **", file=sys.stderr)
