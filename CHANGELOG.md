@@ -27,6 +27,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 - Added `prompt_template_file`.
 - Added `prompt_template`.
+- CLI app: log_level is now a command line argument.
 
 ### Changed
 

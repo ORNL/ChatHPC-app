@@ -1,6 +1,7 @@
 import argparse
 import sys
 
+from loguru import logger
 from pydantic import ValidationError
 from pydantic_settings import (
     CliApp,
@@ -53,6 +54,7 @@ def run(config):
 
 def init_parser(parser):
     parser.add_argument("--debug", action="store_true", help="Open debug port (5678).")
+    parser.add_argument("--log_level", type=str, help="Log level.")
     parser.add_argument("--config", type=str, help="Path to config json file.")
     parser.set_defaults(func=config)
 
@@ -78,6 +80,27 @@ def cli(raw_args=None):
 
     # Parse and load AppConfig settings from the command line into the settings source.
     args = parser.parse_args(raw_args)
+
+    # Setup debugging.
+    if args.debug:
+        if args.log_level is None:
+            args.log_level = "DEBUG"
+
+        import debugpy  # noqa: T100
+
+        debugpy.listen(5678)  # noqa: T100
+        print("Attach debugger to continue.")
+        debugpy.wait_for_client()  # noqa: T100
+
+    # Setup log level
+    if args.log_level:
+        logger.remove()
+        logger.add(sys.stderr, level=args.log_level.upper())
+    else:
+        logger.remove()
+        logger.add(sys.stderr, level="WARNING")
+
+    # Read in configuration file.
     try:
         json_config = load_json_arg(args.config)
         app_config = CliApp.run(AppConfig, cli_args=args, cli_settings_source=cli_settings, **json_config)
@@ -87,13 +110,7 @@ def cli(raw_args=None):
         print(e)
         sys.exit(1)
 
-    if args.debug:
-        import debugpy  # noqa: T100
-
-        debugpy.listen(5678)  # noqa: T100
-        print("Attach debugger to continue.")
-        debugpy.wait_for_client()  # noqa: T100
-
+    # Run the subcommand.
     args.func(app_config)
 
 
