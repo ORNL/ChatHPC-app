@@ -344,6 +344,7 @@ class App:
                 prompt_template_string = f.read()
 
         prompt_template_string = template_utils.normalize_template(prompt_template_string)
+        self.config.prompt_template = prompt_template_string
 
         self.training_template = self.jinja.from_string(prompt_template_string)
         self._prompt_prefix, self._prompt_postfix = template_utils.split_on_response(prompt_template_string)

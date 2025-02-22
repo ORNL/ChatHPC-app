@@ -78,6 +78,10 @@ def normalize_template(template: str) -> str:
         >>> normalize_template("{{assistant}} responds to {{user}}")
         '{{ response }} responds to {{ prompt }}'
     """
+    # Expand raw newlines.
+    template = template.replace("\\n", "\n")
+
+    # Update keywords.
     for alias, keyword in ALIASES.items():
         pattern = r"{{\s*" + alias + r"\s*}}"
         template = re.sub(pattern=pattern, repl=f"{{{{ {keyword} }}}}", string=template)
