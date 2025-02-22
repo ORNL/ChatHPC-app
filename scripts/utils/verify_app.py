@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 import traceback
+from functools import partial
 from subprocess import check_output
 
 from datastore.datastore import read_or_new_json
@@ -70,14 +71,76 @@ def shell_source(script):
     os.environ.update(env)
 
 
+def run_experiment_chat_app(experiment, basepath, template):
+    from chathpc.app import App as ChatApp
+
+    chat_app = ChatApp.from_json(
+        {
+            "prompt_template": template,
+            "finetuned_model_path": f"{basepath}/peft_adapter",
+            "merged_model_path": f"{basepath}/merged_adapters",
+            "training_output_dir": f"{basepath}/kokkos-code-llama",
+        }
+    )
+    chat_app.load_datasets()
+
+    def get_finetuned():
+        chat_app.load_finetuned_model()
+        finetune = []
+        for i, item in tqdm(list(enumerate(chat_app.train_dataset)), "Run Finetune"):
+            response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
+            datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
+                "response": response,
+            }
+            finetune.append(datapoint)
+        return finetune
+
+    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
+
+    def get_merged():
+        chat_app.load_merged_model()
+        merged = []
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
+            response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
+            datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
+                "question": item["question"],
+                "context": item["context"],
+                "answer": item["answer"],
+                "response": response,
+            }
+            merged.append(datapoint)
+        return merged
+
+    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
+
+    return (finetune, merged)
+
+
 def run_notebook():
     from chathpc.app import App as ChatApp
 
     experiment = "jupyter"
-    os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./peft_adapter"
-    os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./merged_adapters"
-    os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./kokkos-code-llama"
-    chat_app = ChatApp()
+    chat_app = ChatApp.from_json(
+        {
+            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n",
+            "finetuned_model_path": "./peft_adapter",
+            "merged_model_path": "./merged_adapters",
+            "training_output_dir": "./kokkos-code-llama",
+        }
+    )
     chat_app.load_datasets()
 
     def get_finetuned():
@@ -119,18 +182,27 @@ def run_notebook_app():
     from chathpc.app import App as ChatApp
 
     experiment = "jupyter_app"
-    os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./jupyter_app/peft_adapter"
-    os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./jupyter_app/merged_adapters"
-    os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./jupyter_app/kokkos-code-llama"
-    chat_app = ChatApp()
+    chat_app = ChatApp.from_json(
+        {
+            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n",
+            "finetuned_model_path": "./jupyter_app/peft_adapter",
+            "merged_model_path": "./jupyter_app/merged_adapters",
+            "training_output_dir": "./jupyter_app/kokkos-code-llama",
+        }
+    )
     chat_app.load_datasets()
 
     def get_finetuned():
         chat_app.load_finetuned_model()
         finetune = []
-        for item in tqdm(chat_app.train_dataset, "Run Finetune"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune"):
             response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
             datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
@@ -144,9 +216,14 @@ def run_notebook_app():
     def get_merged():
         chat_app.load_merged_model()
         merged = []
-        for item in tqdm(chat_app.train_dataset, "Run Merged"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
             response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
             datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
@@ -178,9 +255,14 @@ def run_app():
     def get_finetuned():
         chat_app.load_finetuned_model()
         finetune = []
-        for item in tqdm(chat_app.train_dataset, "Run Finetune"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune"):
             response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
             datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
@@ -194,9 +276,14 @@ def run_app():
     def get_merged():
         chat_app.load_merged_model()
         merged = []
-        for item in tqdm(chat_app.train_dataset, "Run Merged"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
             response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
             datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
@@ -228,9 +315,14 @@ def run_app_old():
     def get_finetuned():
         chat_app.load_finetuned_model()
         finetune = []
-        for item in tqdm(chat_app.train_dataset, "Run Finetune"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune"):
             response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
             datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
@@ -244,9 +336,14 @@ def run_app_old():
     def get_merged():
         chat_app.load_merged_model()
         merged = []
-        for item in tqdm(chat_app.train_dataset, "Run Merged"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
             response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
             datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
@@ -278,9 +375,14 @@ def run_app_prior():
     def get_finetuned():
         chat_app.load_finetuned_model()
         finetune = []
-        for item in tqdm(chat_app.train_dataset, "Run Finetune"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune"):
             response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
             datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
@@ -294,9 +396,14 @@ def run_app_prior():
     def get_merged():
         chat_app.load_merged_model()
         merged = []
-        for item in tqdm(chat_app.train_dataset, "Run Merged"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
             response = chat_app.chat_evaluate_extract(**item)
+            prompt = chat_app.chat_prompt(**item)
+            training_prompt = chat_app.training_prompt(**item)
             datapoint = {
+                "index": i,
+                "prompt": prompt,
+                "training_prompt": training_prompt,
                 "question": item["question"],
                 "context": item["context"],
                 "answer": item["answer"],
@@ -440,37 +547,51 @@ def main(raw_args=None):
         debugpy.wait_for_client()  # noqa: T100
 
     os.environ["CHATHPC_DATA_FILE"] = "/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json"
-    # os.environ["CHATHPC_FINETUNED_MODEL_PATH"] = "./peft_adapter"
-    # os.environ["CHATHPC_MERGED_MODEL_PATH"] = "./merged_adapters"
-    # os.environ["CHATHPC_TRAINING_OUTPUT_DIR"] = "./kokkos-code-llama"
 
-    # print("** Running Notebook **")
-    # print("** Running Notebook **", file=sys.stderr)
-    # notebook_errors = verify_app(run_notebook)
-    # print("Response Errors: {}, Merge Errors: {}".format(*notebook_errors))
-    # print("Response Errors: {}, Merge Errors: {}".format(*notebook_errors), file=sys.stderr)
+    old_template = "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n"
 
-    # print("\n\n** Running Notebook App **")
-    # print("\n\n** Running Notebook App **", file=sys.stderr)
-    # notebook_app_errors = verify_app(run_notebook_app)
-    # print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors))
-    # print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors), file=sys.stderr)
+    new_template = "You are a powerful LLM model for Kokkos called ChatKokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Context:\n{{ context }}\n\n### Question:\n{{ question }}\n\n### Answer:\n{{ answer }}\n\n"
+
+    print("** Running Notebook **")
+    print("** Running Notebook **", file=sys.stderr)
+    notebook_errors = verify_app(
+        partial(run_experiment_chat_app, experiment="jupyter", basepath=".", template=new_template)
+    )
+    print("Response Errors: {}, Merge Errors: {}".format(*notebook_errors))
+    print("Response Errors: {}, Merge Errors: {}".format(*notebook_errors), file=sys.stderr)
+
+    print("\n\n** Running Notebook App **")
+    print("\n\n** Running Notebook App **", file=sys.stderr)
+    notebook_app_errors = verify_app(
+        partial(run_experiment_chat_app, experiment="jupyter_app", basepath="./jupyter_app", template=new_template)
+    )
+    print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors))
+    print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors), file=sys.stderr)
 
     print("\n\n** Running App **")
     print("\n\n** Running App **", file=sys.stderr)
-    app_errors = verify_app(run_app)
+    app_errors = verify_app(partial(run_experiment_chat_app, experiment="app", basepath="./app", template=new_template))
     print("Response Errors: {}, Merge Errors: {}".format(*app_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*app_errors), file=sys.stderr)
 
     print("\n\n** Running App Old **")
     print("\n\n** Running App Old **", file=sys.stderr)
-    app_old_errors = verify_app(run_app_old)
+    app_old_errors = verify_app(
+        partial(run_experiment_chat_app, experiment="app_old", basepath="./app_old", template=old_template)
+    )
     print("Response Errors: {}, Merge Errors: {}".format(*app_old_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*app_old_errors), file=sys.stderr)
 
     print("\n\n** Running App Prior **")
     print("\n\n** Running App Prior **", file=sys.stderr)
-    app_prior_errors = verify_app(run_app_prior)
+    app_prior_errors = verify_app(
+        partial(
+            run_experiment_chat_app,
+            experiment="app_prior",
+            basepath="/home/7ry/Data/ellora/ChatHPC-app-main/examples/app",
+            template=old_template,
+        )
+    )
     print("Response Errors: {}, Merge Errors: {}".format(*app_prior_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*app_prior_errors), file=sys.stderr)
 

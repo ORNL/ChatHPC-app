@@ -5,6 +5,7 @@ tmp/
 *.old
 *.o
 *.code-workspace
+.nfs*
 __pycache__/
 pyvenv.cfg
 finder.txt
