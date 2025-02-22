@@ -129,294 +129,6 @@ def run_experiment_chat_app(experiment, basepath, template):
     return (finetune, merged)
 
 
-def run_notebook():
-    from chathpc.app import App as ChatApp
-
-    experiment = "jupyter"
-    chat_app = ChatApp.from_json(
-        {
-            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n",
-            "finetuned_model_path": "./peft_adapter",
-            "merged_model_path": "./merged_adapters",
-            "training_output_dir": "./kokkos-code-llama",
-        }
-    )
-    chat_app.load_datasets()
-
-    def get_finetuned():
-        chat_app.load_finetuned_model()
-        finetune = []
-        for item in tqdm(chat_app.train_dataset, "Run Finetune"):
-            response = chat_app.chat_evaluate_extract(**item)
-            datapoint = {
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            finetune.append(datapoint)
-        return finetune
-
-    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
-
-    def get_merged():
-        chat_app.load_merged_model()
-        merged = []
-        for item in tqdm(chat_app.train_dataset, "Run Merged"):
-            response = chat_app.chat_evaluate_extract(**item)
-            datapoint = {
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            merged.append(datapoint)
-        return merged
-
-    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
-
-    return (finetune, merged)
-
-
-def run_notebook_app():
-    from chathpc.app import App as ChatApp
-
-    experiment = "jupyter_app"
-    chat_app = ChatApp.from_json(
-        {
-            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n",
-            "finetuned_model_path": "./jupyter_app/peft_adapter",
-            "merged_model_path": "./jupyter_app/merged_adapters",
-            "training_output_dir": "./jupyter_app/kokkos-code-llama",
-        }
-    )
-    chat_app.load_datasets()
-
-    def get_finetuned():
-        chat_app.load_finetuned_model()
-        finetune = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune"):
-            response = chat_app.chat_evaluate_extract(**item)
-            prompt = chat_app.chat_prompt(**item)
-            training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            finetune.append(datapoint)
-        return finetune
-
-    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
-
-    def get_merged():
-        chat_app.load_merged_model()
-        merged = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
-            response = chat_app.chat_evaluate_extract(**item)
-            prompt = chat_app.chat_prompt(**item)
-            training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            merged.append(datapoint)
-        return merged
-
-    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
-
-    return (finetune, merged)
-
-
-def run_app():
-    from chathpc.app import App as ChatApp
-
-    experiment = "app"
-    chat_app = ChatApp.from_json(
-        {
-            "prompt_template": "You are a powerful LLM model for Kokkos called ChatKokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Context:\n{{ context }}\n\n### Question:\n{{ question }}\n\n### Answer:\n{{ answer }}\n\n",
-            "finetuned_model_path": "./app/peft_adapter",
-            "merged_model_path": "./app/merged_adapters",
-            "training_output_dir": "./app/kokkos-code-llama",
-        }
-    )
-
-    chat_app.load_datasets()
-
-    def get_finetuned():
-        chat_app.load_finetuned_model()
-        finetune = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune"):
-            response = chat_app.chat_evaluate_extract(**item)
-            prompt = chat_app.chat_prompt(**item)
-            training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            finetune.append(datapoint)
-        return finetune
-
-    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
-
-    def get_merged():
-        chat_app.load_merged_model()
-        merged = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
-            response = chat_app.chat_evaluate_extract(**item)
-            prompt = chat_app.chat_prompt(**item)
-            training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            merged.append(datapoint)
-        return merged
-
-    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
-
-    return (finetune, merged)
-
-
-def run_app_old():
-    from chathpc.app import App as ChatApp
-
-    experiment = "app_old"
-    chat_app = ChatApp.from_json(
-        {
-            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n",
-            "finetuned_model_path": "./app_old/peft_adapter",
-            "merged_model_path": "./app_old/merged_adapters",
-            "training_output_dir": "./app_old/kokkos-code-llama",
-        }
-    )
-
-    chat_app.load_datasets()
-
-    def get_finetuned():
-        chat_app.load_finetuned_model()
-        finetune = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune"):
-            response = chat_app.chat_evaluate_extract(**item)
-            prompt = chat_app.chat_prompt(**item)
-            training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            finetune.append(datapoint)
-        return finetune
-
-    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
-
-    def get_merged():
-        chat_app.load_merged_model()
-        merged = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
-            response = chat_app.chat_evaluate_extract(**item)
-            prompt = chat_app.chat_prompt(**item)
-            training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            merged.append(datapoint)
-        return merged
-
-    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
-
-    return (finetune, merged)
-
-
-def run_app_prior():
-    from chathpc.app import App as ChatApp
-
-    experiment = "app_prior"
-    chat_app = ChatApp.from_json(
-        {
-            "prompt_template": "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n",
-            "finetuned_model_path": "/home/7ry/Data/ellora/ChatHPC-app-main/examples/app/peft_adapter",
-            "merged_model_path": "/home/7ry/Data/ellora/ChatHPC-app-main/examples/app/merged_adapters",
-            "training_output_dir": "/home/7ry/Data/ellora/ChatHPC-app-main/examples/app/kokkos-code-llama",
-        }
-    )
-
-    chat_app.load_datasets()
-
-    def get_finetuned():
-        chat_app.load_finetuned_model()
-        finetune = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune"):
-            response = chat_app.chat_evaluate_extract(**item)
-            prompt = chat_app.chat_prompt(**item)
-            training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            finetune.append(datapoint)
-        return finetune
-
-    finetune = read_or_new_json(f"{experiment}_finetune_out", get_finetuned)
-
-    def get_merged():
-        chat_app.load_merged_model()
-        merged = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
-            response = chat_app.chat_evaluate_extract(**item)
-            prompt = chat_app.chat_prompt(**item)
-            training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
-            merged.append(datapoint)
-        return merged
-
-    merged = read_or_new_json(f"{experiment}_merged_out", get_merged)
-
-    return (finetune, merged)
-
-
 def ignore_minor(string: str):
     s = string.strip()
     line = s.splitlines()
@@ -450,8 +162,8 @@ def run_ollama():
     return read_or_new_json(f"{experiment}_ol_out", get_ol)
 
 
-def verify_ollama(expected_reponse_errors=0):
-    (finetuned, merged) = run_app()
+def verify_ollama(template, expected_reponse_errors=0):
+    (finetuned, merged) = run_experiment_chat_app(experiment="app", basepath="./app", template=template)
     ol = run_ollama()
 
     response_errors = 0
@@ -552,6 +264,7 @@ def main(raw_args=None):
 
     new_template = "You are a powerful LLM model for Kokkos called ChatKokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Context:\n{{ context }}\n\n### Question:\n{{ question }}\n\n### Answer:\n{{ answer }}\n\n"
 
+    # Notebook
     print("** Running Notebook **")
     print("** Running Notebook **", file=sys.stderr)
     notebook_errors = verify_app(
@@ -560,6 +273,7 @@ def main(raw_args=None):
     print("Response Errors: {}, Merge Errors: {}".format(*notebook_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*notebook_errors), file=sys.stderr)
 
+    # Notebook App
     print("\n\n** Running Notebook App **")
     print("\n\n** Running Notebook App **", file=sys.stderr)
     notebook_app_errors = verify_app(
@@ -568,12 +282,14 @@ def main(raw_args=None):
     print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors), file=sys.stderr)
 
+    # App
     print("\n\n** Running App **")
     print("\n\n** Running App **", file=sys.stderr)
     app_errors = verify_app(partial(run_experiment_chat_app, experiment="app", basepath="./app", template=new_template))
     print("Response Errors: {}, Merge Errors: {}".format(*app_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*app_errors), file=sys.stderr)
 
+    # App Old
     print("\n\n** Running App Old **")
     print("\n\n** Running App Old **", file=sys.stderr)
     app_old_errors = verify_app(
@@ -582,6 +298,7 @@ def main(raw_args=None):
     print("Response Errors: {}, Merge Errors: {}".format(*app_old_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*app_old_errors), file=sys.stderr)
 
+    # App Prior
     print("\n\n** Running App Prior **")
     print("\n\n** Running App Prior **", file=sys.stderr)
     app_prior_errors = verify_app(
@@ -597,7 +314,7 @@ def main(raw_args=None):
 
     # print("\n\n** Running Ollama **")
     # print("\n\n** Running Ollama **", file=sys.stderr)
-    # ol_errors = verify_ollama(expected_reponse_errors=app_errors[0])
+    # ol_errors = verify_ollama(expected_reponse_errors=app_errors[0], template=new_template)
     # print(f"Ollama Errors: {ol_errors}")
     # print(f"Ollama Errors: {ol_errors}", file=sys.stderr)
 
