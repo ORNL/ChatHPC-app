@@ -107,6 +107,7 @@ class AppConfig(BaseSettings):
         env_file_encoding="utf-8",
         # json_file=DEFAULT_APP_CONFIG_FILE,
         json_file_encoding="utf-8",
+        extra="allow",
     )
 
     @model_validator(mode="before")
@@ -330,6 +331,15 @@ class App:
             This method is called automatically during App initialization and should
             not typically be called directly.
         """
+        relative_path = None
+        if (
+            hasattr(self.config, "filename")
+            and self.config.prompt_template is None
+            and self.config.prompt_template_file is not None
+            and not self.config.prompt_template_file.is_absolute()
+        ):
+            filename = Path(self.config.filename)  # type: ignore
+            relative_path = filename.parent / self.config.prompt_template_file
 
         if self.config.prompt_template is not None:
             prompt_template_string = self.config.prompt_template
@@ -337,11 +347,17 @@ class App:
         else:
             if self.config.prompt_template_file is None:
                 raise ValueError("Unexpected Error: Prompt template file is not set.")
-            if not self.config.prompt_template_file.is_file():
-                raise ValueError("Prompt template file not found.")
 
-            with open(self.config.prompt_template_file) as f:
-                prompt_template_string = f.read()
+            if self.config.prompt_template_file.is_file():
+                logger.info("Loading prompt template from %s", self.config.prompt_template_file)
+                with open(self.config.prompt_template_file) as f:
+                    prompt_template_string = f.read()
+            elif relative_path is not None and relative_path.is_file():
+                logger.info("Loading prompt template from %s", relative_path)
+                with open(relative_path) as f:
+                    prompt_template_string = f.read()
+            else:
+                raise ValueError("Prompt template file not found.")
 
         prompt_template_string = template_utils.normalize_template(prompt_template_string)
         self.config.prompt_template = prompt_template_string

@@ -7,7 +7,7 @@
     "max_response_tokens": 600,
     "max_training_tokens": 512,
     "prompt_history_file": "~/.chatkokkos_history",
-    "prompt_template_file": "tests/files/prompt_template.txt",
+    "prompt_template_file": "prompt_template.txt",
     "prompt_template": null,
     "use_wandb": false
 }

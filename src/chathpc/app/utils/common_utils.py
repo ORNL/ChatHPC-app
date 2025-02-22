@@ -30,6 +30,7 @@ def load_json_arg(str_or_fn):
     else:
         with open(str_or_fn) as f:
             params = json.loads(f.read())
+            params["filename"] = str_or_fn
             f.close()
     return params
 
