@@ -24,6 +24,7 @@ class TestLoadJson(unittest.TestCase):
         j = load_json_arg(filename)
         with open(filename) as f:
             jj = json.loads(f.read())
+            jj["filename"] = filename
         assert j == jj
 
     def test_json_path(self):
@@ -31,6 +32,7 @@ class TestLoadJson(unittest.TestCase):
         j = load_json_arg(path)
         with open(path) as f:
             jj = json.loads(f.read())
+            jj["filename"] = path
         assert j == jj
 
 

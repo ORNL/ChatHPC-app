@@ -12,6 +12,15 @@ def test_chat_prompt_json():
     assert result == expected, "Prompt is not as expected."
 
 
+def test_chat_prompt_json_no_context():
+    """Test without context"""
+    app = App.from_json("tests/files/config.json")
+
+    expected = "You are a powerful LLM model for Kokkos called ChatKokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Question:\nQuestion\n\n### Answer:\n"
+    result = app.chat_prompt(question="Question")
+    assert result == expected, "Prompt is not as expected."
+
+
 def test_training_prompt_json():
     """Test basice prompt fuction from simple template setting."""
     app = App.from_json(
@@ -60,6 +69,20 @@ def test_training_prompt_simple():
         "tests/files/config.json",
         extra_params={
             "prompt_template": "System\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n\n",
+            "prompt_template_file": None,
+        },
+    )
+    expected = "System\n\n### Input:\nQuestion\n\n### Context:\nContext\n\n### Response:\nAnswer\n\n"
+    result = app.training_prompt(user="Question", context="Context", assistant="Answer")
+    assert result == expected, "Prompt is not as expected."
+
+
+def test_training_prompt_liternal_newline():
+    """Test literal newline in template."""
+    app = App.from_json(
+        "tests/files/config.json",
+        extra_params={
+            "prompt_template": "System\\n\\n### Input:\\n{{question}}\\n\\n### Context:\\n{{context}}\\n\\n### Response:\\n{{answer}}\\n\\n",
             "prompt_template_file": None,
         },
     )
