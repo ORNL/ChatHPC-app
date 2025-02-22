@@ -8,7 +8,6 @@ import readline
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import jinja2
 import torch
@@ -629,7 +628,7 @@ class App:
         prompt = self.chat_prompt(**kwargs)
         return self.evaluate_model(prompt)
 
-    def chat_evaluate_extract(self, **kwargs: dict[str, Any]) -> str:
+    def chat_evaluate_extract(self, **kwargs) -> str:
         """Extract the model's answer from a chat evaluation response.
 
         This method combines chat_evaluate() with answer extraction, removing template
@@ -882,7 +881,7 @@ class App:
         self.tokenizer.save_pretrained(self.config.merged_model_path)
         self.model.save_pretrained(self.config.merged_model_path)
 
-    def interactive(self, prompt="chathpc") -> None:
+    def interactive(self, args, prompt="chathpc") -> None:
         """Start an interactive chat session with the model.
 
         This method provides a command-line interface for interacting with the model.
@@ -926,16 +925,25 @@ class App:
 
         atexit.register(save_history, h_len, history_file)
 
-        context = ""
+        context = None
         print("Use '/bye' to exit.\nUse '/context' to set context.")
         while True:
-            user_input = input(f"{prompt} ({context})> ")
+            prompt_line = f"{prompt} ({context})> " if context is not None else f"{prompt}> "
+            user_input = input(prompt_line)
             if user_input == "/bye":
+                print("Goodbye!")
                 break
-            if user_input == "/context":
-                context = input("Context: ")
+            if user_input.startswith("/context"):
+                context = user_input.replace("/context", "").strip()
+                if context == "":
+                    context = input("Context: ")
+                if context.strip() == "":
+                    context = None
                 continue
-            print(self.chat_evaluate(question=user_input, context=context))
+            if args.extract:
+                print(self.chat_evaluate_extract(question=user_input, context=context))
+            else:
+                print(self.chat_evaluate(question=user_input, context=context))
 
     def print_config(self) -> None:
         """Print the current configurations of the application in a formatted table.

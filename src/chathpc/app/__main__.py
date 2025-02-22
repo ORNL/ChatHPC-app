@@ -12,12 +12,12 @@ from chathpc.app import App, AppConfig
 from chathpc.app.utils.common_utils import load_json_arg
 
 
-def config(config):
+def config(_args, config):
     app = App(config)
     app.print_config()
 
 
-def train(config):
+def train(_args, config):
     app = App(config)
     app.print_config()
     app.load_base_model()
@@ -26,36 +26,49 @@ def train(config):
     app.train()
 
 
-def run_base(config):
+def run_base(args, config):
     app = App(config)
     app.load_base_model()
-    app.interactive("base")
+    app.interactive(args, "base")
 
 
-def _run_fine(config):
+def _run_fine(args, config):
     app = App(config)
     app.load_finetuned_model()
-    app.interactive()
+    app.interactive(args)
 
 
-def run_fine(config):
-    _run_fine(config)
+def run_fine(args, config):
+    _run_fine(args, config)
 
 
-def run_merged(config):
+def run_merged(args, config):
     app = App(config)
     app.load_merged_model()
-    app.interactive("merged")
+    app.interactive(args, "merged")
 
 
-def run(config):
-    _run_fine(config)
+def run(args, config):
+    _run_fine(args, config)
 
 
 def init_parser(parser):
     parser.add_argument("--debug", action="store_true", help="Open debug port (5678).")
     parser.add_argument("--log_level", type=str, help="Log level.")
     parser.add_argument("--config", type=str, help="Path to config json file.")
+    parser.add_argument(
+        "--extract",
+        dest="extract",
+        action="store_true",
+        help="Extract the answer from the response.",
+    )
+    parser.add_argument(
+        "--no-extract",
+        dest="extract",
+        action="store_false",
+        help="Show the response without extracting the answer.",
+    )
+    parser.set_defaults(extract=False)
     parser.set_defaults(func=config)
 
     subparsers = parser.add_subparsers(title="subcommands", description="valid subcommands")
@@ -111,7 +124,10 @@ def cli(raw_args=None):
         sys.exit(1)
 
     # Run the subcommand.
-    args.func(app_config)
+    try:
+        args.func(args, app_config)
+    except EOFError:
+        print("\nGoodbye!")
 
 
 if __name__ == "__main__":
