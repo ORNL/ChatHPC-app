@@ -94,15 +94,17 @@ def run_experiment_chat_app(experiment, basepath, template):
             response = chat_app.chat_evaluate_extract(**item)
             prompt = chat_app.chat_prompt(**item)
             training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
+            datapoint = OrderedDict(
+                [
+                    ("index", i),
+                    ("prompt", prompt),
+                    ("training_prompt", training_prompt),
+                    ("question", item["question"]),
+                    ("context", item["context"]),
+                    ("answer", item["answer"]),
+                    ("response", response),
+                ]
+            )
             finetune.append(datapoint)
         return finetune
 
