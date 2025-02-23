@@ -348,11 +348,11 @@ class App:
                 raise ValueError("Unexpected Error: Prompt template file is not set.")
 
             if self.config.prompt_template_file.is_file():
-                logger.info("Loading prompt template from %s", self.config.prompt_template_file)
+                logger.info("Loading prompt template from {file}", file=self.config.prompt_template_file)
                 with open(self.config.prompt_template_file) as f:
                     prompt_template_string = f.read()
             elif relative_path is not None and relative_path.is_file():
-                logger.info("Loading prompt template from %s", relative_path)
+                logger.info("Loading prompt template from {file}", file=relative_path)
                 with open(relative_path) as f:
                     prompt_template_string = f.read()
             else:
@@ -392,7 +392,7 @@ class App:
             for optimal performance on available hardware.
         """
 
-        logger.info("Loading the base model from %s", self.config.base_model_path)
+        logger.info("Loading the base model from {path}", path=self.config.base_model_path)
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.base_model_path)
 
@@ -431,7 +431,7 @@ class App:
             before applying the finetuned layers.
         """
 
-        logger.info("Loading the finetuned model from %s", self.config.finetuned_model_path)
+        logger.info("Loading the finetuned model from {path}", path=self.config.finetuned_model_path)
 
         self.load_base_model()
 
@@ -465,7 +465,7 @@ class App:
             for optimal performance on available hardware.
         """
 
-        logger.info("Loading the merged model from %s", self.config.merged_model_path)
+        logger.info("Loading the merged model from {path}", path=self.config.merged_model_path)
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.base_model_path)
 
@@ -495,7 +495,7 @@ class App:
             - The data file must be in JSON format
             - The data file path must be set in preferences.data_file
         """
-        logger.info("Loading the dataset from %s", self.config.data_file)
+        logger.info("Loading the dataset from {path}", path=self.config.data_file)
 
         from datasets import load_dataset
 
