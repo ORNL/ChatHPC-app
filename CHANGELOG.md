@@ -28,6 +28,8 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 - Config: `prompt_template_file`.
 - Config: `prompt_template`.
 - APP: `chat_evaluate_extract` to chathpc to evaluate and extract the answer portion in one call.
+- APP: `save_readme` function to save starter readme for models.
+- Train: Save a template readme in the output folders.
 - CLI app: log_level is now a command line argument.
 - Template: Suport relative paths from the config file.
 - Interactive: Added optional ability to extract answer from response with `--extract`.

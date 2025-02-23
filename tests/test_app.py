@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 from chathpc.app.app import App, AppConfig
 
@@ -89,6 +90,24 @@ def test_training_prompt_liternal_newline():
     expected = "System\n\n### Input:\nQuestion\n\n### Context:\nContext\n\n### Response:\nAnswer\n\n"
     result = app.training_prompt(user="Question", context="Context", assistant="Answer")
     assert result == expected, "Prompt is not as expected."
+
+
+def test_save_readme():
+    app = App.from_json(
+        "tests/files/config.json",
+    )
+    app.save_readme("tests/files/README.md")
+    assert Path("tests/files/README.md").is_file()
+    Path("tests/files/README.md").unlink()
+
+
+def test_save_readme_folder():
+    app = App.from_json(
+        "tests/files/config.json",
+    )
+    app.save_readme("tests/files")
+    assert Path("tests/files/README.md").is_file()
+    Path("tests/files/README.md").unlink()
 
 
 if __name__ == "__main__":
