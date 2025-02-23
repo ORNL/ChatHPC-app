@@ -151,7 +151,7 @@ def save_json(filename, data, override=True):
         filename = add_unique_postfix(filename)
 
     with open(filename, "w") as f:
-        json.dump(data, f, indent=4, separators=(",", ": "), sort_keys=True, allow_nan=True)
+        json.dump(data, f, indent=4, separators=(",", ": "), sort_keys=False, allow_nan=True)
 
     return filename
 

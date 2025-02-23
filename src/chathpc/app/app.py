@@ -6,6 +6,7 @@ import atexit
 import os
 import readline
 import sys
+from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 
@@ -22,10 +23,13 @@ from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 from pytz import timezone
 from tabulate import tabulate
+from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
 
 from chathpc.app.utils import template_utils
 from chathpc.app.utils.common_utils import load_json_arg
+from chathpc.app.utils.datastore import save_json
+from chathpc.app.utils.verify_utils import ignore_minor
 
 DEFAULT_APP_CONFIG_FILE = Path(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "config/default_app_settings.json"))
@@ -944,6 +948,43 @@ class App:
                 print(self.chat_evaluate_extract(question=user_input, context=context))
             else:
                 print(self.chat_evaluate(question=user_input, context=context))
+
+    def verify(self, save_verify_data_path: str | Path | None = None) -> int:
+        verify_data = []
+
+        for i, item in tqdm(enumerate(self.train_dataset), "Verify", total=len(self.train_dataset)):  # type: ignore
+            response = self.chat_evaluate_extract(**item)
+            prompt = self.chat_prompt(**item)
+            training_prompt = self.training_prompt(**item)
+            datapoint = OrderedDict(
+                [
+                    ("index", i),
+                    ("prompt", prompt),
+                    ("training_prompt", training_prompt),
+                    ("question", item["question"]),
+                    ("context", item["context"]),
+                    ("answer", item["answer"]),
+                    ("response", response),
+                ]
+            )
+            verify_data.append(datapoint)
+
+        if save_verify_data_path is not None:
+            save_json(save_verify_data_path, verify_data)
+
+        errors = 0
+        for d in verify_data:
+            if ignore_minor(d["response"]) != ignore_minor(d["answer"]):
+                errors += 1
+                print("Error: answer missmatch")
+                print(f"Index: {d['index']}")
+                print(f"Answer:\n{d['answer']}")
+                print(f"Response:\n{d['response']}")
+                print("**********************************************************")
+                print()
+
+        print(f"Total mismatches: {errors}")
+        return errors
 
     def print_config(self) -> None:
         """Print the current configurations of the application in a formatted table.

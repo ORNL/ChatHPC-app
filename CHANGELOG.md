@@ -35,6 +35,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 - Interactive: Allow context to be added inline with `/context <context>`.
 - Interactive: A blank context, unsets the context.
 - Ollama: Test both generate and chat API.
+- CLI & Method: Verify to verify the model against the training dataset.
 
 ### Changed
 

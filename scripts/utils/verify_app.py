@@ -16,6 +16,7 @@ from tqdm import tqdm
 
 from chathpc.app.utils.datastore import read_or_new_json
 from chathpc.app.utils.template_utils import map_keywords
+from chathpc.app.utils.verify_utils import ignore_minor
 
 GIT_ROOT = check_output("git rev-parse --show-toplevel", shell=True).decode().strip()  # noqa S602
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -136,13 +137,6 @@ def run_experiment_chat_app(experiment, basepath, template):
     return (finetune, merged)
 
 
-def ignore_minor(string: str):
-    s = string.strip()
-    line = s.splitlines()
-    line = [x.strip() for x in line]
-    return "\n".join(line)
-
-
 def run_ollama(template):
     from ollama import GenerateResponse, generate
 
@@ -250,7 +244,6 @@ def verify_app(runner):
 
 
 def verify_ollama(template):
-    (finetuned, merged) = run_experiment_chat_app(experiment="app", basepath=".", template=template)
     ol = run_ollama(template=template)
     ol_chat = run_ollama_chat(template=template)
 
@@ -258,7 +251,7 @@ def verify_ollama(template):
     ol_errors = 0
     olc_errors = 0
 
-    for i, (fine, o, oc) in tqdm(enumerate(zip(finetuned, ol, ol_chat)), "Compare"):  # type: ignore
+    for i, (o, oc) in tqdm(enumerate(zip(ol, ol_chat)), "Compare"):  # type: ignore
         if o["answer"] != oc["answer"]:
             print("Error: answer mismatch")
             print(f"Sample {i}")
