@@ -8,11 +8,14 @@ import os
 import subprocess
 import sys
 import traceback
+from collections import OrderedDict
 from functools import partial
 from subprocess import check_output
 
-from datastore.datastore import read_or_new_json
 from tqdm import tqdm
+
+from chathpc.app.utils.datastore import read_or_new_json
+from chathpc.app.utils.template_utils import map_keywords
 
 GIT_ROOT = check_output("git rev-parse --show-toplevel", shell=True).decode().strip()  # noqa S602
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -87,7 +90,7 @@ def run_experiment_chat_app(experiment, basepath, template):
     def get_finetuned():
         chat_app.load_finetuned_model()
         finetune = []
-        for i, item in tqdm(list(enumerate(chat_app.train_dataset)), "Run Finetune"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Finetune", total=len(chat_app.train_dataset)):  # type: ignore
             response = chat_app.chat_evaluate_extract(**item)
             prompt = chat_app.chat_prompt(**item)
             training_prompt = chat_app.training_prompt(**item)
@@ -108,19 +111,21 @@ def run_experiment_chat_app(experiment, basepath, template):
     def get_merged():
         chat_app.load_merged_model()
         merged = []
-        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged"):
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run Merged", total=len(chat_app.train_dataset)):  # type: ignore
             response = chat_app.chat_evaluate_extract(**item)
             prompt = chat_app.chat_prompt(**item)
             training_prompt = chat_app.training_prompt(**item)
-            datapoint = {
-                "index": i,
-                "prompt": prompt,
-                "training_prompt": training_prompt,
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response,
-            }
+            datapoint = OrderedDict(
+                [
+                    ("index", i),
+                    ("prompt", prompt),
+                    ("training_prompt", training_prompt),
+                    ("question", item["question"]),
+                    ("context", item["context"]),
+                    ("answer", item["answer"]),
+                    ("response", response),
+                ]
+            )
             merged.append(datapoint)
         return merged
 
@@ -136,71 +141,74 @@ def ignore_minor(string: str):
     return "\n".join(line)
 
 
-def run_ollama():
+def run_ollama(template):
     from ollama import GenerateResponse, generate
 
     from chathpc.app import App as ChatApp
 
     experiment = "ollama"
-    chat_app = ChatApp()
+    chat_app = ChatApp.from_json({"prompt_template": template})
     chat_app.load_datasets()
 
     def get_ol():
         ol = []
-        for item in tqdm(chat_app.train_dataset, "Run ol"):
-            prompt = chat_app.chat_prompt(**item)
-            response: GenerateResponse = generate(model="ChatKokkos", prompt=prompt, options={"temperature": 0.0})
-            datapoint = {
-                "question": item["question"],
-                "context": item["context"],
-                "answer": item["answer"],
-                "response": response.response,
-            }
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run ol", total=len(chat_app.train_dataset)):  # type: ignore
+            response: GenerateResponse = generate(
+                model="ChatKokkos",
+                prompt=map_keywords(item)["prompt"],
+                system=item["context"],
+                options={"temperature": 0.0},
+            )
+            datapoint = OrderedDict(
+                [
+                    ("index", i),
+                    ("question", item["question"]),
+                    ("context", item["context"]),
+                    ("answer", item["answer"]),
+                    ("response", response.response.strip()),
+                ]
+            )
             ol.append(datapoint)
         return ol
 
     return read_or_new_json(f"{experiment}_ol_out", get_ol)
 
 
-def verify_ollama(template, expected_reponse_errors=0):
-    (finetuned, merged) = run_experiment_chat_app(experiment="app", basepath="./app", template=template)
-    ol = run_ollama()
+def run_ollama_chat(template):
+    from ollama import ChatResponse, chat
 
-    response_errors = 0
-    ol_errors = 0
+    from chathpc.app import App as ChatApp
 
-    for i, (fine, o) in tqdm(enumerate(zip(merged, ol)), "Compare"):  # type: ignore
-        if fine["answer"] != o["answer"]:
-            print("Error: answer mismatch")
-            print(f"Sample {i}")
-            print(f"Finetuned:\n{fine['answer']}")
-            print(f"Ollama:\n{o['answer']}")
-            print("**********************************************************")
-            print()
-            raise RuntimeError("Answer Mismatch")
-        if ignore_minor(o["answer"]) != ignore_minor(o["response"]):
-            response_errors += 1
-            # print("Error: response mismatch")
-            # print(f"Sample {i}")
-            # print(f"Answer:\n{o['answer']}")
-            # print(f"Response:\n{o['response']}")
-            # print(f"**********************************************************")
-            # print()
-        if ignore_minor(fine["response"]) != ignore_minor(o["response"]):
-            ol_errors += 1
-            print("Error: ollama mismatch")
-            print(f"Sample {i}")
-            print(f"Finetuned:\n{fine['response']}")
-            print(f"Ollama:\n{o['response']}")
-            print("**********************************************************")
-            print()
+    experiment = "ollama"
+    chat_app = ChatApp.from_json({"prompt_template": template})
+    chat_app.load_datasets()
 
-    if response_errors != expected_reponse_errors:
-        print(f"Error: Response Errors do not match expected: {response_errors} != {expected_reponse_errors}")
-        ol_errors += 1
+    def get_ol_chat():
+        ol = []
+        for i, item in tqdm(enumerate(chat_app.train_dataset), "Run ol Chat", total=len(chat_app.train_dataset)):  # type: ignore
+            response: ChatResponse = chat(
+                model="ChatKokkos",
+                options={"temperature": 0.0},
+                messages=[
+                    {"role": "system", "content": item["context"]},
+                    {"role": "user", "content": map_keywords(item)["prompt"]},
+                ],
+            )
+            training_prompt = chat_app.training_prompt(**item)
+            datapoint = OrderedDict(
+                [
+                    ("index", i),
+                    ("training_prompt", training_prompt),
+                    ("question", item["question"]),
+                    ("context", item["context"]),
+                    ("answer", item["answer"]),
+                    ("response", response.message.content),
+                ]
+            )
+            ol.append(datapoint)
+        return ol
 
-    print(f"Ollama Errors: {ol_errors}")
-    return ol_errors
+    return read_or_new_json(f"{experiment}_ol_chat_out", get_ol_chat)
 
 
 def verify_app(runner):
@@ -237,6 +245,53 @@ def verify_app(runner):
 
     print(f"Response Errors: {response_errors}, Merge Errors: {merge_errors}")
     return response_errors, merge_errors
+
+
+def verify_ollama(template):
+    (finetuned, merged) = run_experiment_chat_app(experiment="app", basepath=".", template=template)
+    ol = run_ollama(template=template)
+    ol_chat = run_ollama_chat(template=template)
+
+    response_errors = 0
+    ol_errors = 0
+    olc_errors = 0
+
+    for i, (fine, o, oc) in tqdm(enumerate(zip(finetuned, ol, ol_chat)), "Compare"):  # type: ignore
+        if o["answer"] != oc["answer"]:
+            print("Error: answer mismatch")
+            print(f"Sample {i}")
+            print(f"Ollama:\n{o['answer']}")
+            print(f"Ollama Chat:\n{oc['answer']}")
+            print("**********************************************************")
+            print()
+            raise RuntimeError("Answer Mismatch")
+        if ignore_minor(o["answer"]) != ignore_minor(o["response"]):
+            response_errors += 1
+            # print("Error: response mismatch")
+            # print(f"Sample {i}")
+            # print(f"Answer:\n{o['answer']}")
+            # print(f"Response:\n{o['response']}")
+            # print(f"**********************************************************")
+            # print()
+        if ignore_minor(o["answer"]) != ignore_minor(o["response"]):
+            ol_errors += 1
+            print("Error: ollama mismatch")
+            print(f"Sample {i}")
+            print(f"Answer:\n{o['answer']}")
+            print(f"Ollama:\n{o['response']}")
+            print("**********************************************************")
+            print()
+        if ignore_minor(o["response"]) != ignore_minor(oc["response"]):
+            olc_errors += 1
+            print("Error: ollama chat mismatch")
+            print(f"Sample {i}")
+            print(f"Ollama:\n{o['response']}")
+            print(f"Ollama Chat:\n{oc['response']}")
+            print("**********************************************************")
+            print()
+
+    print(f"Ollama Errors: {ol_errors}")
+    return ol_errors, olc_errors
 
 
 def init_parser(parser):
@@ -285,11 +340,11 @@ def main(raw_args=None):
     # App New
     print("\n\n** Running App New **")
     print("\n\n** Running App New **", file=sys.stderr)
-    app_errors = verify_app(
+    app_new_errors = verify_app(
         partial(run_experiment_chat_app, experiment="app_new", basepath="../", template=new_template)
     )
-    print("Response Errors: {}, Merge Errors: {}".format(*app_errors))
-    print("Response Errors: {}, Merge Errors: {}".format(*app_errors), file=sys.stderr)
+    print("Response Errors: {}, Merge Errors: {}".format(*app_new_errors))
+    print("Response Errors: {}, Merge Errors: {}".format(*app_new_errors), file=sys.stderr)
 
     # App
     print("\n\n** Running App **")
@@ -307,25 +362,26 @@ def main(raw_args=None):
     print("Response Errors: {}, Merge Errors: {}".format(*app_old_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*app_old_errors), file=sys.stderr)
 
-    # App Prior
-    print("\n\n** Running App Prior **")
-    print("\n\n** Running App Prior **", file=sys.stderr)
-    app_prior_errors = verify_app(
-        partial(
-            run_experiment_chat_app,
-            experiment="app_prior",
-            basepath="/home/7ry/Data/ellora/ChatHPC-app-main/examples/app",
-            template=old_template,
-        )
-    )
-    print("Response Errors: {}, Merge Errors: {}".format(*app_prior_errors))
-    print("Response Errors: {}, Merge Errors: {}".format(*app_prior_errors), file=sys.stderr)
+    # # App Prior
+    # print("\n\n** Running App Prior **")
+    # print("\n\n** Running App Prior **", file=sys.stderr)
+    # app_prior_errors = verify_app(
+    #     partial(
+    #         run_experiment_chat_app,
+    #         experiment="app_prior",
+    #         basepath="/home/7ry/Data/ellora/ChatHPC-app-main/examples/app",
+    #         template=old_template,
+    #     )
+    # )
+    # print("Response Errors: {}, Merge Errors: {}".format(*app_prior_errors))
+    # print("Response Errors: {}, Merge Errors: {}".format(*app_prior_errors), file=sys.stderr)
 
-    # print("\n\n** Running Ollama **")
-    # print("\n\n** Running Ollama **", file=sys.stderr)
-    # ol_errors = verify_ollama(expected_reponse_errors=app_errors[0], template=new_template)
-    # print(f"Ollama Errors: {ol_errors}")
-    # print(f"Ollama Errors: {ol_errors}", file=sys.stderr)
+    # Ollama
+    print("\n\n** Running Ollama **")
+    print("\n\n** Running Ollama **", file=sys.stderr)
+    ol_errors = verify_ollama(template=new_template)
+    print("Ollama Errors: {}, Ollama Chat Errors: {}".format(*ol_errors))
+    print("Ollama Errors: {}, Ollama Chat Errors: {}".format(*ol_errors), file=sys.stderr)
 
 
 if __name__ == "__main__":

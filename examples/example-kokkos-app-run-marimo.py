@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.7"
+__generated_with = "0.11.8"
 app = marimo.App()
 
 
@@ -32,12 +32,11 @@ def _(logger_setup):
     from chathpc.app import App as ChatApp
 
     chat_app = ChatApp.from_json(
-        "../tests/files/config.json",
+        "./tests/files/config.json",
         {
-            "prompt_template_file": "../tests/files/prompt_template.txt",
-            "finetuned_model_path": "./app/peft_adapter",
-            "merged_model_path": "./app/merged_adapters",
-            "training_output_dir": "./app/kokkos-code-llama",
+            "finetuned_model_path": "./peft_adapter",
+            "merged_model_path": "./merged_adapters",
+            "training_output_dir": "./kokkos-code-llama",
         },
     )
 
@@ -161,28 +160,8 @@ def _(chat_app, finetuned_model_loaded):
     question_5 = "Can you give me an example of Kokkos parallel_reduce?"
     context_5 = "Introduction to Kokkos programming model"
     output_5 = chat_app.chat_evaluate(question=question_5, context=context_5, max_new_tokens=500)
-    print("-----------------")
     print(output_5)
-    print("-----------------")
-    output_5_extract = chat_app.chat_evaluate_extract(question=question_5, context=context_5, max_new_tokens=500)
-    print("-----------------")
-    print(output_5_extract)
-    print("-----------------")
-    return context_5, output_5, output_5_extract, question_5
-
-
-@app.cell
-def _(chat_app, finetuned_model_loaded):
-    assert finetuned_model_loaded == True
-    chat_app.train_dataset.to_pandas()
-
-
-@app.cell
-def _():
-    import pandas as pd
-
-    pd.read_json("app_finetune_out.json")
-    return (pd,)
+    return context_5, output_5, question_5
 
 
 @app.cell(hide_code=True)
