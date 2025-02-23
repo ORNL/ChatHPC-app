@@ -258,7 +258,7 @@ def main(raw_args=None):
         print("Attach debugger to continue.")
         debugpy.wait_for_client()  # noqa: T100
 
-    os.environ["CHATHPC_DATA_FILE"] = "/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json"
+    os.environ["CHATHPC_DATA_FILE"] = "/home/7ry/Data/ellora/ChatKokkos-data/kokkos_dataset_before_reinforcement.json"
 
     old_template = "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n"
 
@@ -281,6 +281,15 @@ def main(raw_args=None):
     )
     print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors))
     print("Response Errors: {}, Merge Errors: {}".format(*notebook_app_errors), file=sys.stderr)
+
+    # App New
+    print("\n\n** Running App New **")
+    print("\n\n** Running App New **", file=sys.stderr)
+    app_errors = verify_app(
+        partial(run_experiment_chat_app, experiment="app_new", basepath="../", template=new_template)
+    )
+    print("Response Errors: {}, Merge Errors: {}".format(*app_errors))
+    print("Response Errors: {}, Merge Errors: {}".format(*app_errors), file=sys.stderr)
 
     # App
     print("\n\n** Running App **")

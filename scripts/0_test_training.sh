@@ -19,14 +19,14 @@ do
     $GIT_ROOT/scripts/utils/extract_responses.py "${f%.*}_output.ipynb" > "${f%.*}_output.txt"
 done
 
-CHATHPC_DATA_FILE="/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json"\
+CHATHPC_DATA_FILE="/home/7ry/Data/ellora/ChatKokkos-data/kokkos_dataset_before_reinforcement.json"\
     CHATHPC_FINETUNED_MODEL_PATH="./app/peft_adapter"\
     CHATHPC_MERGED_MODEL_PATH="./app/merged_adapters"\
     CHATHPC_TRAINING_OUTPUT_DIR="./app/kokkos-code-llama"\
     CHATHPC_PROMPT_TEMPLATE='You are a powerful LLM model for Kokkos called ChatKokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Context:\n{{ context }}\n\n### Question:\n{{ question }}\n\n### Answer:\n{{ answer }}\n\n'\
     chathpc train
 
-CHATHPC_DATA_FILE="/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json"\
+CHATHPC_DATA_FILE="/home/7ry/Data/ellora/ChatKokkos-data/kokkos_dataset_before_reinforcement.json"\
     CHATHPC_FINETUNED_MODEL_PATH="./app_old/peft_adapter"\
     CHATHPC_MERGED_MODEL_PATH="./app_old/merged_adapters"\
     CHATHPC_TRAINING_OUTPUT_DIR="./app_old/kokkos-code-llama"\
