@@ -43,6 +43,7 @@ dependencies = [
   "readline>=3.5",
   "loguru",
   "jinja2",
+  "json_tricks",
 ]
 
 [tool.hatch.metadata]
