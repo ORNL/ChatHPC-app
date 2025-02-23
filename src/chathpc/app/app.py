@@ -6,6 +6,7 @@ import atexit
 import os
 import readline
 import sys
+from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
 
@@ -22,10 +23,15 @@ from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 from pytz import timezone
 from tabulate import tabulate
+from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
 
+import chathpc
+import chathpc.app
 from chathpc.app.utils import template_utils
-from chathpc.app.utils.common_utils import load_json_arg
+from chathpc.app.utils.common_utils import load_json_arg, run
+from chathpc.app.utils.datastore import save_json
+from chathpc.app.utils.verify_utils import ignore_minor
 
 DEFAULT_APP_CONFIG_FILE = Path(
     os.path.abspath(os.path.join(os.path.dirname(__file__), "config/default_app_settings.json"))
@@ -877,9 +883,11 @@ class App:
         trainer.train()
 
         trainer.model.save_pretrained(self.config.finetuned_model_path)  # type: ignore
+        self.save_readme(self.config.finetuned_model_path)
         self.model = trainer.model.merge_and_unload()  # type: ignore
         self.tokenizer.save_pretrained(self.config.merged_model_path)
         self.model.save_pretrained(self.config.merged_model_path)
+        self.save_readme(self.config.merged_model_path)
 
     def interactive(self, args, prompt="chathpc") -> None:
         """Start an interactive chat session with the model.
@@ -945,6 +953,43 @@ class App:
             else:
                 print(self.chat_evaluate(question=user_input, context=context))
 
+    def verify(self, save_verify_data_path: str | Path | None = None) -> int:
+        verify_data = []
+
+        for i, item in tqdm(enumerate(self.train_dataset), "Verify", total=len(self.train_dataset)):  # type: ignore
+            response = self.chat_evaluate_extract(**item)
+            prompt = self.chat_prompt(**item)
+            training_prompt = self.training_prompt(**item)
+            datapoint = OrderedDict(
+                [
+                    ("index", i),
+                    ("prompt", prompt),
+                    ("training_prompt", training_prompt),
+                    ("question", item["question"]),
+                    ("context", item["context"]),
+                    ("answer", item["answer"]),
+                    ("response", response),
+                ]
+            )
+            verify_data.append(datapoint)
+
+        if save_verify_data_path is not None:
+            save_json(save_verify_data_path, verify_data)
+
+        errors = 0
+        for d in verify_data:
+            if ignore_minor(d["response"]) != ignore_minor(d["answer"]):
+                errors += 1
+                print("Error: answer missmatch")
+                print(f"Index: {d['index']}")
+                print(f"Answer:\n{d['answer']}")
+                print(f"Response:\n{d['response']}")
+                print("**********************************************************")
+                print()
+
+        print(f"Total mismatches: {errors}")
+        return errors
+
     def print_config(self) -> None:
         """Print the current configurations of the application in a formatted table.
 
@@ -987,6 +1032,43 @@ class App:
 
         # Print formatted table
         print(tabulate(table_data, headers=headers, tablefmt="simple"))
+
+    def save_readme(self, filename: Path | str) -> None:
+        if type(filename) is not Path:
+            filename = Path(filename)
+
+        if filename.is_dir():
+            filename = filename / "README.md"
+
+        # Get configuration as dict, excluding internal pydantic fields
+        config_dict = self.config.model_dump()
+
+        # Replace newlines with newline char.
+        config_dict["prompt_template"] = config_dict["prompt_template"].replace("\n", "\\n")
+
+        # Add version
+        version_dict = {
+            "commit": run("git rev-parse --short HEAD"),
+            "version": chathpc.app.version,
+        }
+
+        # Format as table rows
+        table_data = [[setting, value] for setting, value in config_dict.items()]
+        version_table_data = [[setting, value] for setting, value in version_dict.items()]
+
+        # Define table headers
+        headers = ["Setting", "Value"]
+
+        # Print formatted table
+        config_table = tabulate(table_data, headers=headers, tablefmt="github")
+        version_table = tabulate(version_table_data, headers=headers, tablefmt="github")
+
+        with open(filename, "w") as fd:
+            project_name = Path(run("git rev-parse --show-toplevel")).name.strip()
+            fd.write(f"# {project_name} Model Info\n\n## ChatHPC Version Info\n\n")
+            fd.write(version_table)
+            fd.write("\n\n## Configuration\n\n")
+            fd.write(config_table)
 
     def extract_answer(self, response: str, **kwargs):
         """Extract the model's answer from a complete response string.

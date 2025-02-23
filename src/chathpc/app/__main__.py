@@ -52,6 +52,13 @@ def run(args, config):
     _run_fine(args, config)
 
 
+def verify(args, config):
+    app = App(config)
+    app.load_datasets()
+    app.load_merged_model()
+    app.verify(args.save_results_path)
+
+
 def init_parser(parser):
     parser.add_argument("--debug", action="store_true", help="Open debug port (5678).")
     parser.add_argument("--log_level", type=str, help="Log level.")
@@ -79,6 +86,9 @@ def init_parser(parser):
     subparsers.add_parser("run_base", help="Interact with the base model").set_defaults(func=run_base)
     subparsers.add_parser("run_fine", help="Interact with the finetuned model").set_defaults(func=run_fine)
     subparsers.add_parser("run_merged", help="Interact with the merged model").set_defaults(func=run_merged)
+    verify_parser = subparsers.add_parser("verify", help="Verify the trained model with the training dataset")
+    verify_parser.set_defaults(func=verify)
+    verify_parser.add_argument("--save_results_path", type=str, help="Save verification results here.")
 
 
 def cli(raw_args=None):

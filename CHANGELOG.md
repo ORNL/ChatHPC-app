@@ -25,8 +25,11 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ### Added
 
-- Added `prompt_template_file`.
-- Added `prompt_template`.
+- Config: `prompt_template_file`.
+- Config: `prompt_template`.
+- APP: `chat_evaluate_extract` to chathpc to evaluate and extract the answer portion in one call.
+- APP: `save_readme` function to save starter readme for models.
+- Train: Save a template readme in the output folders.
 - CLI app: log_level is now a command line argument.
 - Template: Suport relative paths from the config file.
 - Interactive: Added optional ability to extract answer from response with `--extract`.
@@ -35,6 +38,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 - Interactive: Allow context to be added inline with `/context <context>`.
 - Interactive: A blank context, unsets the context.
 - Ollama: Test both generate and chat API.
+- CLI & Method: Verify to verify the model against the training dataset.
 
 ### Changed
 
