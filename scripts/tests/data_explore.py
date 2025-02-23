@@ -9,7 +9,6 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 app = ChatApp.from_json(
     os.path.join(GIT_ROOT, "tests/files/config.json"),
-    {"prompt_template_file": os.path.join(GIT_ROOT, "tests/files/prompt_template.txt")},
 )
 
 # %%
@@ -21,14 +20,13 @@ df = app.train_dataset.to_pandas()
 df["prompt_filled"] = df.apply(lambda row: app.training_prompt(**row), axis=1)
 
 # %%
-df["prompt_filled"].to_markdown("df.md")
-
-# %%
 with open("out.md", "w") as fd:
-    fd.write("Output2\n")
-    fd.write("----\n\n")
+    fd.write("Output\n")
     for index, row in df.iterrows():
+        fd.write(f"----  {index}\n\n")
+        fd.write(row["prompt_filled"])
+        fd.write("----\n\n")
         fd.write(app.extract_answer(row["prompt_filled"], **row) + "\n")
-        fd.write("\n----\n\n")
+    fd.write("\n----\n\n")
 
 # %%
