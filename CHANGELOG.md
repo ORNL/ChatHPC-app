@@ -38,12 +38,18 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 - Interactive: A blank context, unsets the context.
 - Ollama: Now tests both generate and chat API. It is recommended to use the chat API to be more compatible with OpenAI's api.
 - CLI & Method: `Verify` subcommand to verify the model against the training dataset.
+- Examples: Added [Marimo](https://marimo.io/) example using ChatHPC.
+- Full Test: Top level `scripts/full_test.sh` to run all the tests in order.
+- Data Explore: Data explore script `scripts/tests/data_expore.py` to print out an inspect the training dataset.
+- Added version to package for easy query of ChatHPC version.
 
 ### Changed
 
 - Template: Switch from format string to Jinja for the templates. The main change required here, is to use `{{}}` for variable names instead of `{}`.
 - Template: Now only one template is used for both training and inference.
 - Template: Can either be set by a file path or a string.
+- datastore: Removed dependency on datastore, by coping datastore into utilities.
+- verify_app.py: Refactored to remove duplicate code.
 
 ## Removed
 
