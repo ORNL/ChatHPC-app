@@ -14,3 +14,7 @@ You must output the answer the question.
 {{ .Response }}
 
 """
+
+PARAMETER stop "### Context"
+PARAMETER stop "### Answer:"
+PARAMETER stop "### Question:"
