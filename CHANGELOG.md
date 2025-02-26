@@ -23,6 +23,8 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+## [25.2.1] - 2025-02-26
+
 ### Added
 
 - Config: `prompt_template_file` option added. This allows defining a prompt template from a file. If relative path, first the CWD is checked, then the path relative to the config.json.
@@ -80,6 +82,7 @@ Verified initial working version of the ChatHPC App.
 
 - Initial version of ChatHPC App. Created from the working ChatKokkos Example.
 
-[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.0...main
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.1...main
+[25.2.1]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.0...v25.2.1
 [25.2.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.1.0...v25.2.0
 [25.1.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/releases/v25.1.0
