@@ -25,20 +25,19 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ### Added
 
-- Config: `prompt_template_file`.
-- Config: `prompt_template`.
-- APP: `chat_evaluate_extract` to chathpc to evaluate and extract the answer portion in one call.
-- APP: `save_readme` function to save starter readme for models.
-- Train: Save a template readme in the output folders.
+- Config: `prompt_template_file` option added. This allows defining a prompt template from a file. If relative path, first the CWD is checked, then the path relative to the config.json.
+- Config: `prompt_template` option added. This is a unified prompt template for both training and inference. Replaces `training_prompt` and `inference_prompt`.
+- APP: `chat_evaluate_extract` method added to chathpc to evaluate and extract the answer portion in one call.
+- APP: `save_readme` function to save a starter readme for models.
+- Train: Now saves a template readme in the output folders.
 - CLI app: log_level is now a command line argument.
-- Template: Suport relative paths from the config file.
 - Interactive: Added optional ability to extract answer from response with `--extract`.
 - Interactive: Gracefully handle EOF.
 - Interactive & Template: Make context optional.
 - Interactive: Allow context to be added inline with `/context <context>`.
 - Interactive: A blank context, unsets the context.
-- Ollama: Test both generate and chat API.
-- CLI & Method: Verify to verify the model against the training dataset.
+- Ollama: Now tests both generate and chat API. It is recommended to use the chat API to be more compatible with OpenAI's api.
+- CLI & Method: `Verify` subcommand to verify the model against the training dataset.
 
 ### Changed
 
