@@ -42,7 +42,8 @@ dependencies = [
   "ollama",
   "readline>=3.5",
   "loguru",
-  "datastore-ayoung48 @ git+ssh://git@github.com/Geekdude/Datastore.git",
+  "jinja2",
+  "json_tricks",
 ]
 
 [tool.hatch.metadata]

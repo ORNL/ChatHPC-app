@@ -1,5 +1,5 @@
 {
-    "data_file": "/home/7ry/Data/ellora/kokkos-data/kokkos_create_context.json",
+    "data_file": "/home/7ry/Data/ellora/ChatKokkos-data/kokkos_dataset_before_reinforcement.json",
     "base_model_path": "/auto/projects/ChatHPC/models/cache/meta-llama/CodeLlama-7b-hf",
     "finetuned_model_path": "peft_adapter",
     "merged_model_path": "merged_adapters",
@@ -7,7 +7,7 @@
     "max_response_tokens": 600,
     "max_training_tokens": 512,
     "prompt_history_file": "~/.chatkokkos_history",
-    "training_prompt" : "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n{answer}\n",
-    "inference_prompt" : "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{question}\n\n### Context:\n{context}\n\n### Response:\n",
+    "prompt_template_file": "prompt_template.txt",
+    "prompt_template": null,
     "use_wandb": false
 }

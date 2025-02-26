@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import contextlib
 import json
+import os
+import subprocess
+import sys
+import traceback
 
 
 def load_json_arg(str_or_fn):
@@ -30,6 +35,7 @@ def load_json_arg(str_or_fn):
     else:
         with open(str_or_fn) as f:
             params = json.loads(f.read())
+            params["filename"] = str_or_fn
             f.close()
     return params
 
@@ -54,14 +60,54 @@ def evaluate_fstring(fstring, **kwargs):
     return eval(f"f'''{fstring}'''", {}, kwargs)  # noqa: S307
 
 
-def extract_answer(response: str, prompt: str, stop: str | None = None):
-    answer = response
-    answer = answer.replace("<s> ", "").replace("</s>", "")
+@contextlib.contextmanager
+def pushd(new_dir):
+    previous_dir = os.getcwd()
+    os.chdir(new_dir)
+    try:
+        yield
+    finally:
+        os.chdir(previous_dir)
 
-    if answer.startswith(prompt):
-        answer = answer[len(prompt) :]
 
-    if stop is not None and answer.endswith(stop):
-        answer = answer[: -len(stop)]
+def run(command, verbose=True, noop=False, directory=None):
+    """Print command then run command"""
+    return_val = ""
 
-    return answer
+    if directory is not None:
+        with pushd(directory):
+            return run(command, verbose, noop)
+
+    if verbose:
+        print(command)
+    if not noop:
+        try:
+            return_val = subprocess.check_output(command, shell=True, stderr=subprocess.PIPE).decode()  # noqa: S602
+        except subprocess.CalledProcessError as e:
+            err_mesg = f"{os.getcwd()}: {e}\n\n{traceback.format_exc()}\n\n{e.returncode}\n\n{e.stdout.decode()}\n\n{e.stderr.decode()}"
+            print(err_mesg, file=sys.stderr)
+            with open("err.txt", "w") as fd:
+                fd.write(err_mesg)
+            raise
+        except Exception as e:
+            err_mesg = f"{os.getcwd()}: {e}\n\n{traceback.format_exc()}"
+            print(err_mesg, file=sys.stderr)
+            with open("err.txt", "w") as fd:
+                fd.write(err_mesg)
+            raise
+        if verbose and return_val:
+            print(return_val)
+
+    return return_val
+
+
+def shell_source(script):
+    """Sometime you want to emulate the action of "source" in bash,
+    settings some environment variables. Here is a way to do it."""
+    import os
+    import subprocess
+
+    pipe = subprocess.Popen(f"bash -c 'source {script} > /dev/null; env'", stdout=subprocess.PIPE, shell=True)  # noqa: S602
+    output = pipe.communicate()[0].decode()
+    env = dict(line.split("=", 1) for line in output.splitlines())
+    os.environ.update(env)

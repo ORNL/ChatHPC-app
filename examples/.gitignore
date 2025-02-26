@@ -7,6 +7,7 @@ verify_training.txt
 requirements-lock.txt
 /jupyter_app/
 /app/
+/app_old/
 /wandb/
 /kokkos-code-llama/
 /merged_adapters/
