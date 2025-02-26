@@ -1,3 +1,5 @@
+# ruff: noqa: S101, INP001
+
 import marimo
 
 __generated_with = "0.11.8"
@@ -26,7 +28,7 @@ def _(mo):
 
 @app.cell
 def _(logger_setup):
-    assert logger_setup == True
+    assert logger_setup
     import os
 
     from chathpc.app import App as ChatApp
@@ -66,7 +68,7 @@ def _(mo):
 
 @app.cell
 def _(base_model_loaded, chat_app):
-    assert base_model_loaded == True
+    assert base_model_loaded
 
     question = "Which kind of Kokkos views are?"
     context = "Introduction to Kokkos programming model"
@@ -79,7 +81,7 @@ def _(base_model_loaded, chat_app):
 
 @app.cell
 def _(base_model_loaded, chat_app):
-    assert base_model_loaded == True
+    assert base_model_loaded
 
     question_1 = "Which compilers can I use to compile Kokkos codes?"
     context_1 = "Kokkos installation"
@@ -90,7 +92,7 @@ def _(base_model_loaded, chat_app):
 
 @app.cell
 def _(base_model_loaded, chat_app):
-    assert base_model_loaded == True
+    assert base_model_loaded
 
     question_2 = "Can you give me an example of Kokkos parallel_reduce?"
     context_2 = "Introduction to Kokkos programming model"
@@ -133,7 +135,7 @@ def _(mo):
 
 @app.cell
 def _(chat_app, finetuned_model_loaded):
-    assert finetuned_model_loaded == True
+    assert finetuned_model_loaded
 
     question_3 = "Which kind of Kokkos views are?"
     context_3 = "Introduction to Kokkos programming model"
@@ -144,7 +146,7 @@ def _(chat_app, finetuned_model_loaded):
 
 @app.cell
 def _(chat_app, finetuned_model_loaded):
-    assert finetuned_model_loaded == True
+    assert finetuned_model_loaded
 
     question_4 = "Which compilers can I use to compile Kokkos codes?"
     context_4 = "Kokkos installation"
@@ -155,7 +157,7 @@ def _(chat_app, finetuned_model_loaded):
 
 @app.cell
 def _(chat_app, finetuned_model_loaded):
-    assert finetuned_model_loaded == True
+    assert finetuned_model_loaded
 
     question_5 = "Can you give me an example of Kokkos parallel_reduce?"
     context_5 = "Introduction to Kokkos programming model"

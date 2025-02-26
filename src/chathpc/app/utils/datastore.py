@@ -36,13 +36,13 @@ def read_or_new_pickle(filename, value, *args, **kwargs):
         if os.path.getsize(filename) > 0:
             with open(filename, "rb") as f:
                 try:
-                    data = pickle.load(f)
+                    data = pickle.load(f)  # noqa: S301
                 except Exception as e:
                     print(e)
-                    raise e
+                    raise
     else:
         # open(filename, "ab").close()
-        if callable(value):
+        if callable(value):  # noqa: SIM108
             data = value(*args, **kwargs)
         else:
             data = value
@@ -58,10 +58,10 @@ def save_pickle(filename, data, override=True):
     if dirname:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-    if override == False:
+    if not override:
         filename = add_unique_postfix(filename)
 
-    with open(filename, "wb") as f:
+    with open(filename, "wb") as f:  # type: ignore
         pickle.dump(data, f)
 
     return filename
@@ -84,15 +84,15 @@ def read_or_new_txt(filename, value, *args, **kwargs):
                     data = f.read()
                 except Exception as e:
                     print(e)
-                    raise e
+                    raise
     else:
         # open(filename, "ab").close()
-        if callable(value):
+        if callable(value):  # noqa: SIM108
             data = value(*args, **kwargs)
         else:
             data = value
         with open(filename, "w") as f:
-            f.write(data)
+            f.write(data)  # type: ignore
     return data
 
 
@@ -103,10 +103,10 @@ def save_txt(filename, data, override=True):
     if dirname:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-    if override == False:
+    if not override:
         filename = add_unique_postfix(filename)
 
-    with open(filename, "w") as f:
+    with open(filename, "w") as f:  # type: ignore
         f.write(data)
 
     return filename
@@ -129,9 +129,9 @@ def read_or_new_json(filename, value, *args, **kwargs):
                     data = json.load(f, preserve_order=True)
                 except Exception as e:
                     print(e)
-                    raise e
+                    raise
     else:
-        if callable(value):
+        if callable(value):  # noqa: SIM108
             data = value(*args, **kwargs)
         else:
             data = value
@@ -147,10 +147,10 @@ def save_json(filename, data, override=True):
     if dirname:
         os.makedirs(os.path.dirname(filename), exist_ok=True)
 
-    if override == False:
+    if not override:
         filename = add_unique_postfix(filename)
 
-    with open(filename, "w") as f:
+    with open(filename, "w") as f:  # type: ignore
         json.dump(data, f, indent=4, separators=(",", ": "), sort_keys=False, allow_nan=True)
 
     return filename
@@ -164,7 +164,8 @@ def add_unique_postfix(filename):
     path, name = os.path.split(filename)
     name, ext = os.path.splitext(name)
 
-    make_filename = lambda i: os.path.join(path, f"{name}_{i}{ext}")
+    def make_filename(i):
+        return os.path.join(path, f"{name}_{i}{ext}")
 
     for i in range(1, sys.maxsize):
         unique_filename = make_filename(i)
@@ -179,7 +180,7 @@ def read_all_data_from_folder(path):
     data = []
 
     # Loop through all files recursively
-    for foldername, subfolders, filenames in os.walk(path):
+    for foldername, _subfolders, filenames in os.walk(path):
         # Loop though each file
         for filename in filenames:
             name, ext = os.path.splitext(filename)
@@ -193,6 +194,6 @@ def read_all_data_from_folder(path):
                     data.append(json.load(f, preserve_order=False))
             elif ext == ".pkl":
                 with open(filepath, "rb") as f:
-                    data.append(pickle.load(f))
+                    data.append(pickle.load(f))  # noqa: S301
 
     return data
