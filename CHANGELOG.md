@@ -42,7 +42,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ### Changed
 
-- Template: Switch from format string to Jinja for the templates.
+- Template: Switch from format string to Jinja for the templates. The main change required here, is to use `{{}}` for variable names instead of `{}`.
 - Template: Now only one template is used for both training and inference.
 - Template: Can either be set by a file path or a string.
 
