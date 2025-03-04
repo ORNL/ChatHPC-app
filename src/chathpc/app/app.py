@@ -1103,7 +1103,7 @@ class App:
         if save_test_data_path is not None:
             save_json(save_test_data_path, results)
 
-        if next(iter(results), {}).contains("answer"):  # type: ignore
+        if "answer" in next(iter(results), {}):  # type: ignore
             errors = 0
             for d in results:
                 if ignore_minor(d["response"]) != ignore_minor(d["answer"]):
