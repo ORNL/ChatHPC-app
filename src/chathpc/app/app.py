@@ -981,7 +981,7 @@ class App:
 
         for i, item in tqdm(enumerate(self.train_dataset), "Verify", total=len(self.train_dataset)):  # type: ignore
             if ollama_model is not None:
-                response = ollama_chat_evaluate(ollama_model, **item)
+                response = ollama_chat_evaluate(self.config, ollama_model, **item)
             else:
                 response = self.chat_evaluate_extract(**item)
             prompt = self.chat_prompt(**item)
@@ -1048,7 +1048,7 @@ class App:
 
         for i, item in tqdm(enumerate(test_data), "Test", total=test_data_len):  # type: ignore
             if ollama_model is not None:
-                response = ollama_chat_evaluate(ollama_model, **item)
+                response = ollama_chat_evaluate(self.config, ollama_model, **item)
             else:
                 response = self.chat_evaluate_extract(**item)
             prompt = self.chat_prompt(**item)

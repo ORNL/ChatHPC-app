@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from chathpc.app.app import AppConfig
+
 from ollama import ChatResponse, GenerateResponse, chat, generate
 
 from chathpc.app.utils import template_utils
 
 
-def ollama_evaluate(model_name: str, **kwargs) -> str | None:
+def ollama_evaluate(config: AppConfig, model_name: str, **kwargs) -> str | None:
     """Evaluate a prompt using Ollama's generate API.
 
     Args:
@@ -30,12 +35,12 @@ def ollama_evaluate(model_name: str, **kwargs) -> str | None:
         model=model_name,
         prompt=kw["prompt"],
         system=kw["context"],
-        options={"temperature": 0.0},
+        options={"temperature": 0.0, "num_predict": config.max_response_tokens},
     )
     return response.response.strip()
 
 
-def ollama_chat_evaluate(model_name: str, **kwargs) -> str | None:
+def ollama_chat_evaluate(config: AppConfig, model_name: str, **kwargs) -> str | None:
     """Evaluate a prompt using Ollama's chat API.
 
     Args:
@@ -58,7 +63,7 @@ def ollama_chat_evaluate(model_name: str, **kwargs) -> str | None:
 
     response: ChatResponse = chat(
         model=model_name,
-        options={"temperature": 0.0},
+        options={"temperature": 0.0, "num_predict": config.max_response_tokens},
         messages=[
             {"role": "system", "content": kw["context"]},
             {"role": "user", "content": kw["prompt"]},
