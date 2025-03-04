@@ -59,6 +59,23 @@ def verify(args, config):
     app.verify(args.save_results_path)
 
 
+def test(args, config):
+    app = App(config)
+    app.load_merged_model()
+    app.test(test_dataset=args.test_json_path, save_test_data_path=args.save_results_path)
+
+
+def ollama_verify(args, config):
+    app = App(config)
+    app.load_datasets()
+    app.verify(save_verify_data_path=args.save_results_path, ollama_model=args.model)
+
+
+def ollama_test(args, config):
+    app = App(config)
+    app.test(test_dataset=args.test_json_path, save_test_data_path=args.save_results_path, ollama_model=args.model)
+
+
 def init_parser(parser):
     parser.add_argument("--debug", action="store_true", help="Open debug port (5678).")
     parser.add_argument("--log_level", type=str, help="Log level.")
@@ -89,6 +106,26 @@ def init_parser(parser):
     verify_parser = subparsers.add_parser("verify", help="Verify the trained model with the training dataset")
     verify_parser.set_defaults(func=verify)
     verify_parser.add_argument("--save_results_path", type=str, help="Save verification results here.")
+
+    test_parser = subparsers.add_parser("test", help="Test the trained model with a testing dataset")
+    test_parser.set_defaults(func=test)
+    test_parser.add_argument("--save_results_path", type=str, help="Save test results here.")
+    test_parser.add_argument("test_json_path", type=str, help="Path to test json file.")
+
+    ollama_parser = subparsers.add_parser("ollama", help="Ollama subcommands")
+    ollama_subparser = ollama_parser.add_subparsers(title="subcommands", description="valid ollama subcommands")
+    ollama_verify_parser = ollama_subparser.add_parser(
+        "verify", help="Verify the ollama model with the training dataset"
+    )
+    ollama_verify_parser.set_defaults(func=ollama_verify)
+    ollama_verify_parser.add_argument("--save_results_path", type=str, help="Save verification results here.")
+    ollama_verify_parser.add_argument("--model", type=str, help="Name of the ollama model to use.")
+
+    ollama_test_parser = ollama_subparser.add_parser("test", help="Test the ollama model with the training dataset")
+    ollama_test_parser.set_defaults(func=ollama_test)
+    ollama_test_parser.add_argument("--save_results_path", type=str, help="Save verification results here.")
+    ollama_test_parser.add_argument("--model", type=str, help="Name of the ollama model to use.")
+    ollama_test_parser.add_argument("test_json_path", type=str, help="Path to test json file.")
 
 
 def cli(raw_args=None):

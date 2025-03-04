@@ -23,6 +23,16 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+### Added
+
+- CI: Test command to evalute all the samples in a json file.
+- CI: Ollama subcommands to run verify and test using an Ollama model.
+- Ollama module: Added to make evaluating Ollama models easier.
+
+### Fixed
+
+- Prompt Template: Missing `:`.
+
 ## [25.2.1] - 2025-02-26
 
 ### Added
