@@ -750,6 +750,20 @@ class App:
                 padding=False,
                 return_tensors=None,
             )
+            result_full = self.tokenizer(
+                prompt,
+                truncation=False,
+                padding=False,
+                return_tensors=None,
+            )
+            if result != result_full:
+                logger.warning(
+                    "Training tokenizer needs {token_count} tokens to fully tokenize the training input and max training tokens is set to {max_training_tokens}. \nPrompt: {prompt}\nCropped to: {prompt_cropped}",
+                    token_count=len(result_full.data["input_ids"]),
+                    max_training_tokens=self.config.max_training_tokens,
+                    prompt=prompt,
+                    prompt_cropped=self.tokenizer.decode(result.data["input_ids"]),
+                )
 
             # "self-supervised learning" means the labels are also the inputs:
             result["labels"] = result["input_ids"].copy()  # type: ignore
