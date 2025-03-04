@@ -8,7 +8,7 @@ import sys
 import traceback
 
 
-def load_json_arg(str_or_fn):
+def load_json_arg(str_or_fn, add_filename_to_json=True):
     """Load and parse JSON data from either a string or file.
 
     Args:
@@ -30,12 +30,13 @@ def load_json_arg(str_or_fn):
         return {}
     if isinstance(str_or_fn, dict):
         return str_or_fn
-    if isinstance(str_or_fn, str) and str_or_fn[0] == "{":
+    if isinstance(str_or_fn, str) and (str_or_fn[0] == "{" or str_or_fn[0] == "["):
         params = json.loads(str_or_fn)
     else:
         with open(str_or_fn) as f:
             params = json.loads(f.read())
-            params["filename"] = str_or_fn
+            if add_filename_to_json:
+                params["filename"] = str_or_fn
             f.close()
     return params
 

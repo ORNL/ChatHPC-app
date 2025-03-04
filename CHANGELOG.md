@@ -31,6 +31,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 - Ollama module: Added to make evaluating Ollama models easier.
 - OpenAI module: Added to make evaluating OpenAI models easier.
 - Training Tokenizer: Added training input cropping warning.
+- CLI: Added chathpc-json-to-md to convert a json output files to markdown for easier reading.
 
 ### Fixed
 
