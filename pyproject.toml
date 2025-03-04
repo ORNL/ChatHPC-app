@@ -40,6 +40,7 @@ dependencies = [
   "pydantic-settings",
   "tabulate",
   "ollama",
+  "openai",
   "readline>=3.5",
   "loguru",
   "jinja2",
@@ -58,6 +59,7 @@ Source = "https://code.ornl.gov/ChatHPC/ChatHPC-app"
 [project.scripts]
 ChatHPC = "chathpc.app.__main__:cli"
 chathpc = "chathpc.app.__main__:cli"
+chathpc-json-to-md = "chathpc.app.json_to_markdown:cli"
 
 [tool.hatch.version]
 path = "src/chathpc/app/__about__.py"

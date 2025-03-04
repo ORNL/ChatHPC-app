@@ -23,6 +23,21 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+### Added
+
+- CI: Test command to evalute all the samples in a json file.
+- CI: Ollama subcommands to run verify and test using an Ollama model.
+- CI: OpenAI subcommands to run verify and test using an OpenAI model.
+- CI: Base subcommands to run verify and test using the base model.
+- Ollama module: Added to make evaluating Ollama models easier.
+- OpenAI module: Added to make evaluating OpenAI models easier.
+- Training Tokenizer: Added training input cropping warning.
+- CLI: Added chathpc-json-to-md to convert a json output files to markdown for easier reading.
+
+### Fixed
+
+- Prompt Template: Missing `:`.
+
 ## [25.2.1] - 2025-02-26
 
 ### Added

@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import atexit
+import json
 import os
 import readline
 import sys
 from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import jinja2
 import torch
@@ -28,6 +30,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq
 
 import chathpc
 import chathpc.app
+from chathpc.app.ollama import ollama_chat_evaluate
+from chathpc.app.openai import ChatHPCOpenAI
 from chathpc.app.utils import template_utils
 from chathpc.app.utils.common_utils import load_json_arg, run
 from chathpc.app.utils.datastore import save_json
@@ -747,6 +751,20 @@ class App:
                 padding=False,
                 return_tensors=None,
             )
+            result_full = self.tokenizer(
+                prompt,
+                truncation=False,
+                padding=False,
+                return_tensors=None,
+            )
+            if result != result_full:
+                logger.warning(
+                    "Training tokenizer needs {token_count} tokens to fully tokenize the training input and max training tokens is set to {max_training_tokens}. \nPrompt: {prompt}\nCropped to: {prompt_cropped}",
+                    token_count=len(result_full.data["input_ids"]),
+                    max_training_tokens=self.config.max_training_tokens,
+                    prompt=prompt,
+                    prompt_cropped=self.tokenizer.decode(result.data["input_ids"]),
+                )
 
             # "self-supervised learning" means the labels are also the inputs:
             result["labels"] = result["input_ids"].copy()  # type: ignore
@@ -953,24 +971,58 @@ class App:
             else:
                 print(self.chat_evaluate(question=user_input, context=context))
 
-    def verify(self, save_verify_data_path: str | Path | None = None) -> int:
+    def verify(
+        self,
+        save_verify_data_path: str | Path | None = None,
+        ollama_model: str | None = None,
+        openai_model: str | None = None,
+    ) -> int:
+        """Verify model outputs against the training dataset.
+
+        This method runs verification tests on the model by comparing its outputs
+        against the training set.
+
+        Args:
+            save_verify_data_path (Union[str, Path, None]): Optional path to save
+                verification results.
+            ollama_model (str, optional): Name of Ollama model, if using Ollama instead of app's model
+
+        Returns:
+            int: The number of errors.
+
+        Example:
+            ```python
+            app = App()
+            app.load_merged_model()
+            tests_failed = app.verify(save_verify_data_path="verify_results.json")
+            ```
+        """
         verify_data = []
 
+        if ollama_model is not None and openai_model is not None:
+            raise RuntimeError("Both Ollama model and OpenAI model cannot both be set. Only one should be set.")
+
+        openai_client = ChatHPCOpenAI(self.config) if openai_model is not None else None
+
         for i, item in tqdm(enumerate(self.train_dataset), "Verify", total=len(self.train_dataset)):  # type: ignore
-            response = self.chat_evaluate_extract(**item)
+            if ollama_model is not None:
+                response = ollama_chat_evaluate(self.config, ollama_model, **item)
+            elif openai_model is not None and openai_client is not None:
+                response = openai_client.openai_chat_evaluate(openai_model, **item)
+            else:
+                response = self.chat_evaluate_extract(**item)
             prompt = self.chat_prompt(**item)
             training_prompt = self.training_prompt(**item)
-            datapoint = OrderedDict(
-                [
-                    ("index", i),
-                    ("prompt", prompt),
-                    ("training_prompt", training_prompt),
-                    ("question", item["question"]),
-                    ("context", item["context"]),
-                    ("answer", item["answer"]),
-                    ("response", response),
-                ]
-            )
+
+            datapoint = OrderedDict()
+            datapoint["index"] = i
+            datapoint["prompt"] = prompt
+            datapoint["training_prompt"] = training_prompt
+            datapoint["question"] = item["question"]
+            if "context" in item:
+                datapoint["context"] = item["context"]
+            datapoint["answer"] = item["answer"]
+            datapoint["response"] = response
             verify_data.append(datapoint)
 
         if save_verify_data_path is not None:
@@ -989,6 +1041,83 @@ class App:
 
         print(f"Total mismatches: {errors}")
         return errors
+
+    def test(
+        self,
+        test_dataset: str,
+        save_test_data_path: str | Path | None = None,
+        ollama_model: str | None = None,
+        openai_model: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Test model against provided testing dataset.
+
+        This method evaluates the model on the test file.
+
+        Args:
+            save_test_data_path (Union[str, Path, None]): Optional path to save
+                test results.
+            ollama_model (str, optional): Name of Ollama model, if using Ollama instead of app's model
+
+        Returns:
+            int: result of the test.
+
+        Example:
+            ```python
+            app = App()
+            test_results = app.test(
+                test_dataset="test_data.json", save_test_data_path="test_results.json"
+            )
+            print(f"Test completed with {len(test_results)} cases")
+            ```
+        """
+        results = []
+
+        if ollama_model is not None and openai_model is not None:
+            raise RuntimeError("Both Ollama model and OpenAI model cannot both be set. Only one should be set.")
+
+        openai_client = ChatHPCOpenAI(self.config) if openai_model is not None else None
+
+        with open(test_dataset) as fd:
+            test_data = json.load(fd)
+        test_data_len = len(test_data)
+
+        for i, item in tqdm(enumerate(test_data), "Test", total=test_data_len):  # type: ignore
+            if ollama_model is not None:
+                response = ollama_chat_evaluate(self.config, ollama_model, **item)
+            elif openai_model is not None and openai_client is not None:
+                response = openai_client.openai_chat_evaluate(openai_model, **item)
+            else:
+                response = self.chat_evaluate_extract(**item)
+            prompt = self.chat_prompt(**item)
+            datapoint = OrderedDict()
+            datapoint["index"] = i
+            datapoint["prompt"] = prompt
+            datapoint["question"] = item["question"]
+            if "context" in item:
+                datapoint["context"] = item["context"]
+            if "answer" in item:
+                datapoint["answer"] = item["answer"]
+            datapoint["response"] = response
+            results.append(datapoint)
+
+        if save_test_data_path is not None:
+            save_json(save_test_data_path, results)
+
+        if "answer" in next(iter(results), {}):  # type: ignore
+            errors = 0
+            for d in results:
+                if ignore_minor(d["response"]) != ignore_minor(d["answer"]):
+                    errors += 1
+                    print("Missed test:")
+                    print(f"Index: {d['index']}")
+                    print(f"Answer:\n{d['answer']}")
+                    print(f"Response:\n{d['response']}")
+                    print("**********************************************************")
+                    print()
+
+            correct = test_data_len - errors
+            print(f"Total correct: {correct} out of {test_data_len} ({(float(correct)/test_data_len) * 100:.2f}%)")
+        return results
 
     def print_config(self) -> None:
         """Print the current configurations of the application in a formatted table.

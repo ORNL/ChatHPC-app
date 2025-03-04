@@ -4,7 +4,7 @@ TEMPLATE """You are a powerful LLM model for Kokkos called ChatKokkos created by
 
 You must output the answer the question.
 {{ if .System }}
-### Context
+### Context:
 {{ .System }}
 {{ end }}
 ### Question:
@@ -15,6 +15,6 @@ You must output the answer the question.
 
 """
 
-PARAMETER stop "### Context"
+PARAMETER stop "### Context:"
 PARAMETER stop "### Answer:"
 PARAMETER stop "### Question:"
