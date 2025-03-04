@@ -1052,34 +1052,34 @@ class App:
             else:
                 response = self.chat_evaluate_extract(**item)
             prompt = self.chat_prompt(**item)
-            datapoint = OrderedDict(
-                [
-                    ("index", i),
-                    ("prompt", prompt),
-                    ("question", item["question"]),
-                    ("context", item["context"]),
-                    ("answer", item["answer"]),
-                    ("response", response),
-                ]
-            )
+            datapoint = OrderedDict()
+            datapoint["index"] = i
+            datapoint["prompt"] = prompt
+            datapoint["question"] = item["question"]
+            if item.contains("context"):
+                datapoint["context"] = item["context"]
+            if item.contains("answer"):
+                datapoint["answer"] = item["answer"]
+            datapoint["response"] = response
             results.append(datapoint)
 
         if save_test_data_path is not None:
             save_json(save_test_data_path, results)
 
-        errors = 0
-        for d in results:
-            if ignore_minor(d["response"]) != ignore_minor(d["answer"]):
-                errors += 1
-                print("Missed test:")
-                print(f"Index: {d['index']}")
-                print(f"Answer:\n{d['answer']}")
-                print(f"Response:\n{d['response']}")
-                print("**********************************************************")
-                print()
+        if next(iter(results), {}).contains("answer"):  # type: ignore
+            errors = 0
+            for d in results:
+                if ignore_minor(d["response"]) != ignore_minor(d["answer"]):
+                    errors += 1
+                    print("Missed test:")
+                    print(f"Index: {d['index']}")
+                    print(f"Answer:\n{d['answer']}")
+                    print(f"Response:\n{d['response']}")
+                    print("**********************************************************")
+                    print()
 
-        correct = test_data_len - errors
-        print(f"Total correct: {correct} out of {test_data_len} ({(float(correct)/test_data_len) * 100:.2f}%)")
+            correct = test_data_len - errors
+            print(f"Total correct: {correct} out of {test_data_len} ({(float(correct)/test_data_len) * 100:.2f}%)")
         return results
 
     def print_config(self) -> None:
