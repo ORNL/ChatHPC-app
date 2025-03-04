@@ -31,6 +31,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq
 import chathpc
 import chathpc.app
 from chathpc.app.ollama import ollama_chat_evaluate
+from chathpc.app.openai import ChatHPCOpenAI
 from chathpc.app.utils import template_utils
 from chathpc.app.utils.common_utils import load_json_arg, run
 from chathpc.app.utils.datastore import save_json
@@ -970,7 +971,12 @@ class App:
             else:
                 print(self.chat_evaluate(question=user_input, context=context))
 
-    def verify(self, save_verify_data_path: str | Path | None = None, ollama_model: str | None = None) -> int:
+    def verify(
+        self,
+        save_verify_data_path: str | Path | None = None,
+        ollama_model: str | None = None,
+        openai_model: str | None = None,
+    ) -> int:
         """Verify model outputs against the training dataset.
 
         This method runs verification tests on the model by comparing its outputs
@@ -993,24 +999,30 @@ class App:
         """
         verify_data = []
 
+        if ollama_model is not None and openai_model is not None:
+            raise RuntimeError("Both Ollama model and OpenAI model cannot both be set. Only one should be set.")
+
+        openai_client = ChatHPCOpenAI(self.config) if openai_model is not None else None
+
         for i, item in tqdm(enumerate(self.train_dataset), "Verify", total=len(self.train_dataset)):  # type: ignore
             if ollama_model is not None:
                 response = ollama_chat_evaluate(self.config, ollama_model, **item)
+            elif openai_model is not None and openai_client is not None:
+                response = openai_client.openai_chat_evaluate(openai_model, **item)
             else:
                 response = self.chat_evaluate_extract(**item)
             prompt = self.chat_prompt(**item)
             training_prompt = self.training_prompt(**item)
-            datapoint = OrderedDict(
-                [
-                    ("index", i),
-                    ("prompt", prompt),
-                    ("training_prompt", training_prompt),
-                    ("question", item["question"]),
-                    ("context", item["context"]),
-                    ("answer", item["answer"]),
-                    ("response", response),
-                ]
-            )
+
+            datapoint = OrderedDict()
+            datapoint["index"] = i
+            datapoint["prompt"] = prompt
+            datapoint["training_prompt"] = training_prompt
+            datapoint["question"] = item["question"]
+            if "context" in item:
+                datapoint["context"] = item["context"]
+            datapoint["answer"] = item["answer"]
+            datapoint["response"] = response
             verify_data.append(datapoint)
 
         if save_verify_data_path is not None:
@@ -1031,7 +1043,11 @@ class App:
         return errors
 
     def test(
-        self, test_dataset: str, save_test_data_path: str | Path | None = None, ollama_model: str | None = None
+        self,
+        test_dataset: str,
+        save_test_data_path: str | Path | None = None,
+        ollama_model: str | None = None,
+        openai_model: str | None = None,
     ) -> list[dict[str, Any]]:
         """Test model against provided testing dataset.
 
@@ -1056,6 +1072,11 @@ class App:
         """
         results = []
 
+        if ollama_model is not None and openai_model is not None:
+            raise RuntimeError("Both Ollama model and OpenAI model cannot both be set. Only one should be set.")
+
+        openai_client = ChatHPCOpenAI(self.config) if openai_model is not None else None
+
         with open(test_dataset) as fd:
             test_data = json.load(fd)
         test_data_len = len(test_data)
@@ -1063,6 +1084,8 @@ class App:
         for i, item in tqdm(enumerate(test_data), "Test", total=test_data_len):  # type: ignore
             if ollama_model is not None:
                 response = ollama_chat_evaluate(self.config, ollama_model, **item)
+            elif openai_model is not None and openai_client is not None:
+                response = openai_client.openai_chat_evaluate(openai_model, **item)
             else:
                 response = self.chat_evaluate_extract(**item)
             prompt = self.chat_prompt(**item)
@@ -1070,9 +1093,9 @@ class App:
             datapoint["index"] = i
             datapoint["prompt"] = prompt
             datapoint["question"] = item["question"]
-            if item.contains("context"):
+            if "context" in item:
                 datapoint["context"] = item["context"]
-            if item.contains("answer"):
+            if "answer" in item:
                 datapoint["answer"] = item["answer"]
             datapoint["response"] = response
             results.append(datapoint)

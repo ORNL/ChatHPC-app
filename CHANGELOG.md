@@ -27,7 +27,9 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 - CI: Test command to evalute all the samples in a json file.
 - CI: Ollama subcommands to run verify and test using an Ollama model.
+- CI: OpanAI subcommands to run verify and test using an OpenAI model.
 - Ollama module: Added to make evaluating Ollama models easier.
+- OpenAI module: Added to make evaluating OpenAI models easier.
 - Training Tokenizer: Added training input cropping warning.
 
 ### Fixed

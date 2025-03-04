@@ -76,6 +76,17 @@ def ollama_test(args, config):
     app.test(test_dataset=args.test_json_path, save_test_data_path=args.save_results_file, ollama_model=args.model)
 
 
+def openai_verify(args, config):
+    app = App(config)
+    app.load_datasets()
+    app.verify(save_verify_data_path=args.save_results_file, openai_model=args.model)
+
+
+def openai_test(args, config):
+    app = App(config)
+    app.test(test_dataset=args.test_json_path, save_test_data_path=args.save_results_file, openai_model=args.model)
+
+
 def init_parser(parser):
     parser.add_argument("--debug", action="store_true", help="Open debug port (5678).")
     parser.add_argument("--log_level", type=str, help="Log level.")
@@ -113,19 +124,34 @@ def init_parser(parser):
     test_parser.add_argument("test_json_path", type=str, help="Path to test json file.")
 
     ollama_parser = subparsers.add_parser("ollama", help="Ollama subcommands")
-    ollama_subparser = ollama_parser.add_subparsers(title="subcommands", description="valid ollama subcommands")
+    ollama_subparser = ollama_parser.add_subparsers(title="subcommands", description="valid Ollama subcommands")
     ollama_verify_parser = ollama_subparser.add_parser(
         "verify", help="Verify the ollama model with the training dataset"
     )
     ollama_verify_parser.set_defaults(func=ollama_verify)
     ollama_verify_parser.add_argument("--save_results_file", type=str, help="Save verification results here.")
-    ollama_verify_parser.add_argument("--model", type=str, help="Name of the ollama model to use.")
+    ollama_verify_parser.add_argument("--model", type=str, help="Name of the Ollama model to use.")
 
-    ollama_test_parser = ollama_subparser.add_parser("test", help="Test the ollama model with the training dataset")
+    ollama_test_parser = ollama_subparser.add_parser("test", help="Test the Ollama model with the training dataset")
     ollama_test_parser.set_defaults(func=ollama_test)
     ollama_test_parser.add_argument("--save_results_file", type=str, help="Save verification results here.")
-    ollama_test_parser.add_argument("--model", type=str, help="Name of the ollama model to use.")
+    ollama_test_parser.add_argument("--model", type=str, help="Name of the Ollama model to use.")
     ollama_test_parser.add_argument("test_json_path", type=str, help="Path to test json file.")
+
+    openai_parser = subparsers.add_parser("openai", help="OpenAI subcommands")
+    openai_subparser = openai_parser.add_subparsers(title="subcommands", description="valid OpenAI subcommands")
+    openai_verify_parser = openai_subparser.add_parser(
+        "verify", help="Verify the OpenAI model with the training dataset"
+    )
+    openai_verify_parser.set_defaults(func=openai_verify)
+    openai_verify_parser.add_argument("--save_results_file", type=str, help="Save verification results here.")
+    openai_verify_parser.add_argument("--model", type=str, help="Name of the OpenAI model to use.")
+
+    openai_test_parser = openai_subparser.add_parser("test", help="Test the OpenAI model with the training dataset")
+    openai_test_parser.set_defaults(func=openai_test)
+    openai_test_parser.add_argument("--save_results_file", type=str, help="Save verification results here.")
+    openai_test_parser.add_argument("--model", type=str, help="Name of the OpenAI model to use.")
+    openai_test_parser.add_argument("test_json_path", type=str, help="Path to test json file.")
 
 
 def cli(raw_args=None):
