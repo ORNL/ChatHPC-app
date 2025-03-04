@@ -65,6 +65,12 @@ def test(args, config):
     app.test(test_dataset=args.test_json_path, save_test_data_path=args.save_results_file)
 
 
+def base_test(args, config):
+    app = App(config)
+    app.load_base_model()
+    app.test(test_dataset=args.test_json_path, save_test_data_path=args.save_results_file)
+
+
 def ollama_verify(args, config):
     app = App(config)
     app.load_datasets()
@@ -122,6 +128,16 @@ def init_parser(parser):
     test_parser.set_defaults(func=test)
     test_parser.add_argument("--save_results_file", type=str, help="Save test results here.")
     test_parser.add_argument("test_json_path", type=str, help="Path to test json file.")
+
+    base_parser = subparsers.add_parser("base", help="base subcommands")
+    base_subparser = base_parser.add_subparsers(title="subcommands", description="valid base subcommands")
+    base_run_parser = base_subparser.add_parser("run", help="Interact with the base model.")
+    base_run_parser.set_defaults(func=run_base)
+
+    base_test_parser = base_subparser.add_parser("test", help="Test the base model with the training dataset")
+    base_test_parser.set_defaults(func=base_test)
+    base_test_parser.add_argument("--save_results_file", type=str, help="Save verification results here.")
+    base_test_parser.add_argument("test_json_path", type=str, help="Path to test json file.")
 
     ollama_parser = subparsers.add_parser("ollama", help="Ollama subcommands")
     ollama_subparser = ollama_parser.add_subparsers(title="subcommands", description="valid Ollama subcommands")
