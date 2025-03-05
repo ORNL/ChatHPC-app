@@ -14,31 +14,37 @@ def json_to_markdown(json_or_str, add_rating_template=False):
     return_str.append("# ChatHPC JSON to Markdown\n\n")
 
     for index, row in enumerate(json_str):
+        question_keywords = ["question", "user", "prompt"]
+        response_keywords = ["response", "assistant"]
+
         return_str.append(f"## Index {index}\n\n")
-        # if 'prompt' in row:
-        #     return_str.append("### Prompt\n\n")
-        #     return_str.append(row['prompt'])
-        #     return_str.append("\n\n")
-        # if 'training_prompt' in row:
-        #     return_str.append("### Training Prompt\n\n")
-        #     return_str.append(row['training_prompt'])
-        #     return_str.append("\n\n")
+        # Context
         if "context" in row:
             return_str.append("### Context\n\n")
             return_str.append(row["context"])
             return_str.append("\n\n")
-        if "question" in row:
+        # Question
+        if any(key in row for key in question_keywords):
             return_str.append("### Question\n\n")
-            return_str.append(row["question"])
-            return_str.append("\n\n")
+            for item in question_keywords:
+                if item in row:
+                    return_str.append(row[item])
+                    return_str.append("\n\n")
+                    break
+        # Response
+        if any(key in row for key in response_keywords):
+            return_str.append("### Response\n\n")
+            for item in response_keywords:
+                if item in row:
+                    return_str.append(row[item])
+                    return_str.append("\n\n")
+                    break
+        # Answer
         if "answer" in row:
             return_str.append("### Answer\n\n")
             return_str.append(row["answer"])
             return_str.append("\n\n")
-        if "response" in row:
-            return_str.append("### Response\n\n")
-            return_str.append(row["response"])
-            return_str.append("\n\n")
+        # Rating
         if add_rating_template:
             return_str.append("### Rating\n\n")
             return_str.append("### Rating Notes\n\n")
@@ -69,7 +75,7 @@ def cli(raw_args=None):
         import debugpy  # noqa: T100
 
         debugpy.listen(5678)  # noqa: T100
-        print("Attach debugger to continue.")
+        print("Attach debugger to continue.", file=sys.stderr)
         debugpy.wait_for_client()  # noqa: T100
 
     # Setup log level
