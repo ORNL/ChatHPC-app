@@ -35,6 +35,7 @@ from chathpc.app.openai import ChatHPCOpenAI
 from chathpc.app.utils import template_utils
 from chathpc.app.utils.common_utils import load_json_arg, run
 from chathpc.app.utils.datastore import save_json
+from chathpc.app.utils.template_utils import map_keywords
 from chathpc.app.utils.verify_utils import ignore_minor
 
 DEFAULT_APP_CONFIG_FILE = Path(
@@ -670,8 +671,8 @@ class App:
             - Automatically extracts the answer portion using template structure
             - More concise than chat_evaluate() for direct answer retrieval
         """
-        response = self.chat_evaluate(**kwargs)
-        return self.extract_answer(response, **kwargs)
+        chat_response = self.chat_evaluate(**kwargs)
+        return self.extract_answer(chat_response, **kwargs)
 
     def training_prompt(self, **kwargs) -> str:
         """Create a formatted prompt for training data.
@@ -900,11 +901,15 @@ class App:
 
         trainer.train()
 
+        print("Saving Model...")
         trainer.model.save_pretrained(self.config.finetuned_model_path)  # type: ignore
         self.save_readme(self.config.finetuned_model_path)
+        print("Merging model...")
         self.model = trainer.model.merge_and_unload()  # type: ignore
+        print("Saving merged model...")
         self.tokenizer.save_pretrained(self.config.merged_model_path)
         self.model.save_pretrained(self.config.merged_model_path)
+        print("Saving README.md...")
         self.save_readme(self.config.merged_model_path)
 
     def interactive(self, args, prompt="chathpc") -> None:
@@ -1005,23 +1010,24 @@ class App:
         openai_client = ChatHPCOpenAI(self.config) if openai_model is not None else None
 
         for i, item in tqdm(enumerate(self.train_dataset), "Verify", total=len(self.train_dataset)):  # type: ignore
+            item_mapped = map_keywords(item)
             if ollama_model is not None:
-                response = ollama_chat_evaluate(self.config, ollama_model, **item)
+                response = ollama_chat_evaluate(self.config, ollama_model, **item_mapped)
             elif openai_model is not None and openai_client is not None:
-                response = openai_client.openai_chat_evaluate(openai_model, **item)
+                response = openai_client.openai_chat_evaluate(openai_model, **item_mapped)
             else:
-                response = self.chat_evaluate_extract(**item)
-            prompt = self.chat_prompt(**item)
-            training_prompt = self.training_prompt(**item)
+                response = self.chat_evaluate_extract(**item_mapped)
+            prompt = self.chat_prompt(**item_mapped)
+            training_prompt = self.training_prompt(**item_mapped)
 
             datapoint = OrderedDict()
             datapoint["index"] = i
             datapoint["prompt"] = prompt
             datapoint["training_prompt"] = training_prompt
-            datapoint["question"] = item["question"]
-            if "context" in item:
-                datapoint["context"] = item["context"]
-            datapoint["answer"] = item["answer"]
+            datapoint["question"] = item_mapped["prompt"]
+            if "context" in item_mapped:
+                datapoint["context"] = item_mapped["context"]
+            datapoint["answer"] = item_mapped["response"]
             datapoint["response"] = response
             verify_data.append(datapoint)
 
@@ -1082,21 +1088,22 @@ class App:
         test_data_len = len(test_data)
 
         for i, item in tqdm(enumerate(test_data), "Test", total=test_data_len):  # type: ignore
+            item_mapped = map_keywords(item)
             if ollama_model is not None:
-                response = ollama_chat_evaluate(self.config, ollama_model, **item)
+                response = ollama_chat_evaluate(self.config, ollama_model, **item_mapped)
             elif openai_model is not None and openai_client is not None:
-                response = openai_client.openai_chat_evaluate(openai_model, **item)
+                response = openai_client.openai_chat_evaluate(openai_model, **item_mapped)
             else:
-                response = self.chat_evaluate_extract(**item)
-            prompt = self.chat_prompt(**item)
+                response = self.chat_evaluate_extract(**item_mapped)
+            prompt = self.chat_prompt(**item_mapped)
             datapoint = OrderedDict()
             datapoint["index"] = i
             datapoint["prompt"] = prompt
-            datapoint["question"] = item["question"]
-            if "context" in item:
-                datapoint["context"] = item["context"]
-            if "answer" in item:
-                datapoint["answer"] = item["answer"]
+            datapoint["question"] = item_mapped["prompt"]
+            if "context" in item_mapped:
+                datapoint["context"] = item_mapped["context"]
+            if "response" in item_mapped:
+                datapoint["answer"] = item_mapped["response"]
             datapoint["response"] = response
             results.append(datapoint)
 
@@ -1199,7 +1206,7 @@ class App:
             fd.write("\n\n## Configuration\n\n")
             fd.write(config_table)
 
-    def extract_answer(self, response: str, **kwargs):
+    def extract_answer(self, chat_response: str, **kwargs):
         """Extract the model's answer from a complete response string.
 
         This method processes the full model response to extract just the answer portion,
@@ -1224,15 +1231,15 @@ class App:
             The exact extraction logic depends on the prompt template structure
             defined in the application configuration.
         """
-        answer = response
-        answer = answer.replace("<s> ", "").replace("</s>", "")
+        chat_answer = chat_response
+        chat_answer = chat_answer.replace("<s> ", "").replace("</s>", "")
 
         prefix = self.inference_template.render(**template_utils.map_keywords(kwargs))
         postfix = self.postfix_template.render(**template_utils.map_keywords(kwargs))
-        if answer.startswith(prefix):
-            answer = answer[len(prefix) :]
+        if chat_answer.startswith(prefix):
+            chat_answer = chat_answer[len(prefix) :]
 
-        if answer.endswith(postfix):
-            answer = answer[: -len(postfix)]
+        if chat_answer.endswith(postfix):
+            chat_answer = chat_answer[: -len(postfix)]
 
-        return answer
+        return chat_answer
