@@ -1184,7 +1184,7 @@ class App:
 
         # Add version
         version_dict = {
-            "commit": run("git rev-parse --short HEAD"),
+            "commit": run("git rev-parse --short HEAD", verbose=False),
             "version": chathpc.app.version,
         }
 
@@ -1200,7 +1200,7 @@ class App:
         version_table = tabulate(version_table_data, headers=headers, tablefmt="github")
 
         with open(filename, "w") as fd:
-            project_name = Path(run("git rev-parse --show-toplevel")).name.strip()
+            project_name = Path(run("git rev-parse --show-toplevel", verbose=False)).name.strip()
             fd.write(f"# {project_name} Model Info\n\n## ChatHPC Version Info\n\n")
             fd.write(version_table)
             fd.write("\n\n## Configuration\n\n")
