@@ -41,7 +41,7 @@ dependencies = [
   "tabulate",
   "ollama",
   "openai",
-  "readline>=3.5",
+  "gnureadline",
   "loguru",
   "jinja2",
   "json_tricks",
