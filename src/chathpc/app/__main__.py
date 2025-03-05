@@ -191,7 +191,7 @@ def cli(raw_args=None):
         import debugpy  # noqa: T100
 
         debugpy.listen(5678)  # noqa: T100
-        print("Attach debugger to continue.")
+        print("Attach debugger to continue.", file=sys.stderr)
         debugpy.wait_for_client()  # noqa: T100
 
     # Setup log level
