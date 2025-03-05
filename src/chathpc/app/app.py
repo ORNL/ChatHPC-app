@@ -1024,9 +1024,9 @@ class App:
             datapoint["index"] = i
             datapoint["prompt"] = prompt
             datapoint["training_prompt"] = training_prompt
-            datapoint["question"] = item_mapped["prompt"]
             if "context" in item_mapped and item_mapped["context"] is not None:
                 datapoint["context"] = item_mapped["context"]
+            datapoint["question"] = item_mapped["prompt"]
             datapoint["answer"] = item_mapped["response"]
             datapoint["response"] = response
             verify_data.append(datapoint)
@@ -1099,9 +1099,9 @@ class App:
             datapoint = OrderedDict()
             datapoint["index"] = i
             datapoint["prompt"] = prompt
-            datapoint["question"] = item_mapped["prompt"]
             if "context" in item_mapped and item_mapped["context"] is not None:
                 datapoint["context"] = item_mapped["context"]
+            datapoint["question"] = item_mapped["prompt"]
             if "response" in item_mapped and item_mapped["response"] is not None:
                 datapoint["answer"] = item_mapped["response"]
             datapoint["response"] = response
