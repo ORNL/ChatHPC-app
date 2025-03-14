@@ -30,8 +30,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq
 
 import chathpc
 import chathpc.app
-from chathpc.app.ollama import ollama_chat_evaluate
-from chathpc.app.openai import ChatHPCOpenAI
+from chathpc.app.ollama_interface import ollama_chat_evaluate
+from chathpc.app.openai_interface import ChatHPCOpenAI
 from chathpc.app.utils import template_utils
 from chathpc.app.utils.common_utils import load_json_arg, run
 from chathpc.app.utils.datastore import save_json
