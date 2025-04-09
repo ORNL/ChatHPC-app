@@ -1,5 +1,7 @@
 # ChatHPC Application
 
+See documentation at <https://devdocs.ornl.gov/ChatHPC/ChatHPC-project> for general usage information.
+
 ## Tools Used
 
 - [Hatch](https://hatch.pypa.io/) --- Python Build System.

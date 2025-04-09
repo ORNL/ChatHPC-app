@@ -9,9 +9,9 @@ Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage>
     - [Installation](#installation)
     - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
     - [Quick Start](#quick-start)
-        - [Train model](#train-model)
-        - [Export Trained model to Ollama.](#export-trained-model-to-ollama)
     - [CLI Interface](#cli-interface)
+        - [ChatHPC](#chathpc)
+        - [ChatHPC JSON to MD](#chathpc-json-to-md)
     - [Running with hatch](#running-with-hatch)
     - [Testing with hatch](#testing-with-hatch)
     - [Format code with hatch](#format-code-with-hatch)
@@ -72,20 +72,11 @@ sudo apt install ruby-full
 
 ## Quick Start
 
-### Train model
-
-1. Install package
-2. `chathpc train`
-
-### Export Trained model to Ollama.
-
-```bash
-module load ollama
-/home/7ry/Data/ellora/llama.cpp/convert_hf_to_gguf.py merged_adapters/     
-ollama create <appname>
-```
+See [Creating a new ChatHPC application.](https://devdocs.ornl.gov/ChatHPC/ChatHPC-project/#how-to-create-a-new-chathpcchatx-application-repo).
 
 ## CLI Interface
+
+### ChatHPC
 
 Get Help:
 ```bash
@@ -134,6 +125,33 @@ chathpc (Introduction to Kokkos programming model)> \bye
 Train:
 ```bash
 chathpc train
+```
+
+### ChatHPC JSON to MD
+
+Get Help:
+```shell
+$ chathpc-json-to-md -h
+usage: chathpc-json-to-md [-h] [--debug] [--log_level LOG_LEVEL] [--add_rating_template] [json]
+
+Convert Json files to Markdown for ease of reading.
+
+positional arguments:
+  json                  Json string or path to json file.
+
+options:
+  -h, --help            show this help message and exit
+  --debug               Open debug port (5678).
+  --log_level LOG_LEVEL
+                        Log level.
+  --add_rating_template
+                        Add rating template to markdown.
+
+```
+
+Example:
+```shell
+chathpc-json-to-md input.json > output.md
 ```
 
 ## Running with hatch
