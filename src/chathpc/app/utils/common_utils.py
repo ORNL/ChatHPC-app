@@ -12,7 +12,23 @@ import yaml
 from option import Err, Ok, Result
 
 
-def get_valid_path_from_string(path_str) -> Result[Path, Exception]:
+def get_valid_path_from_string(path_str: str) -> Result[Path, Exception]:
+    """Check if a string represents a valid file path.
+
+    Args:
+        path_str (str): A string representing a file path.
+
+    Returns:
+        Result[Path, Exception]: An Ok result containing the Path object if the path
+            exists and is a file, or an Err result containing the exception if the
+            path is invalid or doesn't exist.
+
+    Examples:
+        >>> get_valid_path_from_string("/path/to/existing/file.txt").is_ok
+        True
+        >>> get_valid_path_from_string("/nonexistent/path.txt").is_ok
+        False
+    """
     try:
         path = Path(path_str)
         if path.is_file():
@@ -22,7 +38,23 @@ def get_valid_path_from_string(path_str) -> Result[Path, Exception]:
         return Err(e)
 
 
-def get_valid_json_from_string(json_str) -> Result[dict, Exception]:
+def get_valid_json_from_string(json_str: str) -> Result[dict, Exception]:
+    """Check if a string represents valid JSON and parse it.
+
+    Args:
+        json_str (str): A string containing JSON data.
+
+    Returns:
+        Result[dict, Exception]: An Ok result containing the parsed JSON as a dictionary
+            if the string is valid JSON, or an Err result containing the exception if
+            the string is invalid JSON.
+
+    Examples:
+        >>> get_valid_json_from_string('{"key": "value"}').is_ok
+        True
+        >>> get_valid_json_from_string("invalid json").is_ok
+        False
+    """
     try:
         values = json.loads(json_str)
         return Ok(values)
@@ -30,7 +62,23 @@ def get_valid_json_from_string(json_str) -> Result[dict, Exception]:
         return Err(e)
 
 
-def get_valid_yaml_from_string(yaml_str) -> Result[dict, Exception]:
+def get_valid_yaml_from_string(yaml_str: str) -> Result[dict, Exception]:
+    """Check if a string represents valid YAML and parse it.
+
+    Args:
+        yaml_str (str): A string containing YAML data.
+
+    Returns:
+        Result[dict, Exception]: An Ok result containing the parsed YAML as a dictionary
+            if the string is valid YAML, or an Err result containing the exception if
+            the string is invalid YAML.
+
+    Examples:
+        >>> get_valid_yaml_from_string("key: value").is_ok
+        True
+        >>> get_valid_yaml_from_string("invalid: yaml: structure:").is_ok
+        False
+    """
     try:
         values = yaml.safe_load(yaml_str)
         return Ok(values)
@@ -38,7 +86,7 @@ def get_valid_yaml_from_string(yaml_str) -> Result[dict, Exception]:
         return Err(e)
 
 
-def load_json_yaml_arg(str_or_fn, add_filename=True):
+def load_json_yaml_arg(str_or_fn: str, add_filename: bool = True):
     """Load and parse JSON data from either a string or file.
 
     Args:
