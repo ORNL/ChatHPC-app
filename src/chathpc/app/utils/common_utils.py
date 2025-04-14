@@ -6,9 +6,39 @@ import os
 import subprocess
 import sys
 import traceback
+from pathlib import Path
+
+import yaml
+from option import Err, Ok, Result
 
 
-def load_json_arg(str_or_fn, add_filename_to_json=True):
+def get_valid_path_from_string(path_str) -> Result[Path, Exception]:
+    try:
+        path = Path(path_str)
+        if path.is_file():
+            return Ok(path)
+        return Err(FileNotFoundError(path_str))
+    except Exception as e:  # noqa: BLE001
+        return Err(e)
+
+
+def get_valid_json_from_string(json_str) -> Result[dict, Exception]:
+    try:
+        values = json.loads(json_str)
+        return Ok(values)
+    except Exception as e:  # noqa: BLE001
+        return Err(e)
+
+
+def get_valid_yaml_from_string(yaml_str) -> Result[dict, Exception]:
+    try:
+        values = yaml.safe_load(yaml_str)
+        return Ok(values)
+    except Exception as e:  # noqa: BLE001
+        return Err(e)
+
+
+def load_json_yaml_arg(str_or_fn, add_filename=True):
     """Load and parse JSON data from either a string or file.
 
     Args:
@@ -19,26 +49,55 @@ def load_json_arg(str_or_fn, add_filename_to_json=True):
         dict: Parsed JSON data as a dictionary. Returns empty dict if input is None.
 
     Examples:
-        >>> load_json_arg('{"key": "value"}')
+        >>> load_json_yaml_arg('{"key": "value"}')
         {'key': 'value'}
-        >>> load_json_arg("path/to/file.json")
+        >>> load_json_yaml_arg("path/to/file.json")
         {'contents': 'from file'}
-        >>> load_json_arg(None)
+        >>> load_json_yaml_arg(None)
         {}
     """
     if str_or_fn is None:
         return {}
+
     if isinstance(str_or_fn, dict):
         return str_or_fn
-    if isinstance(str_or_fn, str) and (str_or_fn[0] == "{" or str_or_fn[0] == "["):
-        params = json.loads(str_or_fn)
-    else:
-        with open(str_or_fn) as f:
-            params = json.loads(f.read())
-            if add_filename_to_json:
-                params["filename"] = str_or_fn
-            f.close()
-    return params
+
+    if isinstance(str_or_fn, list):
+        return str_or_fn
+
+    path = get_valid_path_from_string(str_or_fn)
+    if path.is_ok:
+        path = path.unwrap()
+
+        if path.suffix == ".json":
+            with open(path) as f:
+                params = json.loads(f.read())
+                if add_filename:
+                    params["filename"] = str_or_fn
+                f.close()
+            return params
+
+        if path.suffix in (".yaml", ".yml"):
+            with open(path) as f:
+                params = yaml.safe_load(f)
+                if add_filename:
+                    params["filename"] = str_or_fn
+                f.close()
+            return params
+
+        msg = f"Unsupported file type: {str_or_fn}"
+        raise ValueError(msg)
+
+    json_values = get_valid_json_from_string(str_or_fn)
+    if json_values.is_ok:
+        return json_values.unwrap()
+
+    yaml_values = get_valid_yaml_from_string(str_or_fn)
+    if yaml_values.is_ok:
+        return yaml_values.unwrap()
+
+    msg = f"Invalid JSON or YAML string or missing file: {str_or_fn}"
+    raise ValueError(msg)
 
 
 def evaluate_fstring(fstring, **kwargs):

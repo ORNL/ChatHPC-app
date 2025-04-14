@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from chathpc.app.app import AppConfig
-from chathpc.app.utils.common_utils import load_json_arg
+from chathpc.app.utils.common_utils import load_json_yaml_arg
 
 
 class TestAppConfig(unittest.TestCase):
@@ -59,7 +59,7 @@ class TestAppPreferencesJson(unittest.TestCase):
     def test_json(self):
         preferences = AppConfig.from_json("tests/files/config.json")
         json_preferences = json.loads(preferences.model_dump_json())
-        json_default = load_json_arg("tests/files/config.json")
+        json_default = load_json_yaml_arg("tests/files/config.json")
         assert json_preferences == json_default, "config missmatch."
 
 
