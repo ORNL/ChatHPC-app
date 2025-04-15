@@ -23,6 +23,8 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+## [25.4.0] - 2025-04-15
+
 This release adds support for YAML files as both data files and config files as the main feature.
 
 ### Added
@@ -115,7 +117,8 @@ Verified initial working version of the ChatHPC App.
 
 - Initial version of ChatHPC App. Created from the working ChatKokkos Example.
 
-[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.3.0...main
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.0...main
+[25.4.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.3.0...v25.4.0
 [25.3.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.1...v25.3.0
 [25.2.1]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.0...v25.2.1
 [25.2.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.1.0...v25.2.0
