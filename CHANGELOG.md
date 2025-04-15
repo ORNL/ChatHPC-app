@@ -32,6 +32,12 @@ This release adds support for YAML files as both data files and config files as 
 ### Changed
 
 - Changed `load_json_arg` to `load_json_yaml_arg` with added yaml parsing support.
+- Changed depenency: readline -> gnureadline.
+
+### Fixed
+
+- Fixed item keyword mapping in test and verify.
+- Fix edge cases with generating markdown from the json.
 
 ## [25.3.0] - 2025-03-04
 
