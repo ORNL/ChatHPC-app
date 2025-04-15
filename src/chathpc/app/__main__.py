@@ -9,7 +9,7 @@ from pydantic_settings import (
 )
 
 from chathpc.app import App, AppConfig
-from chathpc.app.utils.common_utils import load_json_arg
+from chathpc.app.utils.common_utils import load_json_yaml_arg
 
 
 def config(_args, config):
@@ -204,7 +204,7 @@ def cli(raw_args=None):
 
     # Read in configuration file.
     try:
-        json_config = load_json_arg(args.config)
+        json_config = load_json_yaml_arg(args.config)
         app_config = CliApp.run(AppConfig, cli_args=args, cli_settings_source=cli_settings, **json_config)
     except ValidationError as e:
         parser.print_help()

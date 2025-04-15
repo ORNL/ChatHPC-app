@@ -34,7 +34,13 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 - Ollama module: Added to make evaluating Ollama models easier.
 - OpenAI module: Added to make evaluating OpenAI models easier.
 - Training Tokenizer: Added training input cropping warning.
-- CLI: Added chathpc-json-to-md to convert a json output files to markdown for easier reading.
+- CLI: Added `chathpc-json-to-md` to convert a json or yaml output file to markdown for easier reading (same as `chathpc-data-to-md`).
+- CLI: Added `chathpc-data-to-md` to convert a json or yaml output file to markdown for easier reading (alias of `chathpc-json-to-md`).
+- CLI: Added `chathpc-json-to-yaml` to convert a json file to yaml for easier editing.
+
+### Changed
+
+- Changed `load_json_arg` to `load_json_yaml_arg` with added yaml parsing support.
 
 ### Fixed
 

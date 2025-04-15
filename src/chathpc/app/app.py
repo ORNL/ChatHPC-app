@@ -33,7 +33,7 @@ import chathpc.app
 from chathpc.app.ollama_interface import ollama_chat_evaluate
 from chathpc.app.openai_interface import ChatHPCOpenAI
 from chathpc.app.utils import template_utils
-from chathpc.app.utils.common_utils import load_json_arg, run
+from chathpc.app.utils.common_utils import load_json_yaml_arg, run
 from chathpc.app.utils.datastore import save_json
 from chathpc.app.utils.template_utils import map_keywords
 from chathpc.app.utils.verify_utils import ignore_minor
@@ -201,8 +201,8 @@ class AppConfig(BaseSettings):
             When both sources are provided, settings from extra_params override
             corresponding values from the primary source.
         """
-        json_config = load_json_arg(json_or_file)
-        extra_config = load_json_arg(extra_params)
+        json_config = load_json_yaml_arg(json_or_file)
+        extra_config = load_json_yaml_arg(extra_params)
         json_config.update(extra_config)
         return cls(**json_config)
 

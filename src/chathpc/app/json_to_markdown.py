@@ -6,7 +6,7 @@ from loguru import logger
 from chathpc.app.utils.common_utils import load_json_arg
 
 
-def json_to_markdown(json_or_str, add_rating_template=False):
+def json_yaml_to_markdown(json_or_str, add_rating_template=False):
     return_str = []
 
     json_str = load_json_arg(json_or_str, False)
@@ -87,10 +87,10 @@ def cli(raw_args=None):
         logger.add(sys.stderr, level="WARNING")
 
     if args.json is not None:
-        print(json_to_markdown(args.json, add_rating_template=args.add_rating_template))
+        print(json_yaml_to_markdown(args.json, add_rating_template=args.add_rating_template))
     else:
         json_str = sys.stdin.read()
-        print(json_to_markdown(json_str, add_rating_template=args.add_rating_template))
+        print(json_yaml_to_markdown(json_str, add_rating_template=args.add_rating_template))
 
 
 if __name__ == "__main__":
