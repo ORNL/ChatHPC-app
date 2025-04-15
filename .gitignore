@@ -26,3 +26,4 @@ setup_template_input.txt
 commit.md
 tests/files/data-test3.yaml
 tests/files/config.yaml
+uv.lock
