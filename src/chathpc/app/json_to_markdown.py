@@ -3,13 +3,13 @@ import sys
 
 from loguru import logger
 
-from chathpc.app.utils.common_utils import load_json_arg
+from chathpc.app.utils.common_utils import load_json_yaml_arg
 
 
 def json_yaml_to_markdown(json_or_str, add_rating_template=False):
     return_str = []
 
-    json_str = load_json_arg(json_or_str, False)
+    json_str = load_json_yaml_arg(json_or_str, False)
 
     return_str.append("# ChatHPC JSON to Markdown\n\n")
 

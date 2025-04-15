@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import atexit
-import json
 import os
 import readline
 import sys
@@ -1083,8 +1082,7 @@ class App:
 
         openai_client = ChatHPCOpenAI(self.config) if openai_model is not None else None
 
-        with open(test_dataset) as fd:
-            test_data = json.load(fd)
+        test_data = load_json_yaml_arg(test_dataset, False)
         test_data_len = len(test_data)
 
         for i, item in tqdm(enumerate(test_data), "Test", total=test_data_len):  # type: ignore

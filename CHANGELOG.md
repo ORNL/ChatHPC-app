@@ -23,11 +23,16 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+### Fixed
+
+- Found various small bugs with added YAML support.
+
 ## [25.4.0] - 2025-04-15
 
 This release adds support for YAML files as both data files and config files as the main feature.
 
 ### Added
+
 - CLI: Added `chathpc-data-to-md` to convert a json or yaml output file to markdown for easier reading (alias of `chathpc-json-to-md`).
 - CLI: Added `chathpc-json-to-yaml` to convert a json file to yaml for easier editing.
 

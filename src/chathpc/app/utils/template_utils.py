@@ -30,7 +30,7 @@ def keyword_alias(key: str) -> str:
         >>> keyword_alias("unknown")
         'unknown'
     """
-    return ALIASES.get(key, key)
+    return ALIASES.get(key.lower(), key)
 
 
 def map_keywords(kwargs: dict[str, str]) -> dict[str, str]:
