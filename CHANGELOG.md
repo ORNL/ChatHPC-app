@@ -23,6 +23,8 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+## [25.4.1] - 2025-04-15
+
 ### Fixed
 
 - Found various small bugs with added YAML support.
@@ -122,7 +124,8 @@ Verified initial working version of the ChatHPC App.
 
 - Initial version of ChatHPC App. Created from the working ChatKokkos Example.
 
-[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.0...main
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.1...main
+[25.4.1]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.0...v25.4.1
 [25.4.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.3.0...v25.4.0
 [25.3.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.1...v25.3.0
 [25.2.1]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.0...v25.2.1
