@@ -8,14 +8,14 @@ app = marimo.App()
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""# Fine-tunning ChatKokkos Example""")
+    mo.md(r"""# Fine-tunning ChatHPC for Kokkos Example""")
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(
         r"""
-        These are the steps taken to fine-tune ChatKokkos. This is based on the steps developed by Pedro at [Fine-Tuning CodeLLama for Kokkos
+        These are the steps taken to fine-tune ChatHPC for Kokkos. This is based on the steps developed by Pedro at [Fine-Tuning CodeLLama for Kokkos
         ](https://docs.google.com/document/d/1u_r9PKUYYV_n5vte4oHDeZiPjUa_hnCS-pqdoB8YmF4/edit?tab=t.0) and on the [Hugging Face PEFT Adaptor Training Guide](https://huggingface.co/docs/transformers/en/peft).
         """
     )

@@ -122,7 +122,7 @@ Verified initial working version of the ChatHPC App.
 
 ### Added
 
-- Initial version of ChatHPC App. Created from the working ChatKokkos Example.
+- Initial version of ChatHPC App. Created from the working ChatHPC for Kokkos Example.
 
 [unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.1...main
 [25.4.1]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.0...v25.4.1

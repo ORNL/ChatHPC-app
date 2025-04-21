@@ -150,7 +150,7 @@ def run_ollama(template):
         ol = []
         for i, item in tqdm(enumerate(chat_app.train_dataset), "Run ol", total=len(chat_app.train_dataset)):  # type: ignore
             response: GenerateResponse = generate(
-                model="ChatKokkos",
+                model="ChatHPCforKokkos",
                 prompt=map_keywords(item)["prompt"],
                 system=item["context"],
                 options={"temperature": 0.0},
@@ -183,7 +183,7 @@ def run_ollama_chat(template):
         ol = []
         for i, item in tqdm(enumerate(chat_app.train_dataset), "Run ol Chat", total=len(chat_app.train_dataset)):  # type: ignore
             response: ChatResponse = chat(
-                model="ChatKokkos",
+                model="ChatHPCforKokkos",
                 options={"temperature": 0.0},
                 messages=[
                     {"role": "system", "content": item["context"]},
@@ -308,11 +308,13 @@ def main(raw_args=None):
         print("Attach debugger to continue.")
         debugpy.wait_for_client()  # noqa: T100
 
-    os.environ["CHATHPC_DATA_FILE"] = "/home/7ry/Data/ellora/ChatKokkos-data/kokkos_dataset_before_reinforcement.json"
+    os.environ["CHATHPC_DATA_FILE"] = (
+        "/home/7ry/Data/ellora/ChatHPCforKokkos-data/kokkos_dataset_before_reinforcement.json"
+    )
 
     old_template = "You are a powerful LLM model for Kokkos. Your job is to answer questions about Kokkos programming model. You are given a question and context regarding Kokkos programming model.\n\nYou must output the Kokkos question that answers the question.\n\n### Input:\n{{question}}\n\n### Context:\n{{context}}\n\n### Response:\n{{answer}}\n"
 
-    new_template = "You are a powerful LLM model for Kokkos called ChatKokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Context:\n{{ context }}\n\n### Question:\n{{ question }}\n\n### Answer:\n{{ answer }}\n\n"
+    new_template = "You are a powerful LLM model for Kokkos called ChatHPC for Kokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Context:\n{{ context }}\n\n### Question:\n{{ question }}\n\n### Answer:\n{{ answer }}\n\n"
 
     # Notebook
     print("** Running Notebook **")
