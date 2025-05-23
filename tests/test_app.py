@@ -5,7 +5,7 @@ from chathpc.app.app import App, AppConfig
 
 
 def test_chat_prompt_json():
-    """Test basice prompt fuction from reading JSON config."""
+    """Test basic prompt function from reading JSON config."""
     app = App.from_json("tests/files/config.json")
 
     expected = "You are a powerful LLM model for Kokkos called ChatHPC for Kokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Context:\nContext\n\n### Question:\nQuestion\n\n### Answer:\n"
@@ -23,7 +23,7 @@ def test_chat_prompt_json_no_context():
 
 
 def test_training_prompt_json():
-    """Test basice prompt fuction from simple template setting."""
+    """Test basic prompt function from simple template setting."""
     app = App.from_json(
         "tests/files/config.json",
     )
@@ -34,7 +34,7 @@ def test_training_prompt_json():
 
 
 def test_training_prompt_json2():
-    """Test basice prompt fuction from simple template setting."""
+    """Test basic prompt function from simple template setting."""
     app = App.from_json(
         "tests/files/config.json",
     )
@@ -50,7 +50,7 @@ def test_training_prompt_json2():
 
 
 def test_chat_prompt_simple():
-    """Test basice prompt fuction from simple template setting."""
+    """Test basic prompt function from simple template setting."""
     config = AppConfig.from_json(
         "tests/files/config.json",
         extra_params={
@@ -65,7 +65,7 @@ def test_chat_prompt_simple():
 
 
 def test_training_prompt_simple():
-    """Test basice prompt fuction from simple template setting."""
+    """Test basic prompt function from simple template setting."""
     app = App.from_json(
         "tests/files/config.json",
         extra_params={

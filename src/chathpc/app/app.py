@@ -1037,7 +1037,7 @@ class App:
         for d in verify_data:
             if ignore_minor(d["response"]) != ignore_minor(d["answer"]):
                 errors += 1
-                print("Error: answer missmatch")
+                print("Error: answer mismatch")
                 print(f"Index: {d['index']}")
                 print(f"Answer:\n{d['answer']}")
                 print(f"Response:\n{d['response']}")

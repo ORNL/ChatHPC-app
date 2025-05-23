@@ -12,7 +12,7 @@ See documentation at <https://devdocs.ornl.gov/ChatHPC/ChatHPC-project> for gene
 - [GitLab CI](https://docs.gitlab.com/ee/ci/) --- Continuous Integration.
     - [Example Pipeline](https://code.ornl.gov/ChatHPC/ChatHPC-app/-/pipelines)
     - [Example Pipeline Source](https://code.ornl.gov/ChatHPC/ChatHPC-app/-/blob/main/.gitlab-ci.yml?ref_type=heads)
-- [Ruff](https://docs.astral.sh/ruff/) --- Python linter and code formater.
+- [Ruff](https://docs.astral.sh/ruff/) --- Python linter and code formatter.
     - [Ruff Rules](https://docs.astral.sh/ruff/rules/) --- Rules used by Ruff.
 - [EditorConfig](https://editorconfig.org/) --- Maintain consistent coding styles between different editors and IDEs.
 - [Markdown Lint Tool](https://github.com/markdownlint/markdownlint) --- Markdown linting tool.

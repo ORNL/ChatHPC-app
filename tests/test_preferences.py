@@ -60,7 +60,7 @@ class TestAppPreferencesJson(unittest.TestCase):
         preferences = AppConfig.from_json("tests/files/config.json")
         json_preferences = json.loads(preferences.model_dump_json())
         json_default = load_json_yaml_arg("tests/files/config.json")
-        assert json_preferences == json_default, "config missmatch."
+        assert json_preferences == json_default, "config mismatch."
 
 
 if __name__ == "__main__":

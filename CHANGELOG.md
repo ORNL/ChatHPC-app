@@ -19,7 +19,7 @@ A summary of Development Versioning Specification is shown below.
 
 An alternative approach is to use date-based versioning.
 
-With this method, the version is YEAR.MONTH.RELEASE. To increment this version, use the year and the date without 0 padding for the first two numbers. I prefer to use the year without the centary. Then increment the RELEASE number to a unique release. This process is done automatically by the `scripts/version_bump.py` script. Using this script is the prefered method for versioning without planned backporting of fixes.
+With this method, the version is YEAR.MONTH.RELEASE. To increment this version, use the year and the date without 0 padding for the first two numbers. I prefer to use the year without the centary. Then increment the RELEASE number to a unique release. This process is done automatically by the `scripts/version_bump.py` script. Using this script is the preferred method for versioning without planned backporting of fixes.
 
 ## [Unreleased]
 
@@ -41,7 +41,7 @@ This release adds support for YAML files as both data files and config files as 
 ### Changed
 
 - Changed `load_json_arg` to `load_json_yaml_arg` with added yaml parsing support.
-- Changed depenency: readline -> gnureadline.
+- Changed dependency: readline -> gnureadline.
 
 ### Fixed
 
@@ -52,7 +52,7 @@ This release adds support for YAML files as both data files and config files as 
 
 ### Added
 
-- CI: Test command to evalute all the samples in a json file.
+- CI: Test command to evaluate all the samples in a json file.
 - CI: Ollama subcommands to run verify and test using an Ollama model.
 - CI: OpenAI subcommands to run verify and test using an OpenAI model.
 - CI: Base subcommands to run verify and test using the base model.

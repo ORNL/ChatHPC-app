@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Uses the output from scripts/test_training.sh to verify the the models trained properly."""
+"""Uses the output from scripts/test_training.sh to verify the models trained properly."""
 
 import argparse
 import contextlib

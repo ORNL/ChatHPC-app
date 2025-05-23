@@ -220,7 +220,7 @@ Documentation is built with [mkdocs](https://www.mkdocs.org) using the [Read the
 - `mkdocs -h` - Print help message and exit.
 
 Other useful commands:
-- `mkdocs serve -a 0.0.0.0:8000` - Serve with extenal access to the site. (Useful in ExCL to view using foxyproxy.)
+- `mkdocs serve -a 0.0.0.0:8000` - Serve with external access to the site. (Useful in ExCL to view using foxyproxy.)
 
 ### Hatch Commands
 
