@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from chathpc.app.app import AppConfig
 
 import openai
+from loguru import logger
 from openai import OpenAI
 
 from chathpc.app.utils import template_utils
@@ -16,9 +17,16 @@ from chathpc.app.utils import template_utils
 class ChatHPCOpenAI:
     def __init__(self, config: AppConfig):
         try:
-            self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+            logger.info("OPENAI_API_BASE_URL is {}", os.environ.get("OPENAI_API_BASE_URL"))
+            logger.info("OPENAI_API_KEY set? {}", "OPENAI_API_KEY" in os.environ)
+            self.client = OpenAI(
+                base_url=os.environ.get("OPENAI_API_BASE_URL"),
+                api_key=os.environ.get("OPENAI_API_KEY"),
+            )
         except openai.OpenAIError as e:
-            print("Error: OpenAI API key not found. Please set the environment variable OPENAI_API_KEY to your key.")
+            print(
+                "Error: Unable to connect to OpenAI API endpoint. Please check the settings of OPENAI_API_BASE_URL and OPENAI_API_KEY."
+            )
             print(e)
             sys.exit(1)
         self.config = config
