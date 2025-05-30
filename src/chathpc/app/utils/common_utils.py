@@ -86,7 +86,7 @@ def get_valid_yaml_from_string(yaml_str: str) -> Result[dict, Exception]:
         return Err(e)
 
 
-def load_json_yaml_arg(str_or_fn: str, add_filename: bool = True):
+def load_json_yaml_arg(str_or_fn: str, add_filename: bool = True) -> dict:
     """Load and parse JSON data from either a string or file.
 
     Args:

@@ -12,6 +12,7 @@ finder.txt
 .DS_STORE
 /.vscode/
 .venv/
+.idea/
 /dist/
 /site/
 /wandb/

@@ -17,32 +17,35 @@ def json_yaml_to_markdown(json_or_str, add_rating_template=False):
         question_keywords = ["question", "user", "prompt"]
         response_keywords = ["response", "assistant"]
 
+        # Map keywords in row to lowercase
+        row_lower = {key.lower(): value for key, value in row.items()}
+
         return_str.append(f"## Index {index}\n\n")
         # Context
-        if "context" in row:
+        if "context" in row_lower:
             return_str.append("### Context\n\n")
-            return_str.append(row["context"])
+            return_str.append(row_lower["context"])
             return_str.append("\n\n")
         # Question
-        if any(key in row for key in question_keywords):
+        if any(key in row_lower for key in question_keywords):
             return_str.append("### Question\n\n")
             for item in question_keywords:
-                if item in row:
-                    return_str.append(row[item])
+                if item in row_lower:
+                    return_str.append(row_lower[item])
                     return_str.append("\n\n")
                     break
         # Response
-        if any(key in row for key in response_keywords):
+        if any(key in row_lower for key in response_keywords):
             return_str.append("### Response\n\n")
             for item in response_keywords:
-                if item in row:
-                    return_str.append(row[item])
+                if item in row_lower:
+                    return_str.append(row_lower[item])
                     return_str.append("\n\n")
                     break
         # Answer
-        if "answer" in row:
+        if "answer" in row_lower:
             return_str.append("### Answer\n\n")
-            return_str.append(row["answer"])
+            return_str.append(row_lower["answer"])
             return_str.append("\n\n")
         # Rating
         if add_rating_template:
