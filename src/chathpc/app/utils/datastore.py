@@ -156,6 +156,51 @@ def save_json(filename, data, override=True):
     return filename
 
 
+def read_or_new_md(filename, value, *args, **kwargs):
+    """Read or create a new markdown file and return the data."""
+    data = None
+    filename = add_extension(filename, ".md")
+    dirname = os.path.dirname(filename)
+    if dirname:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    if os.path.isfile(filename):
+        # If file had been created, but is empty return None since another process
+        # could be writing to it.
+        if os.path.getsize(filename) > 0:
+            with open(filename) as f:
+                try:
+                    data = f.read()
+                except Exception as e:
+                    print(e)
+                    raise
+    else:
+        # open(filename, "ab").close()
+        if callable(value):  # noqa: SIM108
+            data = value(*args, **kwargs)
+        else:
+            data = value
+        with open(filename, "w") as f:
+            f.write(data)  # type: ignore
+    return data
+
+
+def save_md(filename, data, override=True):
+    """Save data to a markdown file."""
+    filename = add_extension(filename, ".md")
+    dirname = os.path.dirname(filename)
+    if dirname:
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+
+    if not override:
+        filename = add_unique_postfix(filename)
+
+    with open(filename, "w") as f:  # type: ignore
+        f.write(data)
+
+    return filename
+
+
 def add_unique_postfix(filename):
     """Add postfix to a filename to make it unique."""
     if not os.path.exists(filename):

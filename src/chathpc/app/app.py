@@ -29,11 +29,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq
 
 import chathpc
 import chathpc.app
+from chathpc.app.json_to_markdown import json_yaml_to_markdown
 from chathpc.app.ollama_interface import ollama_chat_evaluate
 from chathpc.app.openai_interface import ChatHPCOpenAI
 from chathpc.app.utils import template_utils
 from chathpc.app.utils.common_utils import load_json_yaml_arg, run
-from chathpc.app.utils.datastore import save_json
+from chathpc.app.utils.datastore import save_json, save_md
 from chathpc.app.utils.template_utils import map_keywords
 from chathpc.app.utils.verify_utils import ignore_minor
 
@@ -107,6 +108,7 @@ class AppConfig(BaseSettings):
     prompt_template: str | None = Field(
         None, description="Path to the prompt template to use for training and inference."
     )
+    auto_export_markdown: bool = Field(False, description="Auto export output files to markdown.")
     use_wandb: bool = Field(False, description="Whether to use Weights & Biases for logging.")
 
     model_config = SettingsConfigDict(
@@ -1031,7 +1033,20 @@ class App:
             verify_data.append(datapoint)
 
         if save_verify_data_path is not None:
-            save_json(save_verify_data_path, verify_data)
+            save_verify_data_path_name, ext = os.path.splitext(save_verify_data_path)
+            if ext not in [".json", ""]:
+                logger.warning(
+                    'Expected save path extension to be ".json", but got "{}" ("{}"). Saving to "{}".',
+                    save_verify_data_path,
+                    ext,
+                    save_verify_data_path_name + ".json",
+                )
+            save_json(save_verify_data_path_name, verify_data)
+            logger.info("Saved verify results to {file}", file=save_verify_data_path_name + ".json")
+            if self.config.auto_export_markdown:
+                md = json_yaml_to_markdown(verify_data)
+                save_md(save_verify_data_path_name, md)
+                logger.info("Saved verify results as markdown to {file}", file=save_verify_data_path_name + ".md")
 
         errors = 0
         for d in verify_data:
@@ -1106,7 +1121,20 @@ class App:
             results.append(datapoint)
 
         if save_test_data_path is not None:
-            save_json(save_test_data_path, results)
+            save_test_data_path_name, ext = os.path.splitext(save_test_data_path)
+            if ext not in [".json", ""]:
+                logger.warning(
+                    'Expected save path extension to be ".json", but got "{}" ("{}"). Saving to "{}".',
+                    save_test_data_path,
+                    ext,
+                    save_test_data_path_name + ".json",
+                )
+            save_json(save_test_data_path_name, results)
+            logger.info("Saved test results to {file}", file=save_test_data_path_name + ".json")
+            if self.config.auto_export_markdown:
+                md = json_yaml_to_markdown(results)
+                save_md(save_test_data_path_name, md)
+                logger.info("Saved test results as markdown to {file}", file=save_test_data_path_name + ".md")
 
         if "answer" in next(iter(results), {}):  # type: ignore
             errors = 0

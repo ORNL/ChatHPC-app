@@ -26,6 +26,7 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 ### Added
 
 - OpenAI API: Added the ability to set a custom base URL for the API endpoint using the `OPENAI_API_BASE_URL` environment variable.
+- Auto Export Markdown: Added the ability to automatically export output files to markdown using the `auto_export_markdown` configuration option.
 
 ### Fixed
 
