@@ -1,5 +1,6 @@
 import argparse
 import sys
+from pathlib import Path
 
 from loguru import logger
 from pydantic import ValidationError
@@ -204,6 +205,13 @@ def cli(raw_args=None):
 
     # Read in configuration file.
     try:
+        default_app_config_file = Path("config.json")
+        if args.config is None and default_app_config_file.is_file():
+            args.config = default_app_config_file.as_posix()
+            print(
+                f"Loading config from default configuration file found in the current directory: {args.config}",
+                file=sys.stderr,
+            )
         json_config = load_json_yaml_arg(args.config)
         app_config = CliApp.run(AppConfig, cli_args=args, cli_settings_source=cli_settings, **json_config)
     except ValidationError as e:
