@@ -1,4 +1,5 @@
 {
+    "auto_export_markdown": false,
     "data_file": "/home/7ry/Data/ellora/ChatHPCforKokkos-data/kokkos_dataset_before_reinforcement.json",
     "base_model_path": "/auto/projects/ChatHPC/models/cache/meta-llama/CodeLlama-7b-hf",
     "finetuned_model_path": "peft_adapter",
