@@ -23,6 +23,8 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+## [25.7.0] - 2025-07-22
+
 ### Added
 
 - OpenAI API: Added the ability to set a custom base URL for the API endpoint using the `OPENAI_API_BASE_URL` environment variable.
@@ -134,7 +136,8 @@ Verified initial working version of the ChatHPC App.
 
 - Initial version of ChatHPC App. Created from the working ChatHPC for Kokkos Example.
 
-[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.1...main
+[unreleased]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.7.0...main
+[25.7.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.1...v25.7.0
 [25.4.1]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.4.0...v25.4.1
 [25.4.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.3.0...v25.4.0
 [25.3.0]: https://code.ornl.gov/ChatHPC/ChatHPC-app/-/compare/v25.2.1...v25.3.0
