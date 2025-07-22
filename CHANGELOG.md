@@ -23,6 +23,10 @@ With this method, the version is YEAR.MONTH.RELEASE. To increment this version, 
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed multiple missed renames in examples.
+
 ## [25.7.0] - 2025-07-22
 
 ### Added
