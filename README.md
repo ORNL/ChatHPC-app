@@ -1,5 +1,7 @@
 # ChatHPC Application
 
+[![DOI](https://zenodo.org/badge/1023856406.svg)](https://doi.org/10.5281/zenodo.16746629)
+
 Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app>
 
 Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage>
@@ -130,7 +132,7 @@ chathpc train
 ### ChatHPC JSON to MD
 
 Get Help:
-```shell
+```bash
 $ chathpc-json-to-md -h
 usage: chathpc-json-to-md [-h] [--debug] [--log_level LOG_LEVEL] [--add_rating_template] [json]
 
@@ -146,7 +148,6 @@ options:
                         Log level.
   --add_rating_template
                         Add rating template to markdown.
-
 ```
 
 Example:
