@@ -1,0 +1,6 @@
+griffe
+mkdocs
+mkdocs-autorefs
+mkdocs-material
+mkdocs-mermaid2-plugin
+mkdocstrings[python]

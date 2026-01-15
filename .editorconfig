@@ -33,4 +33,4 @@ indent_size = 2
 # TXT
 [*.txt]
 trim_trailing_whitespace = false
-insert_final_newline = false
+# insert_final_newline = false
