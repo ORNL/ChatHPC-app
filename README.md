@@ -6,7 +6,7 @@ Documentation: <https://chathpc-app.readthedocs.io/>
 
 Internal Development Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app>
 
-Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage>
+Internal Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage>
 
 [Creating a new ChatHPC application.](https://chathpc-app.readthedocs.io/#how-to-create-a-new-chathpcchatx-application-repo)
 
@@ -78,7 +78,7 @@ sudo apt install ruby-full
 
 ## Quick Start
 
-See [Creating a new ChatHPC application.](https://devdocs.ornl.gov/ChatHPC/ChatHPC-project/#how-to-create-a-new-chathpcchatx-application-repo).
+See [Creating a new ChatHPC application](https://chathpc-app.readthedocs.io/#how-to-create-a-new-chathpcchatx-application-repo).
 
 ## CLI Interface
 

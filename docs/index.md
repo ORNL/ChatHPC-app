@@ -6,8 +6,8 @@ The ChatHPC Application is part of the larger ChatHPC ecosystem and Ellora Proje
 
 These steps go over how to create a new ChatX application where ChatX is a place holder for your application name. Replace X with your custom name. For an example ChatX application, take a look at [ChatHPC for Kokkos](https://code.ornl.gov/ChatHPC/ChatHPCforKokkos) or [ChatASMKernel](https://code.ornl.gov/ChatHPC/ChatASMKernel).
 
-> [!CAUTION]
-> Due to trademark and licensing requirements. It is now recommended and potentially required to avoid using the "ChatX" convention. The recommendation now is to use the convention "ChatHPC for X". See [ChatHPC for Kokkos](https://code.ornl.gov/ChatHPC/ChatHPCforKokkos) as an example of the latest recommended convention.
+!!! caution
+    Due to trademark and licensing requirements. It is now recommended and potentially required to avoid using the "ChatX" convention. The recommendation now is to use the convention "ChatHPC for X". See [ChatHPC for Kokkos](https://code.ornl.gov/ChatHPC/ChatHPCforKokkos) as an example of the latest recommended convention.
 
 1. Create new repostories to hold custom app and dataset files.
     1. Create a training data repository for ChatX with the naming convention "ChatX Data" and slug "ChatX-data.
