@@ -55,10 +55,10 @@ dependencies = [
 allow-direct-references = true
 
 [project.urls]
-Documentation = "https://code.ornl.gov/ChatHPC/ChatHPC-app#readme"
-Homepage = "https://code.ornl.gov/ChatHPC/ChatHPC-app"
-Issues = "https://code.ornl.gov/ChatHPC/ChatHPC-app/-/issues"
-Source = "https://code.ornl.gov/ChatHPC/ChatHPC-app"
+Documentation = "https://github.com/ORNL/ChatHPC-app#readme"
+Homepage = "https://github.com/ORNL/ChatHPC-app"
+Issues = "https://github.com/ORNL/ChatHPC-app/-/issues"
+Source = "https://github.com/ORNL/ChatHPC-app"
 
 [project.scripts]
 ChatHPC = "chathpc.app.__main__:cli"

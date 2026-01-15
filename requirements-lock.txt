@@ -19,7 +19,7 @@ bleach==6.2.0
 certifi==2024.12.14
 cffi==1.17.1
 charset-normalizer==3.4.1
--e git+ssh://git@code.ornl.gov/ChatHPC/ChatHPC-app.git@c9d0607eebf06dad8fa245ad8f298f7e3a0a11d0#egg=chathpc_app
+-e git+ssh://git@github.com/ORNL/ChatHPC-app.git@c9d0607eebf06dad8fa245ad8f298f7e3a0a11d0#egg=chathpc_app
 click==8.1.8
 codellama @ git+ssh://git@github.com/meta-llama/codellama.git@e81b597e44dbecc2a0dedb9949fdf84adfc22395
 colorama==0.4.6

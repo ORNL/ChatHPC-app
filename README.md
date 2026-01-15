@@ -2,9 +2,13 @@
 
 [![DOI](https://zenodo.org/badge/1023856406.svg)](https://doi.org/10.5281/zenodo.16746629)
 
-Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app>
+Documentation: <https://chathpc-app.readthedocs.io/>
+
+Internal Development Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app>
 
 Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage>
+
+[Creating a new ChatHPC application.](https://chathpc-app.readthedocs.io/#how-to-create-a-new-chathpcchatx-application-repo)
 
 **Table of Contents**
 - [ChatHPC Application](#chathpc-application)
@@ -29,7 +33,7 @@ Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage>
 For development in folder:
 
 ```bash
-git clone git@code.ornl.gov:ChatHPC/ChatHPC-app.git
+git clone git@github.com:ORNL/ChatHPC-app.git
 cd ChatHPC-app
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
@@ -41,7 +45,7 @@ For use in virtual environment:
 ```bash
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
-pip install git+ssh://git@code.ornl.gov/ChatHPC/ChatHPC-app.git
+pip install git+ssh://git@github.com/ORNL/ChatHPC-app.git
 ```
 
 ## Setup pre-commit Git hooks
