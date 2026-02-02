@@ -49,6 +49,7 @@ dependencies = [
   "pytest",
   "pytest-depends",
   "option",
+  "pytz",
 ]
 
 [tool.hatch.metadata]
