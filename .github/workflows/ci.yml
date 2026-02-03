@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build and import
+        shell: bash
+        run: |
+          set -e
+          python -m venv --upgrade-deps .venv
+          source .venv/bin/activate
+          pip install .
+          python -c "import chathpc.app; print(chathpc.app.__doc__)"
+
+  check_format:
+    name: Check format
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run formatter
+        shell: bash
+        run: |
+          set -e
+          python -m venv --upgrade-deps .venv
+          source .venv/bin/activate
+          pip install --upgrade hatch
+          pip install --upgrade hatch-mkdocs
+          (hatch fmt | tee fmt.out && echo "lint_errors 0" > metrics.txt) || (cat fmt.out | grep -e 'Found .* errors' | sed 's/Found \(.*\) errors.*/lint_errors \1/' > metrics.txt)
+          cat metrics.txt
+          grep -q "lint_errors 0" metrics.txt
+      - name: Upload format artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: format-results
+          path: |
+            fmt.out
+            metrics.txt
+
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build docs
+        shell: bash
+        run: |
+          set -e
+          python -m venv --upgrade-deps .venv
+          source .venv/bin/activate
+          pip install --upgrade hatch
+          hatch run docs:build
+      - name: Upload docs site
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run tests
+        shell: bash
+        run: |
+          set -e
+          python -m venv --upgrade-deps .venv
+          source .venv/bin/activate
+          pip install --upgrade hatch
+          hatch run test
+
+  test_scripts:
+    name: Test scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run script tests
+        shell: bash
+        run: |
+          set -e
+          python -m venv --upgrade-deps .venv
+          source .venv/bin/activate
+          pip install .
+          ./scripts/test_commands.sh
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run coverage
+        shell: bash
+        run: |
+          set -e
+          python -m venv --upgrade-deps .venv
+          source .venv/bin/activate
+          pip install --upgrade hatch
+          hatch run cov-html
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            coverage_html_report
+            coverage.xml
