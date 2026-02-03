@@ -103,7 +103,12 @@ jobs:
           python -m venv --upgrade-deps .venv
           source .venv/bin/activate
           pip install --upgrade hatch
-          hatch run test
+          hatch run test -- --junit-xml=test-results.xml
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: test-results.xml
 
   test_scripts:
     name: Test scripts
@@ -151,3 +156,9 @@ jobs:
           path: |
             coverage_html_report
             coverage.xml
+      - name: Report coverage
+        if: github.event_name == 'pull_request'
+        uses: orgoro/coverage@v3.2
+        with:
+          coverageFile: coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
