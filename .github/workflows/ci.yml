@@ -32,45 +32,81 @@ jobs:
   check_format:
     name: Check format
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Run formatter
         shell: bash
         run: |
-          set -e
+          set -Eeuo pipefail
+
           ./scripts/pyproject_ssh_to_https.sh
+
           python -m venv --upgrade-deps .venv
           source .venv/bin/activate
-          pip install --upgrade hatch
-          pip install --upgrade hatch-mkdocs
-          (hatch fmt | tee fmt.out && echo "lint_errors 0" > metrics.txt) || (cat fmt.out | grep -e 'Found .* errors' | sed 's/Found \(.*\) errors.*/lint_errors \1/' > metrics.txt)
+
+          pip install --upgrade hatch hatch-mkdocs
+
+          # Always create outputs
+          : > fmt.out
+          : > metrics.txt
+
+          # Run hatch fmt, capture exit code, keep full output
+          set +e
+          hatch fmt 2>&1 | tee fmt.out
+          fmt_rc=${PIPESTATUS[0]}
+          set -e
+
+          # Derive lint error count as best-effort (defaults to 0 if unknown)
+          # Adjust the regex to match your formatter's actual output.
+          lint_errors="$(grep -Eo 'Found[[:space:]]+[0-9]+[[:space:]]+errors' fmt.out \
+            | tail -n 1 | grep -Eo '[0-9]+' || true)"
+          lint_errors="${lint_errors:-0}"
+
+          echo "lint_errors ${lint_errors}" > metrics.txt
           cat metrics.txt
-          grep -q "lint_errors 0" metrics.txt
+
+          # Fail if hatch fmt failed OR lint_errors > 0
+          if [[ "${fmt_rc}" -ne 0 || "${lint_errors}" -ne 0 ]]; then
+            echo "Formatting/lint issues detected."
+            exit 1
+          fi
+
       - name: Upload format summary
         if: always()
         shell: bash
         run: |
-          set -e
-          echo "## Format results" >> "$GITHUB_STEP_SUMMARY"
-          if [ -f metrics.txt ]; then
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "Format lint errors:" >> "$GITHUB_STEP_SUMMARY"
-            cat metrics.txt >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "metrics.txt not found" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          if [ -f fmt.out ]; then
-            echo "" >> "$GITHUB_STEP_SUMMARY"
-            echo "Formatter output (last 200 lines):" >> "$GITHUB_STEP_SUMMARY"
-            tail -n 200 fmt.out >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "fmt.out not found" >> "$GITHUB_STEP_SUMMARY"
-          fi
+          set -Eeuo pipefail
+          {
+            echo "## Format results"
+            echo
+            if [[ -f metrics.txt ]]; then
+              echo "Format lint errors:"
+              echo
+              echo '```'
+              cat metrics.txt
+              echo '```'
+            else
+              echo "metrics.txt not found"
+            fi
+
+            echo
+            if [[ -f fmt.out ]]; then
+              echo "Formatter output (last 200 lines):"
+              echo
+              echo '```'
+              tail -n 200 fmt.out
+              echo '```'
+            else
+              echo "fmt.out not found"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload format artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -79,6 +115,7 @@ jobs:
           path: |
             fmt.out
             metrics.txt
+
 
   docs:
     name: Docs
