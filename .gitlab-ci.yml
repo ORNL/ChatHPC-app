@@ -1,6 +1,6 @@
 stages:
   - build
-  - check_format
+  - check
   - docs
   - test
   - check_coverage
@@ -11,8 +11,9 @@ variables:
   HATCH_DATA_DIR: ".hatch"
 
 before_script:
-  - python3 -m venv --upgrade-deps .venv
+  - uv venv --seed
   - source .venv/bin/activate
+  - uv sync
 
 .zenith:
   tags: [ubuntu, zenith]
@@ -21,17 +22,14 @@ build-job:
   extends: [.zenith]
   stage: build
   script:
-    - pip install .
-    - python3 -c "import chathpc.app; print(chathpc.app.__doc__)"
+    - uv run python -c "import chathpc.app; print(chathpc.app.__doc__)"
 
 check_format-job:
   extends: [.zenith]
-  stage: check_format
+  stage: check
   needs: []
   script:
-    - pip install --upgrade hatch
-    - pip install --upgrade hatch-mkdocs
-    - (hatch fmt | tee fmt.out && echo "lint_errors 0" > metrics.txt) || (cat fmt.out | grep -e 'Found .* errors' | sed 's/Found \(.*\) errors.*/lint_errors \1/' > metrics.txt)
+    - (uv run hatch fmt | tee fmt.out && echo "lint_errors 0" > metrics.txt) || (cat fmt.out | grep -e 'Found .* errors' | sed 's/Found \(.*\) errors.*/lint_errors \1/' > metrics.txt)
     - cat metrics.txt
     - grep -q "lint_errors 0" metrics.txt
   artifacts:
@@ -44,13 +42,22 @@ check_format-job:
     exit_codes:
       - 1
 
+check_type-job:
+  extends: [.zenith]
+  stage: check
+  needs: []
+  script:
+    - uv run --all-groups ty check
+  allow_failure:
+    exit_codes:
+      - 1
+
 docs-job:
   tags: [devdocs]
   stage: docs
   needs: []
   script:
-    - pip install --upgrade hatch
-    - hatch run docs:build
+    - uv run hatch run docs:build
   artifacts:
     paths:
       - site
@@ -60,23 +67,20 @@ test-job:
   stage: test
   needs: [build-job]
   script:
-    - pip install --upgrade hatch
-    - hatch run test
+    - uv run hatch run test
 
 test-scripts:
   extends: [.zenith]
   stage: test
   script:
-    - pip install .
-    - ./scripts/test_commands.sh
+    - scripts/test_commands.sh
 
 coverage-job:
   extends: [.zenith]
   stage: check_coverage
   needs: [build-job]
   script:
-    - pip install --upgrade hatch
-    - hatch run cov-html
+    - uv run hatch run cov-html
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     paths:

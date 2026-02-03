@@ -15,3 +15,4 @@ exclude_rule 'MD036' # Emphasis used instead of a header (Catches Table of Conte
 exclude_rule 'MD041' # First line in file should be a top level header (Obsidian Properties can be first)
 exclude_rule 'MD055' # Table row doesn't begin/end with pipes (Does not work with | in links)
 exclude_rule 'MD057' # Table has missing or invalid header separation (second row)
+exclude_rule 'MD033' # Allow inline HTML (Catches system prompt example.)

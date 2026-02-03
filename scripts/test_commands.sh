@@ -5,10 +5,10 @@ set -e
 echo '*** Test -h for scripts ***'
 
 echo ChatHPC -h
-ChatHPC -h
+uv run ChatHPC -h
 echo
 echo chathpc -h
-chathpc -h
+uv run chathpc -h
 
 # Test default arguments
 echo
@@ -25,4 +25,4 @@ CHATHPC_DATA_FILE="/home/7ry/Data/ellora/ChatHPCforKokkos-data/kokkos_dataset_be
     CHATHPC_MERGED_MODEL_PATH="./app/merged_adapters"\
     CHATHPC_TRAINING_OUTPUT_DIR="./app/kokkos-code-llama"\
     CHATHPC_PROMPT_TEMPLATE="You are a powerful LLM model for Kokkos called ChatHPC for Kokkos created by ORNL. Your job is to answer questions about the Kokkos programming model. You are given a question and context regarding the Kokkos programming model.\n\nYou must output the answer the question.\n\n### Context:\n{{ context }}\n\n### Question:\n{{ question }}\n\n### Answer:\n{{ answer }}\n\n"\
-    chathpc config
+    uv run chathpc config

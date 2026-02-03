@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
 
 """Script to bump the version number of the project and release a new version."""
 
@@ -12,12 +12,13 @@ import subprocess
 import sys
 import traceback
 from itertools import pairwise
+from pathlib import Path
 from subprocess import check_output
 
 from pytz import timezone
 
-GIT_ROOT = check_output("git rev-parse --show-toplevel", shell=True).decode().strip()  # noqa S602
-SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+SCRIPT_DIR = Path(__file__).resolve().parent
+GIT_ROOT = Path(check_output(f"cd {SCRIPT_DIR} && git rev-parse --show-toplevel", shell=True).decode().strip())  # noqa S602
 TZ = timezone("US/Eastern")
 
 
@@ -46,7 +47,7 @@ def run(command, verbose=False, noop=False, directory=None):
             return run(command, verbose, noop)
 
     if verbose:
-        print(command)
+        print("  $ " + command)
     if not noop:
         try:
             return_val = subprocess.check_output(command, shell=True, stderr=subprocess.PIPE).decode()  # noqa: S602
@@ -63,7 +64,7 @@ def run(command, verbose=False, noop=False, directory=None):
                 fd.write(err_mesg)
             raise
         if verbose and return_val:
-            print(return_val)
+            print("\n".join(["    " + i for i in return_val.splitlines()]))
 
     return return_val
 
@@ -129,12 +130,12 @@ def get_next_version(version_override: str | None = None, use_last_commit_date: 
 
     # Get the current version
     try:
-        current_version = Version.from_str(run("hatch version"))
+        current_version = Version.from_str(run("hatch version", directory=GIT_ROOT))
     except ValueError:
         current_version = None
 
     # Get current tags
-    tags = run("git tag")
+    tags = run("git tag", directory=GIT_ROOT)
 
     # Get the revision number
     revision = 0
@@ -169,11 +170,11 @@ def collect_versions(changelog: list[str]) -> list[str]:
     return versions
 
 
-def update_changelog(version: Version | str, filename: str, base_url: str | None = None):
+def update_changelog(version: Version | str, filename: str | Path, base_url: str | None = None):
     """Update the changelog on version bump.
 
     Args:
-        version (Version): version
+        version (Version | str): version
         filename (str): Changelog filename.
         base_url (str): Base url for links.
     """
@@ -192,7 +193,7 @@ def update_changelog(version: Version | str, filename: str, base_url: str | None
     # Insert the new version
     changelog[unreleased_loc + 1 : unreleased_loc + 1] = [
         "\n",
-        f'## [{version}] - {datetime.datetime.now(tz=TZ).strftime("%Y-%m-%d")}\n',
+        f"## [{version}] - {datetime.datetime.now(tz=TZ).strftime('%Y-%m-%d')}\n",
     ]
 
     # Update links if base url is provided.
@@ -256,8 +257,11 @@ def main(raw_args=None):
         print("Attach debugger to continue.")
         debugpy.wait_for_client()  # noqa: T100
 
+    # Welcome Message
+    print(f"Upgrading App version of the repository in {GIT_ROOT}.\n")
+
     # Verify git state and return warning.
-    git_state = run("git status --porcelain")
+    git_state = run("git status --porcelain", directory=GIT_ROOT)
     if git_state != "":
         print(f"Warning: Git state is unclean.\n{git_state}")
         answer = str2bool(input("Continue? "))
@@ -268,21 +272,29 @@ def main(raw_args=None):
 
     # Update the version
     print("Updating python project version.")
-    run(f"hatch version {version}", verbose=True)
+    run(f"hatch version {version}", verbose=True, directory=GIT_ROOT)
 
     # Update the CHANGELOG.md
-    print("Updating CHANGELOG.md")
-    update_changelog(version, "CHANGELOG.md", "https://code.ornl.gov/ChatHPC/ChatHPC-app")
+    print("Updating CHANGELOG.md.")
+    update_changelog(version, GIT_ROOT / "CHANGELOG.md", "https://code.ornl.gov/ChatHPC/ChatHPC-app")
 
     # Commit Change.
     print("Committing change.")
-    run("git add src/*/__about__.py CHANGELOG.md", verbose=True)
-    run(f'git commit -m "Release version {version}."', verbose=True)
-    run(f'git tag -a v{version} -m "Version {version}"', verbose=True)
+    run("git add src/*/__about__.py CHANGELOG.md", verbose=True, directory=GIT_ROOT)
+    run(f'git commit -m "Release version {version}."', verbose=True, directory=GIT_ROOT)
+    run(f'git tag -a v{version} -m "Version {version}"', verbose=True, directory=GIT_ROOT)
 
     # Instruct to push to remote.
-    branch_name = run("git rev-parse --abbrev-ref HEAD").strip()
-    print(f"\nPush tag to remote with: `git push origin {branch_name} v{version}`.")
+    branch_name = run("git rev-parse --abbrev-ref HEAD", directory=GIT_ROOT).strip()
+    push_command = f"git push origin {branch_name} v{version}"
+    print(f"\nPush tag to remote with `{push_command}`.")
+
+    # Run push command
+    if answer := str2bool(input(f"\nDo you want to run `{push_command}` now? ")):
+        run(push_command, verbose=True, directory=GIT_ROOT)
+
+    # Instructions to create release on GitHub.
+    print(f"\nNow create a new release on GitHub for the tag v{version}.")
 
 
 if __name__ == "__main__":

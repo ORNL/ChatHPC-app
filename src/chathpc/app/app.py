@@ -21,11 +21,22 @@ from peft import (
     prepare_model_for_kbit_training,  # type: ignore
 )
 from pydantic import Field, model_validator
-from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
+from pydantic_settings import (
+    BaseSettings,
+    JsonConfigSettingsSource,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 from pytz import timezone
 from tabulate import tabulate
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForSeq2Seq, Trainer, TrainingArguments
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForSeq2Seq,
+    Trainer,
+    TrainingArguments,
+)
 
 import chathpc
 import chathpc.app
@@ -408,7 +419,7 @@ class App:
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.base_model_path)
 
-        self.model = AutoModelForCausalLM.from_pretrained(
+        self.model = AutoModelForCausalLM.from_pretrained(  # type: ignore
             self.config.base_model_path,
             load_in_8bit=False,
             torch_dtype=torch.float16,
@@ -481,7 +492,7 @@ class App:
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.config.base_model_path)
 
-        self.model = AutoModelForCausalLM.from_pretrained(
+        self.model = AutoModelForCausalLM.from_pretrained(  # type: ignore
             self.config.merged_model_path,
             load_in_8bit=False,
             torch_dtype=torch.float16,
@@ -900,7 +911,7 @@ class App:
 
         # model.to('cuda')
 
-        trainer.train()
+        trainer.train()  # type: ignore
 
         print("Saving Model...")
         trainer.model.save_pretrained(self.config.finetuned_model_path)  # type: ignore
@@ -1149,7 +1160,7 @@ class App:
                     print()
 
             correct = test_data_len - errors
-            print(f"Total correct: {correct} out of {test_data_len} ({(float(correct)/test_data_len) * 100:.2f}%)")
+            print(f"Total correct: {correct} out of {test_data_len} ({(float(correct) / test_data_len) * 100:.2f}%)")
         return results
 
     def print_config(self) -> None:

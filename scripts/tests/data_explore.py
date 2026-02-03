@@ -1,6 +1,11 @@
 # %%
 import os
 from subprocess import check_output
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from pandas import DataFrame
+
 
 from chathpc.app import App as ChatApp
 
@@ -16,6 +21,8 @@ app.load_datasets()
 
 # %%
 df = app.train_dataset.to_pandas()
+
+df = cast("DataFrame", df)
 
 df["prompt_filled"] = df.apply(lambda row: app.training_prompt(**row), axis=1)
 

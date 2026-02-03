@@ -7,7 +7,7 @@ name = "chathpc-app"
 dynamic = ["version"]
 description = "Base ChatHPC Application"
 readme = "README.md"
-requires-python = ">=3.9.0"
+requires-python = ">=3.10"
 keywords = []
 authors = [
   { name = "Aaron Young", email = "youngar@ornl.gov" },
@@ -15,8 +15,6 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -52,8 +50,24 @@ dependencies = [
   "pytz",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff==0.14.6",
+    "ty",
+    "hatch",
+    "hatch-mkdocs",
+    "coverage[toml]>=6.5",
+    "pre-commit",
+    "debugpy",
+]
+
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.ty.src]
+include = ["src", "tests", "scripts"]
+exclude = ["notebooks"]
 
 [project.urls]
 Documentation = "https://github.com/ORNL/ChatHPC-app#readme"
@@ -84,12 +98,6 @@ path = "mkdocs.yml"
 
 [tool.hatch.envs.docs]
 
-[tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-  "pre-commit",
-]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 test-cov = "coverage run -m pytest {args:tests}"
@@ -146,11 +154,12 @@ exclude_lines = [
 directory = "coverage_html_report"
 
 [tool.hatch.envs.hatch-static-analysis]
-dependencies = ["ruff==0.6.4"]
+dependencies = ["ruff==0.14.6"]
 config-path = "ruff_defaults.toml"
 
 [tool.ruff]
 extend = "ruff_defaults.toml"
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 extend-ignore = [
@@ -159,8 +168,5 @@ extend-ignore = [
   "FBT002", # Boolean default positional argument in function definition
   "EM101",  # Raw string in Exception
   "TRY003", # Avoid long strings in Exception Class.
+  "EXE003", # Allow UV style Shebang.
 ]
-
-[tool.pyright]
-venvPath = "."
-venv = ".venv"
