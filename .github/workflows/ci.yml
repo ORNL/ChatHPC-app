@@ -51,6 +51,26 @@ jobs:
           (hatch fmt | tee fmt.out && echo "lint_errors 0" > metrics.txt) || (cat fmt.out | grep -e 'Found .* errors' | sed 's/Found \(.*\) errors.*/lint_errors \1/' > metrics.txt)
           cat metrics.txt
           grep -q "lint_errors 0" metrics.txt
+      - name: Upload format summary
+        if: always()
+        shell: bash
+        run: |
+          set -e
+          echo "## Format results" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f metrics.txt ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Format lint errors:" >> "$GITHUB_STEP_SUMMARY"
+            cat metrics.txt >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "metrics.txt not found" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f fmt.out ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Formatter output (last 200 lines):" >> "$GITHUB_STEP_SUMMARY"
+            tail -n 200 fmt.out >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "fmt.out not found" >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Upload format artifacts
         if: always()
         uses: actions/upload-artifact@v4
