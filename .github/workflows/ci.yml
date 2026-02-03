@@ -23,6 +23,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          ./scripts/pyproject_ssh_to_https.sh
           python -m venv --upgrade-deps .venv
           source .venv/bin/activate
           pip install .
@@ -42,6 +43,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          ./scripts/pyproject_ssh_to_https.sh
           python -m venv --upgrade-deps .venv
           source .venv/bin/activate
           pip install --upgrade hatch
@@ -71,6 +73,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          ./scripts/pyproject_ssh_to_https.sh
           python -m venv --upgrade-deps .venv
           source .venv/bin/activate
           pip install --upgrade hatch
@@ -96,6 +99,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          ./scripts/pyproject_ssh_to_https.sh
           python -m venv --upgrade-deps .venv
           source .venv/bin/activate
           pip install --upgrade hatch
@@ -114,6 +118,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          ./scripts/pyproject_ssh_to_https.sh
           python -m venv --upgrade-deps .venv
           source .venv/bin/activate
           pip install .
@@ -133,6 +138,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          ./scripts/pyproject_ssh_to_https.sh
           python -m venv --upgrade-deps .venv
           source .venv/bin/activate
           pip install --upgrade hatch
