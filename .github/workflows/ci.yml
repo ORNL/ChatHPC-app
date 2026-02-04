@@ -116,24 +116,32 @@ jobs:
             fmt.out
             metrics.txt
 
+      - name: Build format comment body
+        if: always() && github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          {
+            echo "## Format results"
+            echo
+            echo "**Metrics**"
+            echo '```'
+            cat metrics.txt 2>/dev/null || echo "metrics.txt missing"
+            echo '```'
+            echo
+            echo "**Formatter output (last 200 lines)**"
+            echo '```'
+            tail -n 200 fmt.out 2>/dev/null || echo "fmt.out missing"
+            echo '```'
+          } > pr_comment.md
+
       - name: Post format comment
         if: always() && github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: format-results
-          message: |
-            ## Format results
-
-            **Metrics**
-            ```
-            $(cat metrics.txt 2>/dev/null || echo "metrics.txt missing")
-            ```
-
-            **Formatter output (last 200 lines)**
-            ```
-            $(tail -n 200 fmt.out 2>/dev/null || echo "fmt.out missing")
-            ```
-
+          path: pr_comment.md
 
   docs:
     name: Docs
