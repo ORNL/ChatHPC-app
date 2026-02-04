@@ -1,5 +1,10 @@
 name: CI
 
+permissions:
+  contents: read
+  pull-requests: write
+
+
 on:
   push:
     branches: ["**"]
@@ -116,6 +121,24 @@ jobs:
             fmt.out
             metrics.txt
 
+      - name: Post format comment
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: format-results
+          message: |
+            ## Format results
+
+            **Metrics**
+            ```
+            $(cat metrics.txt 2>/dev/null || echo "metrics.txt missing")
+            ```
+
+            **Formatter output (last 200 lines)**
+            ```
+            $(tail -n 200 fmt.out 2>/dev/null || echo "fmt.out missing")
+            ```
+
 
   docs:
     name: Docs
@@ -219,3 +242,31 @@ jobs:
         with:
           coverageFile: coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Coverage summary
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          if [[ ! -f coverage.xml ]]; then
+            echo "## Coverage results" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "coverage.xml not found" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Extract overall line-rate (Cobertura format)
+          line_rate="$(grep -oP 'line-rate="\K[0-9.]+' coverage.xml | head -n 1)"
+          percent="$(awk "BEGIN { printf \"%.1f\", ${line_rate} * 100 }")"
+
+          {
+            echo "## Coverage results"
+            echo
+            echo "| Metric | Value |"
+            echo "|--------|-------|"
+            echo "| Line coverage | ${percent}% |"
+            echo
+            echo "**Artifacts:**"
+            echo "- coverage.xml"
+            echo "- coverage_html_report/"
+          } >> "$GITHUB_STEP_SUMMARY"
