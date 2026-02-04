@@ -10,7 +10,10 @@ from pydantic_settings import (
 )
 
 from chathpc.app import App, AppConfig
-from chathpc.app.utils.common_utils import load_json_yaml_arg
+from chathpc.app.utils.common_utils import (
+    get_valid_path_from_string,
+    load_json_yaml_arg,
+)
 
 
 def config(_args, config):
@@ -213,6 +216,20 @@ def cli(raw_args=None):
                 file=sys.stderr,
             )
         json_config = load_json_yaml_arg(args.config)
+
+        if not isinstance(json_config, dict):
+            path = get_valid_path_from_string(args.config)
+            if path.is_ok:
+                print(f"Error: Unable to interperate {json_config} as a dictionary. {args.config} has invalid content", file=sys.stderr)
+                sys.exit(1)
+
+            if isinstance(path.unwrap_err(), FileNotFoundError):
+                print(f"Error: Unable to find configuration file: {args.config}", file=sys.stderr)
+                sys.exit(1)
+
+            print(f"Error: Unable to interperate {json_config} as a dictionary.", file=sys.stderr)
+            sys.exit(1)
+
         app_config = CliApp.run(AppConfig, cli_args=args, cli_settings_source=cli_settings, **json_config)
     except ValidationError as e:
         parser.print_help()
