@@ -544,7 +544,7 @@ select = [
 ban-relative-imports = "all"
 
 [lint.isort]
-known-first-party = ["python_project_template"]
+known-first-party = ["chathpc"]
 
 [lint.flake8-pytest-style]
 fixture-parentheses = false
