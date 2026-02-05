@@ -12,7 +12,7 @@ variables:
 
 before_script:
   - bash ./scripts/pyproject_ssh_to_https.sh
-  - uv venv --seed
+  - uv venv --seed --python 3.11
   - source .venv/bin/activate
   - uv sync --all-groups
 
