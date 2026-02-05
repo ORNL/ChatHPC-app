@@ -3,6 +3,8 @@ name: CI
 permissions:
   contents: read
   packages: write
+  pull-requests: write
+  checks: write
 
 on:
   push:
@@ -17,11 +19,16 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    outputs:
+      branch-tag: ${{ steps.branch.outputs.name }}
     steps:
       - uses: actions/checkout@v4
       - name: Set image name (lowercase)
         id: image
         run: echo "name=$(echo ghcr.io/${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+      - name: Set branch name
+        id: branch
+        run: echo "name=$(echo ${{ github.ref }} | sed 's|refs/heads/||' | tr '/' '-')" >> "$GITHUB_OUTPUT"
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Log in to GitHub Container Registry
@@ -36,15 +43,17 @@ jobs:
           context: .
           file: .github/Dockerfile
           push: true
-          tags: ${{ steps.image.outputs.name }}:${{ github.sha }},${{ steps.image.outputs.name }}:latest
+          tags: ${{ steps.image.outputs.name }}:${{ github.sha }},${{ steps.image.outputs.name }}:${{ steps.branch.outputs.name }},${{ steps.image.outputs.name }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Wait for image availability
+        run: sleep 30
       - name: Clean up old images
         uses: actions/delete-package-versions@v4
         with:
           package-name: 'chathpc-app'
           package-type: 'container'
-          min-versions-to-keep: 5
+          min-versions-to-keep: 10
           delete-only-untagged-versions: false
 
   check_format:
@@ -184,6 +193,8 @@ jobs:
       image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+      - name: Configure git safe directory
+        run: git config --global --add safe.directory '*'
       - name: Convert SSH URLs to HTTPS
         run: ./scripts/pyproject_ssh_to_https.sh
       - name: Run tests
@@ -221,6 +232,8 @@ jobs:
       image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
+      - name: Configure git safe directory
+        run: git config --global --add safe.directory '*'
       - name: Convert SSH URLs to HTTPS
         run: ./scripts/pyproject_ssh_to_https.sh
       - name: Run coverage
