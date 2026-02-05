@@ -159,6 +159,17 @@ Example:
 chathpc-json-to-md input.json > output.md
 ```
 
+## Upgrade packages in uv.lock
+
+See [Upgrading locked package versions](https://docs.astral.sh/uv/concepts/projects/sync/#upgrading-locked-package-versions).
+
+With an existing uv.lock file, uv will prefer the previously locked versions of packages when running uv sync and uv lock. Package versions will only change if the project's dependency constraints exclude the previous, locked version.
+
+To upgrade all packages:
+```bash
+uv lock --upgrade
+```
+
 ## Running with hatch
 
 ```bash

@@ -213,7 +213,7 @@ def verify_app(runner):
     response_errors = 0
     merge_errors = 0
 
-    for i, (fine, merge) in tqdm(enumerate(zip(finetuned, merged)), "Compare"):
+    for i, (fine, merge) in tqdm(enumerate(zip(finetuned, merged, strict=True)), "Compare"):
         if fine["answer"] != merge["answer"]:
             print("Error: answer mismatch")
             print(f"Sample {i}")
@@ -251,7 +251,7 @@ def verify_ollama(template):
     ol_errors = 0
     olc_errors = 0
 
-    for i, (o, oc) in tqdm(enumerate(zip(ol, ol_chat)), "Compare"):  # type: ignore
+    for i, (o, oc) in tqdm(enumerate(zip(ol, ol_chat, strict=True)), "Compare"):  # type: ignore
         if o["answer"] != oc["answer"]:
             print("Error: answer mismatch")
             print(f"Sample {i}")

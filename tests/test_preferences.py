@@ -47,11 +47,11 @@ class TestAppPreferences(unittest.TestCase):
 
     def test_test_config(self):
         preferences = AppConfig(
-            data_file="files/data_file.json",
-            base_model_path="files/base_model",
-            finetuned_model_path="files/finetuned_model",
-            merged_model_path="files/merged_model",
-        )  # type: ignore
+            data_file="files/data_file.json",  # type: ignore
+            base_model_path="files/base_model",  # type: ignore
+            finetuned_model_path="files/finetuned_model",  # type: ignore
+            merged_model_path="files/merged_model",  # type: ignore
+        )
         assert preferences.data_file == Path("files/data_file.json")
 
 

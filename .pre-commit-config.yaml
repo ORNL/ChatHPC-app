@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: trailing-whitespace
     args: [--markdown-linebreak-ext=md]
@@ -21,15 +21,17 @@ repos:
   - id: mixed-line-ending
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
-  rev: v0.8.1
+  rev: v0.14.6
   hooks:
     # Run the linter.
     - id: ruff
       args: [ --fix ]
+      exclude: '\.ipynb$'
     # Run the formatter.
     - id: ruff-format
+      exclude: '\.ipynb$'
 - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-  rev: 3.0.3
+  rev: 3.4.1
   hooks:
     - id: editorconfig-checker
       alias: ec
@@ -37,7 +39,19 @@ repos:
   rev: v0.13.0
   hooks:
   - id: markdownlint
-# - repo: https://github.com/RobertCraigie/pyright-python
-#   rev: v1.1.393
-#   hooks:
-#   - id: pyright
+- repo: https://github.com/astral-sh/uv-pre-commit
+  # uv version.
+  rev: 0.9.11
+  hooks:
+    # Update the uv lockfile
+    - id: uv-lock
+- repo: local
+  hooks:
+    - id: ty-check
+      name: ty check
+      description: "Automatically run ty check"
+      entry: ty check
+      language: python
+      args: [--python=.venv/]
+      pass_filenames: false
+      additional_dependencies: [ty]

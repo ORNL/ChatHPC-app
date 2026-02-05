@@ -7,12 +7,13 @@ import subprocess
 import sys
 import traceback
 from pathlib import Path
+from typing import cast
 
 import yaml
 from option import Err, Ok, Result
 
 
-def get_valid_path_from_string(path_str: str) -> Result[Path, Exception]:
+def get_valid_path_from_string(path_str: str) -> Result[Path, Exception | FileNotFoundError]:
     """Check if a string represents a valid file path.
 
     Args:
@@ -33,7 +34,7 @@ def get_valid_path_from_string(path_str: str) -> Result[Path, Exception]:
         path = Path(path_str)
         if path.is_file():
             return Ok(path)
-        return Err(FileNotFoundError(path_str))
+        return cast(Result[Path, Exception], Err(FileNotFoundError(path_str)))
     except Exception as e:  # noqa: BLE001
         return Err(e)
 
@@ -86,12 +87,14 @@ def get_valid_yaml_from_string(yaml_str: str) -> Result[dict, Exception]:
         return Err(e)
 
 
-def load_json_yaml_arg(str_or_fn: str, add_filename: bool = True) -> dict:
+def load_json_yaml_arg(str_or_fn: str | Path | dict | None, add_filename: bool = True) -> dict:
     """Load and parse JSON data from either a string or file.
 
     Args:
         str_or_fn (str): Either a JSON string starting with '{' or a path to a JSON file.
             If None, returns an empty dict.
+
+        add_filename (bool): Add the filename to the returned dictionary.
 
     Returns:
         dict: Parsed JSON data as a dictionary. Returns empty dict if input is None.
@@ -113,6 +116,8 @@ def load_json_yaml_arg(str_or_fn: str, add_filename: bool = True) -> dict:
     if isinstance(str_or_fn, list):
         return str_or_fn
 
+    str_or_fn = cast(str, str_or_fn)
+
     path = get_valid_path_from_string(str_or_fn)
     if path.is_ok:
         path = path.unwrap()
@@ -121,7 +126,7 @@ def load_json_yaml_arg(str_or_fn: str, add_filename: bool = True) -> dict:
             with open(path) as f:
                 params = json.loads(f.read())
                 if add_filename:
-                    params["filename"] = str_or_fn
+                    params["filename"] = path.as_posix()
                 f.close()
             return params
 
@@ -129,7 +134,7 @@ def load_json_yaml_arg(str_or_fn: str, add_filename: bool = True) -> dict:
             with open(path) as f:
                 params = yaml.safe_load(f)
                 if add_filename:
-                    params["filename"] = str_or_fn
+                    params["filename"] = path.as_posix()
                 f.close()
             return params
 
