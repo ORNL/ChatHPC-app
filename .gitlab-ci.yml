@@ -14,7 +14,7 @@ before_script:
   - bash ./scripts/pyproject_ssh_to_https.sh
   - uv venv --seed
   - source .venv/bin/activate
-  - uv sync
+  - uv sync --all-groups
 
 .zenith:
   tags: [ubuntu, zenith]
