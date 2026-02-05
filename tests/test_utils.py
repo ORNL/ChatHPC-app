@@ -35,7 +35,7 @@ class TestLoadJson(unittest.TestCase):
         j = load_json_yaml_arg(path)
         with open(path) as f:
             jj = json.loads(f.read())
-            jj["filename"] = path
+            jj["filename"] = str(path)
         assert j == jj
 
     def test_bad_file(self):
