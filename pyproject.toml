@@ -153,6 +153,10 @@ exclude_lines = [
 [tool.coverage.html]
 directory = "coverage_html_report"
 
+[tool.hatch.envs.default]
+type = "virtual"
+path = ".venv"
+
 [tool.hatch.envs.hatch-static-analysis]
 dependencies = ["ruff==0.14.6"]
 config-path = "ruff_defaults.toml"
