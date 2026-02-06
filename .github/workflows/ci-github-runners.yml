@@ -1,4 +1,4 @@
-name: CI
+name: CI - GitHub Runners
 
 permissions:
   contents: read
