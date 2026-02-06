@@ -41,7 +41,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: .github/Dockerfile
+          file: Dockerfile
           push: true
           tags: ${{ steps.image.outputs.name }}:${{ github.sha }},${{ steps.image.outputs.name }}:${{ steps.branch.outputs.name }},${{ steps.image.outputs.name }}:latest
           cache-from: type=gha

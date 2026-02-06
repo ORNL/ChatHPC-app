@@ -30,5 +30,5 @@ RUN uv venv --seed --python 3.11 \
 # Activate venv by default
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Set default command
-CMD ["/bin/bash"]
+# Set default command to run chathpc CLI
+CMD ["chathpc", "--help"]
