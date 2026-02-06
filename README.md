@@ -24,6 +24,7 @@ Internal Coverage Report: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage
 **Table of Contents**
 - [ChatHPC Application](#chathpc-application)
     - [Installation](#installation)
+    - [Docker Usage](#docker-usage)
     - [Setup pre-commit Git hooks](#setup-pre-commit-git-hooks)
     - [Quick Start](#quick-start)
     - [CLI Interface](#cli-interface)
@@ -57,6 +58,96 @@ For use in virtual environment:
 python3 -m venv --upgrade-deps --prompt $(basename $PWD) .venv
 source .venv/bin/activate
 pip install git+ssh://git@github.com/ORNL/ChatHPC-app.git
+```
+
+## Docker Usage
+
+### Pull and Run Pre-built Image
+
+Pull the latest image from GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/ornl/chathpc-app:latest
+```
+
+Run the ChatHPC CLI:
+
+```bash
+# Show help
+docker run --rm ghcr.io/ornl/chathpc-app:latest
+
+# Run with your data (mount volumes as needed)
+docker run --rm -v $(pwd):/data ghcr.io/ornl/chathpc-app:latest chathpc --config /data/config.json
+
+# Interactive shell
+docker run --rm -it ghcr.io/ornl/chathpc-app:latest /bin/bash
+```
+
+### GPU Support
+
+To use GPU acceleration with the Docker container, you need to install the NVIDIA Container Toolkit and pass GPU access to Docker.
+
+**Install NVIDIA Container Toolkit:**
+
+```bash
+# Add NVIDIA package repositories
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+
+# Install nvidia-container-toolkit
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+
+# Restart Docker daemon
+sudo systemctl restart docker
+```
+
+**Run with GPU access:**
+
+```bash
+# Run with all GPUs
+docker run --rm --gpus all ghcr.io/ornl/chathpc-app:latest
+
+# Run with specific GPU(s)
+docker run --rm --gpus '"device=0"' ghcr.io/ornl/chathpc-app:latest
+docker run --rm --gpus '"device=0,1"' ghcr.io/ornl/chathpc-app:latest
+
+# Run with GPU and mount data
+docker run --rm --gpus all -v $(pwd):/data ghcr.io/ornl/chathpc-app:latest chathpc --config /data/config.json
+
+# Verify GPU access inside container
+docker run --rm --gpus all ghcr.io/ornl/chathpc-app:latest nvidia-smi
+```
+
+**Note:** The Docker image includes CUDA libraries, but the host system must have compatible NVIDIA drivers installed.
+
+### Build Image Locally
+
+Build the Docker image from the repository:
+
+```bash
+git clone git@github.com:ORNL/ChatHPC-app.git
+cd ChatHPC-app
+docker build -t chathpc-app .
+```
+
+Run locally built image:
+
+```bash
+docker run --rm chathpc-app
+```
+
+### Available Tags
+
+- `latest` - Latest build from main branch
+- `<branch-name>` - Latest build from specific branch
+- `<sha>` - Specific commit SHA
+
+Example:
+```bash
+docker pull ghcr.io/ornl/chathpc-app:main
+docker pull ghcr.io/ornl/chathpc-app:abc1234
 ```
 
 ## Setup pre-commit Git hooks

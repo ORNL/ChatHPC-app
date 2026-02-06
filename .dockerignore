@@ -1,0 +1,73 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD (except Dockerfile)
+.github/workflows
+.gitlab-ci.yml
+
+# Python cache
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+
+# Testing and coverage
+.pytest_cache
+.coverage
+coverage_html_report/
+coverage.xml
+htmlcov/
+.tox/
+test-results.xml
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+.hatch/
+
+# Linting and formatting
+.ruff_cache/
+fmt.out
+metrics.txt
+
+# Documentation
+site/
+docs/_build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Local development files
+*.log
+commit.txt
+bad-json.json
+*.local
+
+# Pre-commit
+.pre-commit-config.yaml
+
+# Lock files (if using uv.lock, keep it; otherwise exclude)
+# uv.lock
+
+# Other
+.editorconfig
+.mdlrc
+.tags
+Dockerfile
+.dockerignore

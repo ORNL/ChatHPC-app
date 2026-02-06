@@ -1,0 +1,391 @@
+name: CI
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
+  checks: write
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+      branch-tag: ${{ steps.branch.outputs.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set image name (lowercase)
+        id: image
+        run: echo "name=$(echo ghcr.io/${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+      - name: Set branch name
+        id: branch
+        run: echo "name=$(echo ${{ github.ref }} | sed 's|refs/heads/||' | tr '/' '-')" >> "$GITHUB_OUTPUT"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.image.outputs.name }}:${{ github.sha }},${{ steps.image.outputs.name }}:${{ steps.branch.outputs.name }},${{ steps.image.outputs.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Wait for image availability
+        run: sleep 30
+      - name: Test image
+        run: |
+          docker pull ${{ steps.image.outputs.name }}:${{ github.sha }}
+          docker run --rm ${{ steps.image.outputs.name }}:${{ github.sha }} python -c "import chathpc.app; print(chathpc.app.__doc__)"
+      - name: Clean up old images
+        uses: actions/delete-package-versions@v4
+        with:
+          package-name: 'chathpc-app'
+          package-type: 'container'
+          min-versions-to-keep: 10
+          delete-only-untagged-versions: false
+
+  check_format:
+    name: Check format
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convert SSH URLs to HTTPS
+        run: ./scripts/pyproject_ssh_to_https.sh
+
+      - name: Run formatter
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          # Always create outputs
+          : > fmt.out
+          : > metrics.txt
+
+          # Run hatch fmt, capture exit code, keep full output
+          set +e
+          hatch fmt 2>&1 | tee fmt.out
+          fmt_rc=${PIPESTATUS[0]}
+          set -e
+
+          # Derive lint error count as best-effort (defaults to 0 if unknown)
+          # Adjust the regex to match your formatter's actual output.
+          lint_errors="$(grep -Eo 'Found[[:space:]]+[0-9]+[[:space:]]+errors' fmt.out \
+            | tail -n 1 | grep -Eo '[0-9]+' || true)"
+          lint_errors="${lint_errors:-0}"
+
+          echo "lint_errors ${lint_errors}" > metrics.txt
+          cat metrics.txt
+
+          # Fail if hatch fmt failed OR lint_errors > 0
+          if [[ "${fmt_rc}" -ne 0 || "${lint_errors}" -ne 0 ]]; then
+            echo "Formatting/lint issues detected."
+            exit 1
+          fi
+
+      - name: Upload format summary
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          {
+            echo "## Format results"
+            echo
+            if [[ -f metrics.txt ]]; then
+              echo "Format lint errors:"
+              echo
+              echo '```'
+              cat metrics.txt
+              echo '```'
+            else
+              echo "metrics.txt not found"
+            fi
+
+            echo
+            if [[ -f fmt.out ]]; then
+              echo "Formatter output (last 200 lines):"
+              echo
+              echo '```'
+              tail -n 200 fmt.out
+              echo '```'
+            else
+              echo "fmt.out not found"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload format artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: format-results
+          path: |
+            fmt.out
+            metrics.txt
+
+      - name: Build format comment body
+        if: always() && github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          {
+            echo "## Format results"
+            echo
+            echo "**Metrics**"
+            echo '```'
+            cat metrics.txt 2>/dev/null || echo "metrics.txt missing"
+            echo '```'
+            echo
+            echo "**Formatter output (last 200 lines)**"
+            echo '```'
+            tail -n 200 fmt.out 2>/dev/null || echo "fmt.out missing"
+            echo '```'
+          } > pr_comment.md
+
+      - name: Post format comment
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: format-results
+          path: pr_comment.md
+
+  check_type:
+    name: Type check
+    runs-on: ubuntu-latest
+    needs: build
+    continue-on-error: true
+    container:
+      image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convert SSH URLs to HTTPS
+        run: ./scripts/pyproject_ssh_to_https.sh
+      - name: Run type checker
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          # Always create outputs
+          : > type_check.out
+          : > type_metrics.txt
+
+          # Run type checker, capture exit code, keep full output
+          set +e
+          ty check 2>&1 | tee type_check.out
+          type_rc=${PIPESTATUS[0]}
+          set -e
+
+          # Count errors (adjust regex if needed for your type checker output)
+          type_errors="$(grep -ci 'error' type_check.out || true)"
+
+          echo "type_errors ${type_errors}" > type_metrics.txt
+          echo "exit_code ${type_rc}" >> type_metrics.txt
+          cat type_metrics.txt
+
+          # Exit with the type checker's exit code
+          exit ${type_rc}
+
+      - name: Upload type check summary
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          {
+            echo "## Type check results"
+            echo
+            if [[ -f type_metrics.txt ]]; then
+              echo "Type check metrics:"
+              echo
+              echo '```'
+              cat type_metrics.txt
+              echo '```'
+            else
+              echo "type_metrics.txt not found"
+            fi
+
+            echo
+            if [[ -f type_check.out ]]; then
+              echo "Type checker output (last 200 lines):"
+              echo
+              echo '```'
+              tail -n 200 type_check.out
+              echo '```'
+            else
+              echo "type_check.out not found"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload type check artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: type-check-results
+          path: |
+            type_check.out
+            type_metrics.txt
+
+      - name: Build type check comment body
+        if: always() && github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          {
+            echo "## Type check results"
+            echo
+            echo "**Metrics**"
+            echo '```'
+            cat type_metrics.txt 2>/dev/null || echo "type_metrics.txt missing"
+            echo '```'
+            echo
+            echo "**Type checker output (last 200 lines)**"
+            echo '```'
+            tail -n 200 type_check.out 2>/dev/null || echo "type_check.out missing"
+            echo '```'
+          } > type_pr_comment.md
+
+      - name: Post type check comment
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: type-check-results
+          path: type_pr_comment.md
+
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convert SSH URLs to HTTPS
+        run: ./scripts/pyproject_ssh_to_https.sh
+      - name: Build docs
+        shell: bash
+        run: |
+          set -e
+          hatch run docs:build
+      - name: Upload docs site
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure git safe directory
+        run: git config --global --add safe.directory '*'
+      - name: Convert SSH URLs to HTTPS
+        run: ./scripts/pyproject_ssh_to_https.sh
+      - name: Run tests
+        shell: bash
+        run: |
+          set -e
+          pytest --junit-xml=test-results.xml
+      - name: Publish test results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: test-results.xml
+
+  test_scripts:
+    name: Test scripts
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convert SSH URLs to HTTPS
+        run: ./scripts/pyproject_ssh_to_https.sh
+      - name: Run script tests
+        shell: bash
+        run: |
+          set -e
+          ./scripts/test_commands.sh
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure git safe directory
+        run: git config --global --add safe.directory '*'
+      - name: Convert SSH URLs to HTTPS
+        run: ./scripts/pyproject_ssh_to_https.sh
+      - name: Run coverage
+        shell: bash
+        run: |
+          set -e
+          pytest --cov --cov-report=html:coverage_html_report --cov-report=xml:coverage.xml
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            coverage_html_report
+            coverage.xml
+      - name: Report coverage
+        if: github.event_name == 'pull_request'
+        uses: orgoro/coverage@v3.2
+        with:
+          coverageFile: coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Coverage summary
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          if [[ ! -f coverage.xml ]]; then
+            echo "## Coverage results" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "coverage.xml not found" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # Extract overall line-rate (Cobertura format)
+          line_rate="$(grep -oP 'line-rate="\K[0-9.]+' coverage.xml | head -n 1)"
+          percent="$(awk "BEGIN { printf \"%.1f\", ${line_rate} * 100 }")"
+
+          {
+            echo "## Coverage results"
+            echo
+            echo "| Metric | Value |"
+            echo "|--------|-------|"
+            echo "| Line coverage | ${percent}% |"
+            echo
+            echo "**Artifacts:**"
+            echo "- coverage.xml"
+            echo "- coverage_html_report/"
+          } >> "$GITHUB_STEP_SUMMARY"

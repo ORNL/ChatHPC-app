@@ -53,6 +53,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest",
+    "pytest-cov",
     "ruff==0.14.6",
     "ty",
     "hatch",
