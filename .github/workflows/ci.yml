@@ -48,6 +48,10 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Wait for image availability
         run: sleep 30
+      - name: Test image
+        run: |
+          docker pull ${{ steps.image.outputs.name }}:${{ github.sha }}
+          docker run --rm ${{ steps.image.outputs.name }}:${{ github.sha }} uv run python -c "import chathpc.app; print(chathpc.app.__doc__)"
       - name: Clean up old images
         uses: actions/delete-package-versions@v4
         with:
@@ -78,7 +82,7 @@ jobs:
 
           # Run hatch fmt, capture exit code, keep full output
           set +e
-          hatch fmt 2>&1 | tee fmt.out
+          uv run hatch fmt 2>&1 | tee fmt.out
           fmt_rc=${PIPESTATUS[0]}
           set -e
 
@@ -163,6 +167,108 @@ jobs:
           header: format-results
           path: pr_comment.md
 
+  check_type:
+    name: Type check
+    runs-on: ubuntu-latest
+    needs: build
+    continue-on-error: true
+    container:
+      image: ghcr.io/ornl/chathpc-app:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convert SSH URLs to HTTPS
+        run: ./scripts/pyproject_ssh_to_https.sh
+      - name: Run type checker
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          # Always create outputs
+          : > type_check.out
+          : > type_metrics.txt
+
+          # Run type checker, capture exit code, keep full output
+          set +e
+          uv run --all-groups ty check 2>&1 | tee type_check.out
+          type_rc=${PIPESTATUS[0]}
+          set -e
+
+          # Count errors (adjust regex if needed for your type checker output)
+          type_errors="$(grep -ci 'error' type_check.out || true)"
+
+          echo "type_errors ${type_errors}" > type_metrics.txt
+          echo "exit_code ${type_rc}" >> type_metrics.txt
+          cat type_metrics.txt
+
+          # Exit with the type checker's exit code
+          exit ${type_rc}
+
+      - name: Upload type check summary
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          {
+            echo "## Type check results"
+            echo
+            if [[ -f type_metrics.txt ]]; then
+              echo "Type check metrics:"
+              echo
+              echo '```'
+              cat type_metrics.txt
+              echo '```'
+            else
+              echo "type_metrics.txt not found"
+            fi
+
+            echo
+            if [[ -f type_check.out ]]; then
+              echo "Type checker output (last 200 lines):"
+              echo
+              echo '```'
+              tail -n 200 type_check.out
+              echo '```'
+            else
+              echo "type_check.out not found"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload type check artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: type-check-results
+          path: |
+            type_check.out
+            type_metrics.txt
+
+      - name: Build type check comment body
+        if: always() && github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          {
+            echo "## Type check results"
+            echo
+            echo "**Metrics**"
+            echo '```'
+            cat type_metrics.txt 2>/dev/null || echo "type_metrics.txt missing"
+            echo '```'
+            echo
+            echo "**Type checker output (last 200 lines)**"
+            echo '```'
+            tail -n 200 type_check.out 2>/dev/null || echo "type_check.out missing"
+            echo '```'
+          } > type_pr_comment.md
+
+      - name: Post type check comment
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: type-check-results
+          path: type_pr_comment.md
+
   docs:
     name: Docs
     runs-on: ubuntu-latest
@@ -177,7 +283,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          hatch run docs:build
+          uv run hatch run docs:build
       - name: Upload docs site
         if: always()
         uses: actions/upload-artifact@v4
@@ -201,7 +307,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          hatch run test -- --junit-xml=test-results.xml
+          uv run hatch run test -- --junit-xml=test-results.xml
       - name: Publish test results
         if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -240,7 +346,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          hatch run cov-html
+          uv run hatch run cov-html
       - name: Upload coverage artifacts
         if: always()
         uses: actions/upload-artifact@v4

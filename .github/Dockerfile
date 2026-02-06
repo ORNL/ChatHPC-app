@@ -1,8 +1,12 @@
 FROM python:3.11-slim
 
 # Install build dependencies and clean up aggressively
-RUN apt-get update && apt-get install -y --no-install-recommends git \
+RUN apt-get update && apt-get install -y --no-install-recommends git curl \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
 
 # Set working directory
 WORKDIR /app
@@ -10,18 +14,18 @@ WORKDIR /app
 # Copy source code
 COPY . .
 
-# Install hatch and build tools
-RUN pip install --no-cache-dir hatch hatch-mkdocs \
-    && pip cache purge
-
 # Convert SSH URLs to HTTPS in pyproject.toml
 RUN bash ./scripts/pyproject_ssh_to_https.sh
 
-# Install the package and all dependencies
-RUN pip install --no-cache-dir . \
-    && pip cache purge \
-    && find /usr/local/lib/python3.11/site-packages -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true \
-    && find /usr/local/lib/python3.11/site-packages -type d -name "*.dist-info" -prune -o -type f -name "*.pyc" -delete 2>/dev/null || true
+# Create venv and install dependencies with uv
+RUN uv venv --seed --python 3.11 \
+    && . .venv/bin/activate \
+    && uv sync --all-groups \
+    && find .venv -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true \
+    && find .venv -type f -name "*.pyc" -delete 2>/dev/null || true
+
+# Activate venv by default
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Set default command
 CMD ["/bin/bash"]
