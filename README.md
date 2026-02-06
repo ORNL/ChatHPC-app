@@ -2,6 +2,17 @@
 
 [![DOI](https://zenodo.org/badge/1023856406.svg)](https://doi.org/10.5281/zenodo.16746629)
 
+**GitHub Status:**
+
+[![GitHub CI](https://github.com/ORNL/ChatHPC-app/actions/workflows/ci.yml/badge.svg)](https://github.com/ORNL/ChatHPC-app/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/ORNL/ChatHPC-app)](https://github.com/ORNL/ChatHPC-app/releases/latest)
+
+**GitLab Status** *(requires access and sign-in to code.ornl.gov)*:
+
+[![GitLab CI](https://code.ornl.gov/ChatHPC/ChatHPC-app/badges/main/pipeline.svg)](https://code.ornl.gov/ChatHPC/ChatHPC-app/-/pipelines)
+[![Coverage](https://code.ornl.gov/ChatHPC/ChatHPC-app/badges/main/coverage.svg)](https://devdocs.ornl.gov/ChatHPC/ChatHPC-app/coverage)
+[![GitLab Release](https://code.ornl.gov/ChatHPC/ChatHPC-app/-/badges/release.svg)](https://code.ornl.gov/ChatHPC/ChatHPC-app/-/releases)
+
 Documentation: <https://chathpc-app.readthedocs.io/>
 
 Internal Development Documentation: <https://devdocs.ornl.gov/ChatHPC/ChatHPC-app>
