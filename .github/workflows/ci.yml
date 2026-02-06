@@ -51,7 +51,7 @@ jobs:
       - name: Test image
         run: |
           docker pull ${{ steps.image.outputs.name }}:${{ github.sha }}
-          docker run --rm ${{ steps.image.outputs.name }}:${{ github.sha }} uv run python -c "import chathpc.app; print(chathpc.app.__doc__)"
+          docker run --rm ${{ steps.image.outputs.name }}:${{ github.sha }} python -c "import chathpc.app; print(chathpc.app.__doc__)"
       - name: Clean up old images
         uses: actions/delete-package-versions@v4
         with:
@@ -82,7 +82,7 @@ jobs:
 
           # Run hatch fmt, capture exit code, keep full output
           set +e
-          uv run hatch fmt 2>&1 | tee fmt.out
+          hatch fmt 2>&1 | tee fmt.out
           fmt_rc=${PIPESTATUS[0]}
           set -e
 
@@ -189,7 +189,7 @@ jobs:
 
           # Run type checker, capture exit code, keep full output
           set +e
-          uv run --all-groups ty check 2>&1 | tee type_check.out
+          ty check 2>&1 | tee type_check.out
           type_rc=${PIPESTATUS[0]}
           set -e
 
@@ -283,7 +283,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          uv run hatch run docs:build
+          hatch run docs:build
       - name: Upload docs site
         if: always()
         uses: actions/upload-artifact@v4
@@ -307,7 +307,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          uv run hatch run test -- --junit-xml=test-results.xml
+          hatch run test -- --junit-xml=test-results.xml
       - name: Publish test results
         if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -346,7 +346,7 @@ jobs:
         shell: bash
         run: |
           set -e
-          uv run hatch run cov-html
+          hatch run cov-html
       - name: Upload coverage artifacts
         if: always()
         uses: actions/upload-artifact@v4
