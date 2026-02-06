@@ -18,9 +18,12 @@ COPY . .
 RUN bash ./scripts/pyproject_ssh_to_https.sh
 
 # Create venv and install dependencies with uv
+# Set UV cache to /app to allow hardlinking (same filesystem)
+ENV UV_CACHE_DIR=/app/.uv-cache
 RUN uv venv --seed --python 3.11 \
     && . .venv/bin/activate \
     && uv sync --all-groups \
+    && rm -rf /app/.uv-cache \
     && find .venv -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true \
     && find .venv -type f -name "*.pyc" -delete 2>/dev/null || true
 
