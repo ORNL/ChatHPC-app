@@ -4,7 +4,7 @@
 
 **GitHub Status:**
 
-[![GitHub CI](https://github.com/ORNL/ChatHPC-app/actions/workflows/ci.yml/badge.svg)](https://github.com/ORNL/ChatHPC-app/actions/workflows/ci-github-runners.yml)
+[![GitHub CI](https://github.com/ORNL/ChatHPC-app/actions/workflows/ci-github-runners.yml/badge.svg)](https://github.com/ORNL/ChatHPC-app/actions/workflows/ci-github-runners.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/ORNL/ChatHPC-app)](https://github.com/ORNL/ChatHPC-app/releases/latest)
 
 **GitLab Status** *(requires access and sign-in to code.ornl.gov)*:
